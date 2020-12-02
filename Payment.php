@@ -31,6 +31,7 @@ class Payment extends \MapasCulturais\Entity {
     const STATUS_PENDING = 0;
     const STATUS_PROCESSING = 1;
     const STATUS_FAILED = 2;
+    const STATUS_EXPORTED = 3;
     const STATUS_AVAILABLE = 8;
     const STATUS_PAID = 10;
     

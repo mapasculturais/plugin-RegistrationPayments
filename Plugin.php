@@ -3,6 +3,7 @@
 namespace RegistrationPayments;
 
 use MapasCulturais\App;
+use MapasCulturais\i;
 
 class Plugin extends \MapasCulturais\Plugin{
     function _init() {
@@ -49,6 +50,28 @@ class Plugin extends \MapasCulturais\Plugin{
     }
 
     function register () {
-        
+        $this->registerAgentMetadata('payment_bank_account_type', [
+            'label' => i::__('Tipo da conta bancária para pagamentos'),
+            'type' => 'string',
+            'private' => true,
+        ]);
+
+        $this->registerAgentMetadata('payment_bank_account_number', [
+            'label' => i::__('Número da conta bancária para pagamentos'),
+            'type' => 'string',
+            'private' => true,
+        ]);
+
+        $this->registerAgentMetadata('payment_bank_branch', [
+            'label' => i::__('Agência bancária para pagamentos'),
+            'type' => 'string',
+            'private' => true,
+        ]);
+
+        $this->registerAgentMetadata('payment_bank_number', [
+            'label' => i::__('Número do banco para pagamentos'),
+            'type' => 'string',
+            'private' => true,
+        ]);
     }
 }

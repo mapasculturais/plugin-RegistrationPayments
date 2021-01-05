@@ -5,6 +5,7 @@ namespace RegistrationPayments;
 use MapasCulturais\App;
 
 class Plugin extends \MapasCulturais\Plugin{
+
     function _init() {
         $app = App::i();
 
@@ -46,9 +47,50 @@ class Plugin extends \MapasCulturais\Plugin{
             $conn->commit();
         }
 
+        // Adiciona tab de Pagamentos na single da Oportunidade
+        $app->hook('template(opportunity.single.tabs):end', function () use ($app) {
+
+            if (!$app->user->is('admin')) {
+                return;
+            }
+
+            $entity = $this->controller->requestedEntity;
+            // $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+
+        });
+
+        // Adiciona o conteúdo da aba Pagamentos na single da Oportunidade
+        $app->hook('template(opportunity.single.tabs-content):end', function () use ($app) {
+
+            if (!$app->user->is('admin')) {
+                return;
+            }
+
+            $entity = $this->controller->requestedEntity;
+            // $this->part('singles/opportunity-payments', ['entity' => $entity]);
+
+        });
+
     }
 
-    function register () {
+    function register() {
         
+        $app = App::i();
+        $app->registerController('payment', Controller::class);
+
+        $self = $this;
+        $app->hook('view.includeAngularEntityAssets:after', function () use ($self) {
+            $self->enqueueScriptsAndStyles();
+        });
+
     }
+
+    function enqueueScriptsAndStyles()
+    {
+        $app = App::i();
+
+        $app->view->enqueueScript('app', 'regitration-payments', 'js/ng.registrationPayments.js', ['entity.module.opportunity']);
+        $app->view->jsObject['angularAppDependencies'][] = 'ng.registrationPayments';
+    }
+    
 }

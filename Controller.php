@@ -45,10 +45,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $queryResults = $conn->fetchAll("
             SELECT r.id, r.number, p.payment_date, p.amount, p.status
             FROM registration r
-            JOIN payment p
+            RIGHT JOIN payment p
             ON r.id = p.registration_id
             WHERE
                 p.opportunity_id = :opp
+            ORDER BY r.id
         ", $params);
 
         foreach($queryResults as $key => $value) {

@@ -18,11 +18,14 @@
                 <th class="registration-status-col">
                     <?php \MapasCulturais\i::_e("Status"); ?>
                 </th>
+                <th class="registration-status-col">
+                    <?php \MapasCulturais\i::_e("Ações"); ?>
+                </th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td colspan='4'>
+                <td colspan='5'>
                     <span ng-if="data.payments.length === 0"><?php \MapasCulturais\i::_e("Nenhum pagamento registrado."); ?></span>
                     <span ng-if="data.payments.length === 1"><?php \MapasCulturais\i::_e("1 pagamento encontrado."); ?></span>
                     <span ng-if="data.payments.length > 1">{{data.payments.length}}
@@ -35,7 +38,7 @@
             </tr>
 
             <tr ng-repeat="payment in data.payments" id="payment-{{payment.id}}">
-
+        
                 <td class="registration-id-col">
                     <a href='{{payment.url}}' rel='noopener noreferrer'>
                         <strong>{{payment.number}}</strong>
@@ -52,10 +55,29 @@
                 </td>
 
                 <td class="registration-id-col">
-                    {{getEvaluationResultString(payment)}}
+                    {{getPaymentStatusString(payment.status)}}
+                </td>
+                <td class="registration-id-col">
+                    <a ng-click="data.editPayment=payment">Editar</a>
+                    <button ng-click="deletePayment(payment)">Deletar</button>
                 </td>
 
             </tr>
         </tbody>
     </table>
+
+    <div ng-class="{hidden:!data.editPayment}" >
+        {{data.editPayment.number}}
+        <input type="text" ng-model="data.editPayment.payment_date">
+        <input type="text" ng-model="data.editPayment.amount">
+        <select ng-model="data.editPayment.status">
+            <option value="1">Pendente</option>
+            <option value="2">Falha</option>
+            <option value="10">Pago</option>
+        </select>
+        <button ng-click="savePayment(data.editPayment)">Salvar</button>
+        <button ng-click="data.editPayment=null">Cancelar</button>        
+    </div>
 </div>
+
+

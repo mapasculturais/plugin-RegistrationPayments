@@ -16,11 +16,59 @@
 
         $scope.data = {
             payments: [],
+            editPayment: null
         };
 
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id}).success(function (data){
             $scope.data.payments = data;
         });
+
+        
+        $scope.savePayment = function (payment) {            
+            RegistrationPaymentsService.update(payment).success(function () {
+                MapasCulturais.Messages.success("Pagamento editado com sucesso");
+            });
+        }
+
+        $scope.deletePayment = function(payment){
+            if(!confirm("Você tem certeza que quer deletar esse pagamento?")){
+                return;
+            }
+
+            RegistrationPaymentsService.remove(payment).success(function (){
+                MapasCulturais.Messages.success("Pagamento deletado com sucesso");
+                var index = $scope.data.payments.indexOf(payment);
+
+                $scope.data.payments.splice(index,1);
+            });
+        }
+
+        $scope.getPaymentStatusString = function(status){
+            switch (parseInt(status)) {
+                case 0:
+                    return "Pendente"
+                    break;
+                case 1:
+                    return "Processando"
+                    break;
+                case 2:
+                    return "Falha"
+                    break;
+                case 3:
+                    return "Exportado"
+                    break;
+                case 8:
+                    return "Disponível"
+                    break;
+                case 10:
+                    return "Pago"
+                    break;
+            
+                default:
+                    return status
+                    break;
+            }
+        }
 
     }]);
 
@@ -37,6 +85,18 @@
                         $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
                     });
             },
+
+            remove: function(payment){
+                var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);
+                return $http.delete(url, {});
+            },
+
+            update: function(payment){
+                var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);
+                console.log(payment);
+                return $http.patch(url, {status:payment.status});
+            }
+        
         };
     }]);
 

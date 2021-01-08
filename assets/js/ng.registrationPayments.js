@@ -70,6 +70,32 @@
             }
         }
 
+        $scope.openModal = function(string){
+
+            $('#blockdiv').show();
+            $('body').css('overflow','hidden');
+
+            var $dialog = $('.payment-modal');
+
+            var top = $dialog.height() + 100 > $(window).height() ? $(window).scrollTop() + 100 : $(window).scrollTop() + ( $(window).height() - $dialog.height()) / 2 - 100;
+            
+            $dialog.css({
+                top: top,
+                left: '50%',
+                marginLeft: -$dialog.width() / 2,
+                opacity: 1,
+                display: 'block'
+            });
+
+        }
+
+        $scope.closeModal = function(payment){
+
+            $('#blockdiv').hide();
+            $('body').css('overflow','auto');
+
+        }
+
     }]);
 
     module.factory('RegistrationPaymentsService', ['$http', '$rootScope', 'UrlService', function ($http, $rootScope, UrlService) {

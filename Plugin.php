@@ -83,6 +83,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app = App::i();
 
         $app->view->enqueueScript('app', 'regitration-payments', 'js/ng.registrationPayments.js', ['entity.module.opportunity']);
+        $app->view->enqueueStyle('app', 'regitration-payments', 'css/modal.css');
         $app->view->jsObject['angularAppDependencies'][] = 'ng.registrationPayments';
 
     }

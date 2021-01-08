@@ -38,7 +38,7 @@
             </tr>
 
             <tr ng-repeat="payment in data.payments" id="payment-{{payment.id}}">
-        
+
                 <td class="registration-id-col">
                     <a href='{{payment.url}}' rel='noopener noreferrer'>
                         <strong>{{payment.number}}</strong>
@@ -58,7 +58,7 @@
                     {{getPaymentStatusString(payment.status)}}
                 </td>
                 <td class="registration-id-col">
-                    <a ng-click="data.editPayment=payment">Editar</a>
+                    <a ng-click="data.editPayment=payment; openModal()">Editar</a>
                     <button ng-click="deletePayment(payment)">Deletar</button>
                 </td>
 
@@ -66,8 +66,9 @@
         </tbody>
     </table>
 
-    <div ng-class="{hidden:!data.editPayment}" >
-        {{data.editPayment.number}}
+    <div ng-class="{hidden:!data.editPayment}" class="payment-modal js-dialog">
+        <h2>Editar pagamento: {{data.editPayment.number}}</h2>
+
         <input type="text" ng-model="data.editPayment.payment_date">
         <input type="text" ng-model="data.editPayment.amount">
         <select ng-model="data.editPayment.status">
@@ -75,9 +76,9 @@
             <option value="2">Falha</option>
             <option value="10">Pago</option>
         </select>
-        <button ng-click="savePayment(data.editPayment)">Salvar</button>
-        <button ng-click="data.editPayment=null">Cancelar</button>        
+        <button ng-click="savePayment(data.editPayment); closeModal()">Salvar</button>
+        <button ng-click="data.editPayment = null; closeModal()">Cancelar</button>
     </div>
+
 </div>
-
-
+<div id="paymentModal" style="background-color: rgba(0, 0, 0, 0.6); width: 100%; height: 100%; position: absolute; z-index: 1800; top: 0px; left: 0px; display: none;"></div>

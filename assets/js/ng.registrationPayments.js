@@ -19,9 +19,17 @@
             editPayment: null
         };
         
-        RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id}).success(function (data){
+        RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:""}).success(function (data){
             $scope.data.payments = data;
         });
+
+       $scope.search = function (){
+           var search = $("#search").val()
+           RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search}).success(function (data){
+                $scope.data.payments = data;
+            });
+
+       }
         
         $scope.savePayment = function (payment) {                        
             RegistrationPaymentsService.update(payment).success(function () {
@@ -125,8 +133,8 @@
 
     module.factory('RegistrationPaymentsService', ['$http', '$rootScope', 'UrlService', function ($http, $rootScope, UrlService) {
         return {
-            find: function (data) {
-                var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id});
+            find: function (data) {                
+                var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id, search:data.search});                
                 
                 return $http.get(url, data).
                     success(function (data, status) {
@@ -153,7 +161,11 @@
                 }               
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);
-            }
+            },
+
+            searsh: function (data) {
+                
+            },
         
         };
     }]);

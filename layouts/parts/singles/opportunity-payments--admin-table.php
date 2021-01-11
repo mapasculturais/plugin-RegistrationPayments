@@ -11,12 +11,10 @@ use MapasCulturais\i;
     <header id="header-inscritos" class="clearfix">
         <h3><?php \MapasCulturais\i::_e("Pagamentos"); ?></h3>
     </header>
-
     <div id="payments-filter">
-        <span class="label"> <?php i::_e("Filtrar pagamento:"); ?> </span>
-        <input ng-model="data.registrationsFilter" placeholder="<?php i::_e('Busque pelo número de inscrição') ?>" />
+        <span class="label"> Filtrar inscrição: </span>
+        <input id="search" ng-keyup="search()" placeholder="Busque pelo número de inscrição, status da avaliação, nome ou cpf do responsável" class="ng-pristine ng-untouched ng-valid ng-empty">
     </div>
-
     <table class="js-registration-list registrations-table" ng-class="{'no-options': data.entity.registrationCategories.length === 0, 'no-attachments': data.entity.registrationFileConfigurations.length === 0, 'registrations-results': data.entity.published}">
         <thead>
             <tr>

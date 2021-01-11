@@ -84,6 +84,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      */
     function GET_findPayments($opportunity_id =  null)
     {
+       
         $this->requireAuthentication();
 
         $opportunity_id = $this->data['opportunity'];
@@ -91,7 +92,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $conn = $app->em->getConnection();
 
-        $params = ['opp' => $opportunity_id];
+        $params = [
+            'opp' => $opportunity_id,
+            'search' => "%".$this->data['search']."%"
+        ];
 
         $queryResults = $conn->fetchAll("
             SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status
@@ -99,7 +103,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             RIGHT JOIN payment p
             ON r.id = p.registration_id
             WHERE
-                p.opportunity_id = :opp
+                p.opportunity_id = :opp AND
+                r.number like :search
             ORDER BY r.id
         ", $params);        
 

@@ -46,38 +46,39 @@
                 </td>
 
                 <td class="registration-id-col">
-                    {{ payment.payment_date }}
+                    {{getDatePaymentString(payment.payment_date)}}
                 </td>
 
                 <td class="registration-id-col">
-                    {{ payment.amount }}
+                    {{getAmountPaymentString(payment.amount) }}
 
                 </td>
 
                 <td class="registration-id-col">
                     {{getPaymentStatusString(payment.status)}}
                 </td>
-                <td class="registration-id-col">
-                    <a ng-click="data.editPayment=payment; openModal()">Editar</a>
-                    <button ng-click="deletePayment(payment)">Deletar</button>
+                <td class="registration-id-col actions-icons">
+                    <a ng-click="data.editPayment=startEdition(payment); openModal()" title="Editar pagamento"><i class="fas fa-edit"></i></a>
+                    <a ng-click="deletePayment(payment)" title="Excluir pagamento"><i class="far fa-trash-alt"></i></a>
                 </td>
-
             </tr>
         </tbody>
     </table>
 
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal js-dialog">
         <h2>Editar pagamento: {{data.editPayment.number}}</h2>
-
-        <input type="text" ng-model="data.editPayment.payment_date">
-        <input type="text" ng-model="data.editPayment.amount">
-        <select ng-model="data.editPayment.status">
-            <option value="1">Pendente</option>
-            <option value="2">Falha</option>
-            <option value="10">Pago</option>
+        <input type="date" ng-model="data.editPayment.payment_date" id="date_payment">
+        <input type="text" ng-model="data.editPayment.amount" id="amount">
+        <select ng-model="data.editPayment.status">        
+            <option value="0" ng-selected="data.editPayment.status === 0">Pendente</option>
+            <option value="1" ng-selected="data.editPayment.status === 1">Em processo</option>
+            <option value="2" ng-selected="data.editPayment.status === 2">Falha</option>
+            <option value="3" ng-selected="data.editPayment.status === 3">Exportado</option>
+            <option value="8" ng-selected="data.editPayment.status === 8">Disponível</option>
+            <option value="10" ng-selected="data.editPayment.status === 10">Pago</option>
         </select>
-        <button ng-click="savePayment(data.editPayment); closeModal()">Salvar</button>
-        <button ng-click="data.editPayment = null; closeModal()">Cancelar</button>
+        <button ng-click="savePayment(data.editPayment);" class="js-close">Salvar</button>
+        <button ng-click="data.editPayment = null;" class="js-close">Cancelar</button>
     </div>
 
 </div>

@@ -60,7 +60,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            // $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+            //$this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
 
         });
 
@@ -72,7 +72,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            // $this->part('singles/opportunity-payments', ['entity' => $entity]);
+            //$this->part('singles/opportunity-payments', ['entity' => $entity]);
 
         });
 
@@ -83,6 +83,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app = App::i();
 
         $app->view->enqueueScript('app', 'regitration-payments', 'js/ng.registrationPayments.js', ['entity.module.opportunity']);
+        $app->view->enqueueStyle('app', 'fontawesome', 'https://use.fontawesome.com/releases/v5.8.2/css/all.css');
         $app->view->enqueueStyle('app', 'regitration-payments', 'css/modal.css');
         $app->view->jsObject['angularAppDependencies'][] = 'ng.registrationPayments';
 

@@ -2,14 +2,7 @@
     position: fixed !important;
 }
 
-.controller-opportunity .payment-modal {
-    position: absolute;
-    display: none;
-    margin-top: 15px;
-    padding: 1.5rem;
-    z-index: 2000;
-    background: #fff;
-    border-top: 4px solid #1c5690;
-    border-radius: 2px;
-    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.3);
+.actions-icons i{
+    margin: 5px;
+    font-size: 14px;
 }

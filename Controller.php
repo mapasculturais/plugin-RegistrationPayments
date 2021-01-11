@@ -101,21 +101,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             WHERE
                 p.opportunity_id = :opp
             ORDER BY r.id
-        ", $params);
-
-        foreach($queryResults as $key => $value) {            
-
-            if ($value['payment_date']) {
-                $queryResults[$key]['payment_date'] = date("d/m/Y", strtotime($value['payment_date']));
-            }
-
-            if ($value['amount']) {
-                $queryResults[$key]['amount'] = 'R$ ' . number_format($value['amount'], '2', ',', '.');
-            }
-
-            $queryResults[$key]['url'] = $app->createUrl('inscricao', $value['id']);
-
-        }
+        ", $params);        
 
         //$this->apiAddHeaderMetadata($this->data, $_result, $queryResults);
         $this->apiResponse($queryResults);
@@ -128,6 +114,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      * @apiParam {Array} [data] Array com valores para popular os atributos da entidade. Use o método describe para descobrir os atributos. 
      */
     function PATCH_single($data = null) {
+       
         $this->requireAuthentication();
 
         if (is_null($data)) {
@@ -147,7 +134,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         //Atribui a propriedade editada
         foreach($data as $field => $value){
-           
             $entity->$field = $value;
         }
 
@@ -158,7 +144,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     $errors[$field] = $_errors[$field];
                 }
             }
-
+            
             if($errors){
                 $this->errorJson($errors, 400);
             }

@@ -1,8 +1,22 @@
+<?php
+
+namespace RegistrationPayments;
+
+use MapasCulturais\i;
+
+?>
+
 <div ng-controller='RegistrationPayments'>
 
     <header id="header-inscritos" class="clearfix">
         <h3><?php \MapasCulturais\i::_e("Pagamentos"); ?></h3>
     </header>
+
+    <div id="payments-filter">
+        <span class="label"> <?php i::_e("Filtrar pagamento:"); ?> </span>
+        <input ng-model="data.registrationsFilter" placeholder="<?php i::_e('Busque pelo número de inscrição') ?>" />
+    </div>
+
     <table class="js-registration-list registrations-table" ng-class="{'no-options': data.entity.registrationCategories.length === 0, 'no-attachments': data.entity.registrationFileConfigurations.length === 0, 'registrations-results': data.entity.published}">
         <thead>
             <tr>
@@ -69,7 +83,7 @@
         <h2>Editar pagamento: {{data.editPayment.number}}</h2>
         <input type="date" ng-model="data.editPayment.payment_date" id="date_payment">
         <input type="text" ng-model="data.editPayment.amount" id="amount">
-        <select ng-model="data.editPayment.status">        
+        <select ng-model="data.editPayment.status">
             <option value="0" ng-selected="data.editPayment.status === 0">Pendente</option>
             <option value="1" ng-selected="data.editPayment.status === 1">Em processo</option>
             <option value="2" ng-selected="data.editPayment.status === 2">Falha</option>

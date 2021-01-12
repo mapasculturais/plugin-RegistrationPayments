@@ -85,31 +85,64 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     function GET_findPayments($opportunity_id =  null)
     {
        
+        
         $this->requireAuthentication();
 
         $opportunity_id = $this->data['opportunity'];
+        $data = $this->data;       
 
         $app = App::i();
         $conn = $app->em->getConnection();
 
-        $params = [
-            'opp' => $opportunity_id,
-            'search' => "%".$this->data['search']."%"
-        ];
+        
+        $limit = isset($data['@limit']) ? $data['@limit'] : 50;
+        $page = isset($data['@page'] ) ? $data['@page'] : 1;
+        $search = isset($data['search']) ? $data['search'] : "";
+        $max = ($page * $limit);
+        $offset = ($page -1) * $limit;    
 
-        $queryResults = $conn->fetchAll("
+        //Busca os ids das inscrições
+        $payments = $conn->fetchAll("
             SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status
             FROM registration r
             RIGHT JOIN payment p
-            ON r.id = p.registration_id
-            WHERE
-                p.opportunity_id = :opp AND
-                r.number like :search
-            ORDER BY r.id
-        ", $params);        
+            ON r.id = p.registration_id WHERE
+            p.opportunity_id = :opp AND
+            r.number like :search
+            LIMIT :limit
+            OFFSET :offset", [
+                "opp" => $opportunity_id, 
+                "search" => "%".$search."%", 
+                "limit" => $limit,
+                'offset' => $offset
+            ]); 
 
-        //$this->apiAddHeaderMetadata($this->data, $_result, $queryResults);
-        $this->apiResponse($queryResults);
+            $paymentsResultString = array_map(function($payment) {
+                return [
+                    "id" => $payment['id'],
+                    "registration_id" => $payment['registration_id'],
+                    "number" => $payment['number'],
+                    "payment_date" => $payment['payment_date'],
+                    "amount" => (float) $payment['amount'],
+                    "status" => $payment['status'],
+                   
+                ];
+            },$payments);            
+        
+          
+      
+        //Pega o total de pagamentos cadastrados
+        $total = $conn->fetchAll("
+        SELECT count(p) as total
+        FROM registration r
+        RIGHT JOIN payment p
+        ON r.id = p.registration_id WHERE
+        p.opportunity_id = :opp ", ["opp" => $opportunity_id]);  
+        
+       
+
+        $this->apiAddHeaderMetadata($this->data, $payments, $total[0]['total']);
+        $this->apiResponse($paymentsResultString);
     }
 
      /**

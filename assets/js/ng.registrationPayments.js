@@ -13,32 +13,44 @@
     }]);
 
     module.controller('RegistrationPayments',['$scope', 'RegistrationPaymentsService', function($scope, RegistrationPaymentsService){
-
+        
         $scope.data = {
             payments: [],
             editPayment: null
         };
         
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:""}).success(function (data){
-            $scope.data.payments = data;
+            $scope.data.payments = $scope.data.payments.concat(data);
         });
+        
 
        $scope.search = function (){
-           var search = $("#search").val()
-           RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search}).success(function (data){
-                $scope.data.payments = data;
+            var search = $("#search").val()
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search}).success(function (data){
+                $scope.data.payments = $scope.data.payments.concat(data);
             });
-
        }
+
+       $scope.loadMore = function(){
+
+           var search = $("#search").val();
+           var page = parseInt($("#page").val());
+           page++;
+
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page}).success(function (data){
+                $scope.data.payments = $scope.data.payments.concat(data);
+                $("#page").val(page);
+            });
+        }
         
         $scope.savePayment = function (payment) {                        
             RegistrationPaymentsService.update(payment).success(function () {
                 MapasCulturais.Messages.success("Pagamento editado com sucesso");                
                 var index = $scope.data.payments.findIndex(function(value){ 
                    return payment.id === value.id;
-                }) 
+                });
                 
-                $scope.data.payments[index].amount = parseFloat(payment.amount);
+                $scope.data.payments[index].amount = payment.amount;
                 $scope.data.payments[index].status = payment.status;
                 $scope.data.payments[index].payment_date = payment.payment_date;
                 
@@ -46,16 +58,50 @@
         }
 
         $scope.deletePayment = function(payment){
-            if(!confirm("Você tem certeza que quer deletar esse pagamento?")){
+            if(!confirm("Você tem certeza que deseja deletar esse pagamento?")){
                 return;
             }
 
             RegistrationPaymentsService.remove(payment).success(function (){
                 MapasCulturais.Messages.success("Pagamento deletado com sucesso");
                 var index = $scope.data.payments.indexOf(payment);
-
+                
                 $scope.data.payments.splice(index,1);
             });
+        }
+
+        
+        $scope.deleteSelectedPayments = function(){
+            if(!confirm("Você tem certeza que deseja deletar todos os pagamentos selecionados?")){
+                return;
+            }
+
+
+            var checked =  new Array(); 
+            $("input[name='checkedPayment[]']:checked").each(function (){
+                checked.push($(this).val()); 
+            });
+
+            
+            
+            for(var i = 0; i < checked.length; i++){   
+                console.log(checked[i])             
+                var payment = $scope.data.payments[checked[i]];
+                RegistrationPaymentsService.remove(payment);
+                
+            }
+
+            for(var i = 0; i < checked.length; i++){                
+                $scope.data.payments.splice(i,checked.length);
+                if(i == (checked.length-1)){
+                    MapasCulturais.Messages.success("Pagamentos deletados com sucesso"); 
+                    setTimeout(function(){ 
+                        window.location.reload(true); 
+                    }, 1200);
+                }
+            }
+            
+
         }
 
         $scope.getDatePaymentString = function (valor){
@@ -63,7 +109,7 @@
         }
 
         $scope.getAmountPaymentString = function (amount){          
-            return (new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })).format(amount);
+            return (new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount));
         }
 
         $scope.startEdition = function (payment){
@@ -124,20 +170,38 @@
 
         }
 
-        $scope.closeModal = function(){            
-            $('#blockdiv').hide();
-            $('body').css('overflow','auto');
-        }
+       
 
+        $scope.selectAll = function(){      
+            if($("#selectAll").is(':checked')){
+                $(".payment-item").prop("checked", true);
+                $(".outher-actions").fadeIn(300);
+            }else{
+                $(".payment-item").prop("checked", false);
+                $(".outher-actions").fadeOut(300);
+            }
+        }
     }]);
 
     module.factory('RegistrationPaymentsService', ['$http', '$rootScope', 'UrlService', function ($http, $rootScope, UrlService) {
         return {
-            find: function (data) {                
-                var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id, search:data.search});                
+            find: function (data) { 
+                if(!data['@limit']){
+                    data['@limit'] = 3;
+                }            
+ 
+                var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id});
                 
-                return $http.get(url, data).
-                    success(function (data, status) {
+                return $http.get(url, {params:data}).
+                    success(function (data, status, headers) {
+                        var metadata = JSON.parse(headers()['api-metadata']);
+                        $scope.data['metadata'] = metadata;
+                        if(metadata.page <= metadata.numPages){
+                            $("#page").val(metadata.page);
+                        }else{
+                            $("#btn-load-more").fadeOut(100);
+                        }
+                                                                             
                         $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
                     }).
                     error(function (data, status) {
@@ -145,7 +209,7 @@
                     });
             },
 
-            remove: function(payment){
+            remove: function(payment){                
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);
                 return $http.delete(url, {});
             },
@@ -155,18 +219,16 @@
                     id: payment.id,
                     number: payment.number,
                     status:payment.status,
-                    amount: (payment.amount.replace('.', '').replace(',', '') / 100),
+                    amount:payment.amount,
                     registration_id: payment.registration_id,
                     paymentDate: moment(payment.payment_date).format('YYYY-MM-DD')
-                }               
+                }
+                
+                console.log(result)
+                
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);
             },
-
-            searsh: function (data) {
-                
-            },
-        
         };
     }]);
 

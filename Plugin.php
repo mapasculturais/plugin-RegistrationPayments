@@ -60,7 +60,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+            //$this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
 
         });
 
@@ -72,7 +72,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            $this->part('singles/opportunity-payments', ['entity' => $entity]);
+            //$this->part('singles/opportunity-payments', ['entity' => $entity]);
 
         });
 

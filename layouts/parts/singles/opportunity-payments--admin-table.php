@@ -89,7 +89,7 @@ use MapasCulturais\i;
                     {{getPaymentStatusString(payment.status)}}
                 </td>
                 <td class="registration-id-col actions-icons">
-                    <a ng-click="data.editPayment=startEdition(payment); openModal(true)" title="Editar pagamento"><i class="fas fa-edit"></i></a>
+                    <a ng-click="data.editPayment=startEdition(payment); openModal(true,payment)" title="Editar pagamento"><i class="fas fa-edit"></i></a>
                     <a ng-click="deletePayment(payment)" title="Excluir pagamento"><i class="far fa-trash-alt"></i></a>
                 </td>
             </tr>

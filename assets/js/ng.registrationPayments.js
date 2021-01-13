@@ -53,7 +53,7 @@
                 }
                 $("#page").val(page);
             });
-            }
+        }
         
         $scope.savePayment = function (payment) {                        
             RegistrationPaymentsService.update(payment).success(function () {
@@ -122,10 +122,7 @@
             
             var amount = $("#amount").val(),
                 payment_date = $("#date_payment").val(),
-                status = $("#payment_status").val()
-            
-
-         
+                status = $("#payment_status").val();
             
             for(var i = 0; i < checked.length; i++){                             
                 var payment = $scope.data.payments[checked[i]];                
@@ -134,11 +131,10 @@
                 payment.status = status ? status : payment.status;
                 RegistrationPaymentsService.update(payment);
             }
-
+            
             MapasCulturais.Messages.success("Pagamentos deletados com sucesso"); 
-            setTimeout(function(){ 
-                window.location.reload(true); 
-            }, 1200);
+            $(".payment-item").prop("checked", false);
+            $(".outher-actions").fadeOut(300);
         }
 
 
@@ -190,7 +186,7 @@
             }
         }
 
-        $scope.openModal = function(single){
+        $scope.openModal = function(single,payment){            
             if(!single){
                 $("#date_payment").val("");
                 $("#amount").val("");
@@ -206,6 +202,7 @@
             }else{
                 $( "#btn-save-selected" ).fadeOut(5);
                 $( "#btn-save-single" ).fadeIn(5);
+                $(".payment-modal-title").html("Editar pagamento: " + payment.number);
             }
             
             $('body').css('overflow','hidden');            
@@ -252,8 +249,8 @@
             find: function (data) { 
                 if(!data['@limit']){
                     data['@limit'] = 50;
-                }            
-                console.log(data)
+                }
+
                 var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id, search:data.search});
                 
                 return $http.get(url, {params:data}).
@@ -286,8 +283,6 @@
                     registration_id: payment.registration_id,
                     paymentDate: moment(payment.payment_date).format('YYYY-MM-DD')
                 }
-                
-                console.log(result)
                 
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);

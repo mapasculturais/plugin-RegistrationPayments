@@ -41,11 +41,11 @@ use MapasCulturais\i;
                 <td></td>
                 <td colspan='5'>
                 
-                    <span ng-if="data.payments.listagem === 0"><?php \MapasCulturais\i::_e("Nenhum pagamento registrado."); ?></span>
-                    <span ng-if="data.payments.listagem  === 1"><?php \MapasCulturais\i::_e("1 pagamento encontrado."); ?></span>
-                    <span ng-if="data.payments.listagem  > 1">{{data.payments.listagem}}
-                        <span ng-if="data.payments.total > 0">
-                            <i>de {{ data.payments.total }}</i>
+                    <span ng-if="data.payments.count === 0"><?php \MapasCulturais\i::_e("Nenhum pagamento registrado."); ?></span>
+                    <span ng-if="data.payments.count  === 1"><?php \MapasCulturais\i::_e("1 pagamento encontrado."); ?></span>
+                    <span ng-if="data.payments.count  > 1">{{data.payments.listagem}}
+                        <span ng-if="data.payments.count > 0">
+                            <i>de {{ data.payments.count }}</i>
                         </span>
                         <?php \MapasCulturais\i::_e("Pagamentos"); ?>
                     </span>
@@ -57,8 +57,8 @@ use MapasCulturais\i;
                     <input type="checkbox" id="selectAll" ng-click="selectAll()">
                 </td>
                 <td colspan='5'>
-                    <span class="outher-actions"> 
-                        <a ng-click="data.editPayment=startEdition(payment); openModal()" title="Editar pagamento"><i class="fas fa-edit"></i></a>
+                    <span class="outher-actions" style="display:none"> 
+                        <a ng-click="openModal(false)" title="Editar pagamento"><i class="fas fa-edit"></i></a>
                         <a ng-click="deleteSelectedPayments(payment)" title="Excluir pagamentos selecionados"><i class="far fa-trash-alt"></i></a>
                     </span>                    
                 </td>
@@ -67,7 +67,7 @@ use MapasCulturais\i;
             <tr ng-repeat="(fIndex, payment) in data.payments" id="payment-{{payment.id}}">
             
                <td>
-                <input type="checkbox" id="checkedPayment-{{payment.id}}" name="checkedPayment[]" class="payment-item" value="{{fIndex}}">
+                    <input ng-click ="selectPayment()" type="checkbox" id="checkedPayment-{{payment.id}}" name="checkedPayment[]" class="payment-item" value="{{fIndex}}">
                </td>
                 <td class="registration-id-col">
                     <a href='{{payment.url}}' rel='noopener noreferrer'>
@@ -89,19 +89,28 @@ use MapasCulturais\i;
                     {{getPaymentStatusString(payment.status)}}
                 </td>
                 <td class="registration-id-col actions-icons">
-                    <a ng-click="data.editPayment=startEdition(payment); openModal()" title="Editar pagamento"><i class="fas fa-edit"></i></a>
+                    <a ng-click="data.editPayment=startEdition(payment); openModal(true)" title="Editar pagamento"><i class="fas fa-edit"></i></a>
                     <a ng-click="deletePayment(payment)" title="Excluir pagamento"><i class="far fa-trash-alt"></i></a>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="6" class="load-more">
+                    <button id="btn-load-more" ng-click="loadMore()"><i class="fas fa-plus-circle"></i><?php \MapasCulturais\i::_e("Carregar Mais"); ?></button>
                 </td>
             </tr>
         </tbody>
     </table>
-        <input type="hidden" id="page">
-        <button id="btn-load-more" ng-click="loadMore()">Carregar Mais<i class="fas fa-edit"></i></button>
+
+        <input type="hidden" id="page" value="1">
+      
+        
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal js-dialog">
-        <h2>Editar pagamento: {{data.editPayment.number}}</h2>        
-        <input type="date" ng-model="data.editPayment.payment_date" id="date_payment">
-        R$ <input type="number" ng-model="data.editPayment.amount" id="amount">
-        <select ng-model="data.editPayment.status">
+        <h2 class="payment-modal-title">Editar pagamento: {{data.editPayment.number}}</h2>        
+        <input type="date" ng-model="data.editPayment.payment_date" id="date_payment" placeholder="Ex.: 01/01/2020">
+        R$ <input type="number" ng-model="data.editPayment.amount" id="amount" placeholder="ex.: 3000,00">
+        <select ng-model="data.editPayment.status" id="payment_status">
+            <option value="">Selecione</option>
             <option value="0" ng-selected="data.editPayment.status === 0">Pendente</option>
             <option value="1" ng-selected="data.editPayment.status === 1">Em processo</option>
             <option value="2" ng-selected="data.editPayment.status === 2">Falha</option>
@@ -109,8 +118,9 @@ use MapasCulturais\i;
             <option value="8" ng-selected="data.editPayment.status === 8">Disponível</option>
             <option value="10" ng-selected="data.editPayment.status === 10">Pago</option>
         </select>
-        <button ng-click="savePayment(data.editPayment);" class="js-close">Salvar</button>
-        <button ng-click="data.editPayment = null;" class="js-close">Cancelar</button>
+        <button id="btn-save-selected" ng-click="updateSelectedPayments();" class="js-close" ><?php \MapasCulturais\i::_e("Editar seleção"); ?></button>
+        <button id="btn-save-single" ng-click="savePayment(data.editPayment);" class="js-close"><?php \MapasCulturais\i::_e("Salvar"); ?></button>
+        <button ng-click="data.editPayment = null;" class="js-close"><?php \MapasCulturais\i::_e("Cancelar"); ?></button>
     </div>
 
 </div>

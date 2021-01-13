@@ -132,11 +132,10 @@
                 RegistrationPaymentsService.update(payment);
             }
             
-            MapasCulturais.Messages.success("Pagamentos deletados com sucesso"); 
+            MapasCulturais.Messages.success("Pagamentos editados com sucesso"); 
             $(".payment-item").prop("checked", false);
             $(".outher-actions").fadeOut(300);
         }
-
 
         $scope.getDatePaymentString = function (valor){
             return moment(valor).format('DD/MM/YYYY');

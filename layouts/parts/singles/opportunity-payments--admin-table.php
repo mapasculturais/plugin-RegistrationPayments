@@ -13,7 +13,7 @@ use MapasCulturais\i;
     </header>
     <div id="payments-filter">
         <span class="label"> Filtrar inscrição: </span>
-        <input id="search" ng-keyup="search()" placeholder="Busque pelo número de inscrição" class="ng-pristine ng-untouched ng-valid ng-empty">
+        <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="Busque pelo número de inscrição" class="ng-pristine ng-untouched ng-valid ng-empty">
     </div>
     <table class="js-registration-list registrations-table">
         <thead>
@@ -39,13 +39,12 @@ use MapasCulturais\i;
         <tbody>
             <tr>
                 <td></td>
-                <td colspan='5'>
-                
-                    <span ng-if="data.payments.count === 0"><?php \MapasCulturais\i::_e("Nenhum pagamento registrado."); ?></span>
-                    <span ng-if="data.payments.count  === 1"><?php \MapasCulturais\i::_e("1 pagamento encontrado."); ?></span>
-                    <span ng-if="data.payments.count  > 1">{{data.payments.listagem}}
-                        <span ng-if="data.payments.count > 0">
-                            <i>de {{ data.payments.count }}</i>
+                <td colspan='5'>                 
+                    <span ng-if="data.apiMetadata.count === 0"><?php \MapasCulturais\i::_e("Nenhum pagamento registrado."); ?></span>
+                    <span ng-if="data.apiMetadata.count  === 1"><?php \MapasCulturais\i::_e("1 pagamento encontrado."); ?></span>
+                    <span ng-if="data.apiMetadata.count  > 1">{{data.payments.length}}
+                        <span ng-if="data.apiMetadata.count > 0">
+                            <i>de {{ data.apiMetadata.count }}</i>
                         </span>
                         <?php \MapasCulturais\i::_e("Pagamentos"); ?>
                     </span>
@@ -94,7 +93,7 @@ use MapasCulturais\i;
                 </td>
             </tr>
 
-            <tr>
+            <tr ng-if="data.apiMetadata.page < data.apiMetadata.numPages">
                 <td colspan="6" class="load-more">
                     <button id="btn-load-more" ng-click="loadMore()"><i class="fas fa-plus-circle"></i><?php \MapasCulturais\i::_e("Carregar Mais"); ?></button>
                 </td>
@@ -106,8 +105,8 @@ use MapasCulturais\i;
       
         
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal js-dialog">
-        <h2 class="payment-modal-title">Editar pagamento: {{data.editPayment.number}}</h2>        
-        <input type="date" ng-model="data.editPayment.payment_date" id="date_payment" placeholder="Ex.: 01/01/2020">
+        <h2 class="payment-modal-title">Editar pagamento: {{data.editPayment.number}}</h2>
+        <input type="date" ng-model="data.editPayment.payment_date" id="date_payment" >
         R$ <input type="number" ng-model="data.editPayment.amount" id="amount" placeholder="ex.: 3000,00">
         <select ng-model="data.editPayment.status" id="payment_status">
             <option value="">Selecione</option>
@@ -121,7 +120,7 @@ use MapasCulturais\i;
         <button id="btn-save-selected" ng-click="updateSelectedPayments();" class="js-close" ><?php \MapasCulturais\i::_e("Editar seleção"); ?></button>
         <button id="btn-save-single" ng-click="savePayment(data.editPayment);" class="js-close"><?php \MapasCulturais\i::_e("Salvar"); ?></button>
         <button ng-click="data.editPayment = null;" class="js-close"><?php \MapasCulturais\i::_e("Cancelar"); ?></button> <br>        
-        <textarea ng-model="data.editPayment.metadataView" name="payment-obs" id="payment-obs" cols="100" rows="10"></textarea>
+        <!-- <textarea ng-model="data.editPayment.metadataView" name="payment-obs" id="payment-obs" cols="100" rows="10"></textarea> -->
     </div>
 
 </div>

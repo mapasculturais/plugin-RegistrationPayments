@@ -12,7 +12,7 @@
         };
     }]);
 
-    module.controller('RegistrationPayments',['$scope', 'RegistrationPaymentsService', function($scope, RegistrationPaymentsService){
+    module.controller('RegistrationPayments',['$scope', 'RegistrationPaymentsService','$window', function($scope, RegistrationPaymentsService, $window){
         
         $scope.data = {
             payments: [],
@@ -49,11 +49,15 @@
             });
         }
 
-        $scope.loadMore = function(){
-            
+        $scope.loadMore = function(){            
             var search = $scope.data.search;
             var page = parseInt($scope.data.apiMetadata.page) +1;           
             
+            if($scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages)){
+                return;
+            }
+            
+            $scope.data.findingPayments = true;
             RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
@@ -63,11 +67,24 @@
                 }else{
                     $scope.data.payments = $scope.data.payments.concat(data);
                 }
+                $scope.data.findingPayments = false;
             });
+
+           
         }
+
+        angular.element($window).bind("scroll", function(){
+            if(document.location.hash.indexOf("tab=payments") >= 0){
+                if(!$scope.data.findingPayments){                   
+                    if(document.body.offsetHeight - $window.pageYOffset <  $window.innerHeight){ 
+                        $scope.loadMore();
+                    }
+                }
+            }
+        });
+    
         
-        $scope.savePayment = function (payment) { 
-            
+        $scope.savePayment = function (payment) {             
             RegistrationPaymentsService.update(payment).success(function () {
                 MapasCulturais.Messages.success("Pagamento editado com sucesso");                
                 var index = $scope.data.payments.findIndex(function(value){ 
@@ -160,6 +177,7 @@
 
         $scope.startEdition = function (payment){
             var result = angular.copy(payment);
+            $('#amount').mask('#.##0,00', { reverse: true });
             return result;
         }
         
@@ -273,8 +291,7 @@
                 return $http.delete(url, {});
             },
 
-            update: function(payment){      
-                        
+            update: function(payment){
                 var result = {
                     id: payment.id,
                     number: payment.number,
@@ -283,11 +300,14 @@
                     registration_id: payment.registration_id,
                     paymentDate: moment(payment.payment_date).format('YYYY-MM-DD'),
                     metadata: payment.metadata
-                }
-                
+                }         
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);
             },
+            finish: function(){
+                var meta = $scope.data[meta_key];
+                return $scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages);
+            }
         };
     }]);
 

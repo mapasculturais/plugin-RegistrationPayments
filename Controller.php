@@ -103,7 +103,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         //Busca os ids das inscrições
         $payments = $conn->fetchAll("
-            SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status
+            SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status, p.metadata
             FROM registration r
             RIGHT JOIN payment p
             ON r.id = p.registration_id WHERE
@@ -125,6 +125,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     "payment_date" => $payment['payment_date'],
                     "amount" => (float) $payment['amount'],
                     "status" => $payment['status'],
+                    "metadata" => $payment['metadata'],
                    
                 ];
             },$payments);            
@@ -138,7 +139,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         RIGHT JOIN payment p
         ON r.id = p.registration_id WHERE
         p.opportunity_id = :opp ", ["opp" => $opportunity_id]);  
-        
+      
        
 
         $this->apiAddHeaderMetadata($this->data, $payments, $total[0]['total']);

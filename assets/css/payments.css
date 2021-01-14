@@ -1,0 +1,34 @@
+/* Modal */
+.controller-opportunity #blockdiv {
+    position: fixed !important;
+}
+
+/* Ícones */
+.actions-icons i {
+    margin: 5px;
+    font-size: 14px;
+}
+
+.outher-actions{
+    margin: 5px;
+    font-size: 14px;
+}
+
+.load-more i{
+    padding: 6px;
+}
+
+/* Campo de pesquisa de pagamentos */
+#payments-filter {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0 10px 0;
+    margin: 10px 0 10px 0;
+}
+#payments-filter input {
+    width: 100%;
+}
+
+table th {
+    width: 18%;
+}

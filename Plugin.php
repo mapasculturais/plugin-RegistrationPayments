@@ -10,6 +10,7 @@ use BankValidator\classes\BankCodeMapping;
 
 
 class Plugin extends \MapasCulturais\Plugin{
+
     function _init() {
         $app = App::i();
 
@@ -51,9 +52,54 @@ class Plugin extends \MapasCulturais\Plugin{
             $conn->commit();
         }
 
+        // Adiciona tab de Pagamentos na single da Oportunidade
+        $app->hook('template(opportunity.single.tabs):end', function () use ($app) {
+
+            if (!$app->user->is('admin')) {
+                return;
+            }
+
+            $entity = $this->controller->requestedEntity;
+            $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+
+        });
+
+        // Adiciona o conteúdo da aba Pagamentos na single da Oportunidade
+        $app->hook('template(opportunity.single.tabs-content):end', function () use ($app) {
+
+            if (!$app->user->is('admin')) {
+                return;
+            }
+
+            $entity = $this->controller->requestedEntity;
+            $this->part('singles/opportunity-payments', ['entity' => $entity]);
+
+        });
+
     }
 
+    function enqueueScriptsAndStyles() {
+        
+        $app = App::i();
+
+        $app->view->enqueueScript('app', 'regitration-payments', 'js/ng.registrationPayments.js', ['entity.module.opportunity']);
+        $app->view->enqueueStyle('app', 'fontawesome', 'https://use.fontawesome.com/releases/v5.8.2/css/all.css');
+        $app->view->enqueueStyle('app', 'regitration-payments', 'css/payments.css');
+        $app->view->jsObject['angularAppDependencies'][] = 'ng.registrationPayments';
+
+    }
+
+
     function register () {
+
+        $app = App::i();
+        $app->registerController('payment', Controller::class);
+
+        $self = $this;
+        $app->hook('view.includeAngularEntityAssets:after', function () use ($self) {
+            $self->enqueueScriptsAndStyles();
+        });
+
         $this->registerAgentMetadata('payment_bank_account_type', [
             'label' => i::__('Tipo da conta bancária para pagamentos'),
             'type' => 'string',
@@ -204,4 +250,5 @@ class Plugin extends \MapasCulturais\Plugin{
         
         return $result;
     }
+    
 }

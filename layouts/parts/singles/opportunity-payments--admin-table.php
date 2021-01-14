@@ -15,7 +15,7 @@ use MapasCulturais\i;
         <span class="label"> Filtrar inscrição: </span>
         <input id="search" ng-keyup="search()" placeholder="Busque pelo número de inscrição" class="ng-pristine ng-untouched ng-valid ng-empty">
     </div>
-    <table class="js-registration-list registrations-table" ng-class="{'no-options': data.entity.registrationCategories.length === 0, 'no-attachments': data.entity.registrationFileConfigurations.length === 0, 'registrations-results': data.entity.published}">
+    <table class="js-registration-list registrations-table">
         <thead>
             <tr> 
             <th></th>              
@@ -76,7 +76,7 @@ use MapasCulturais\i;
                     </a>
                 </td>
 
-                <td class="registration-id-col">
+                <td class="registration-id-col">                
                     {{getDatePaymentString(payment.payment_date)}}
                 </td>
 
@@ -120,7 +120,8 @@ use MapasCulturais\i;
         </select>
         <button id="btn-save-selected" ng-click="updateSelectedPayments();" class="js-close" ><?php \MapasCulturais\i::_e("Editar seleção"); ?></button>
         <button id="btn-save-single" ng-click="savePayment(data.editPayment);" class="js-close"><?php \MapasCulturais\i::_e("Salvar"); ?></button>
-        <button ng-click="data.editPayment = null;" class="js-close"><?php \MapasCulturais\i::_e("Cancelar"); ?></button>
+        <button ng-click="data.editPayment = null;" class="js-close"><?php \MapasCulturais\i::_e("Cancelar"); ?></button> <br>        
+        <textarea ng-model="data.editPayment.metadataView" name="payment-obs" id="payment-obs" cols="100" rows="10"></textarea>
     </div>
 
 </div>

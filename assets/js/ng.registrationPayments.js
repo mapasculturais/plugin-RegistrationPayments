@@ -55,7 +55,15 @@
             });
         }
         
-        $scope.savePayment = function (payment) {                        
+        $scope.savePayment = function (payment) {             
+            
+            if((typeof payment.metadata.csv_line !== 'undefined')){
+                payment.metadata.csv_line.OBSERVACOES = payment.metadataView;
+            }else{
+                payment.metadata = payment.metadata;
+            }
+            
+
             RegistrationPaymentsService.update(payment).success(function () {
                 MapasCulturais.Messages.success("Pagamento editado com sucesso");                
                 var index = $scope.data.payments.findIndex(function(value){ 
@@ -122,14 +130,26 @@
             
             var amount = $("#amount").val(),
                 payment_date = $("#date_payment").val(),
-                status = $("#payment_status").val();
-            
+                status = $("#payment_status").val(),
+                metadataView = $("#payment-obs").val();
+               
             for(var i = 0; i < checked.length; i++){                             
-                var payment = $scope.data.payments[checked[i]];                
+                var payment = $scope.data.payments[checked[i]];
+                var  metadata = JSON.parse(payment.metadata);
+                
+                if((typeof metadata.csv_line !== 'undefined')){
+                    metadata.csv_line.OBSERVACOES = metadataView;
+                    payment.metadata = metadata;
+                }else{
+                    payment.metadata = metadata;
+                }
+                
                 payment.amount = amount ? parseFloat(amount) : payment.amount;
                 payment.payment_date = payment_date ? payment_date : payment.payment_date;
-                payment.status = status ? status : payment.status;
+                payment.status = status ? status : payment.status;                
                 RegistrationPaymentsService.update(payment);
+                payment.metadata = JSON.stringify(payment.metadata);
+                
             }
             
             MapasCulturais.Messages.success("Pagamentos editados com sucesso"); 
@@ -146,6 +166,10 @@
         }
 
         $scope.startEdition = function (payment){
+            
+            var  metadata = JSON.parse(payment.metadata);
+            var csv = metadata.csv_line;
+            
             var dataPayment = new Date(payment.payment_date);
             var result = {
                 id: payment.id,
@@ -153,8 +177,11 @@
                 status:payment.status,
                 amount: payment.amount,
                 registration_id: payment.registration_id,
-                payment_date: dataPayment
-            }         
+                payment_date: dataPayment,
+                metadataView: (typeof csv !== 'undefined') ? csv.OBSERVACOES : "",
+                metadata: metadata
+            }
+                  
             return result;
         }
         
@@ -189,7 +216,8 @@
             if(!single){
                 $("#date_payment").val("");
                 $("#amount").val("");
-                $("#payment_status").val("")
+                $("#payment_status").val("");
+                $("#payment-obs").val("");
                 $( "#btn-save-single" ).fadeOut(5);
                 $( "#btn-save-selected" ).fadeIn(5);
 
@@ -273,15 +301,18 @@
                 return $http.delete(url, {});
             },
 
-            update: function(payment){                
+            update: function(payment){      
+                        
                 var result = {
                     id: payment.id,
                     number: payment.number,
                     status:payment.status,
                     amount:payment.amount,
                     registration_id: payment.registration_id,
-                    paymentDate: moment(payment.payment_date).format('YYYY-MM-DD')
+                    paymentDate: moment(payment.payment_date).format('YYYY-MM-DD'),
+                    metadata: payment.metadata
                 }
+                
                 
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);

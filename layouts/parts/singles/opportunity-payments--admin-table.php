@@ -115,7 +115,7 @@ use MapasCulturais\i;
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal js-dialog">
         <h2 class="payment-modal-title"><?php i::_e("Editar pagamento:"); ?> {{data.editPayment.number}}</h2>        
         <input type="date" ng-model="data.editPayment.payment_date" id="date_payment"/>
-        <?php i::_e("R$"); ?> <input type="text" ng-model="data.editPayment.amount" id="amount" placeholder="ex.: 3000,00"/>
+        <?php i::_e("R$"); ?> <input type="text" ng-model="data.editPayment.amount" id="amount" placeholder="<?php i::_e("ex.: 3000,00"); ?>"/>
         <select ng-model="data.editPayment.status" id="payment_status">
             <option value="">Selecione</option>
             <option value="0" ng-selected="data.editPayment.status === 0"><?php i::_e("Pendente"); ?></option>

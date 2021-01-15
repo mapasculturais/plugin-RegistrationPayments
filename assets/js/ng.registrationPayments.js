@@ -18,9 +18,20 @@
             payments: [],
             editPayment: null,
             apiMetadata: {},
-            search: ""
+            search: "",
+            statusFilter: [
+                {value: null, label: "Todos"},
+                {value: 0, label: "Pendente"},
+                {value: 1, label: "Processando"},
+                {value: 2, label: "Falha"},
+                {value: 3, label: "Exportado"},
+                {value: 8, label: "Disponível"},
+                {value: 10, label: "Pago"},
+            ],
+            getStatus: "",
+            filterDate: ""
         };
-       
+        
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:""}).success(function (data, status, headers){
 
             $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
@@ -31,12 +42,28 @@
                 $scope.data.payments = $scope.data.payments.concat(data);
             }
         });
-        
 
+        $scope.$watch('data.statusFilter[value]', function(new_val, old_val) {
+            var search = $scope.data.search;
+            $scope.data.status = new_val;
+            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;            
+
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:new_val, paymentDate:paymentDate}).success(function (data, status, headers){
+
+                $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
+
+                $scope.data.payments = data;
+                
+            });
+        });
+       
+        
         $scope.search = function (){
             var search = $scope.data.search;
+            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;
+            var status = $scope.data.status ? $scope.data.status : null;
 
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:paymentDate}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 
@@ -52,13 +79,15 @@
         $scope.loadMore = function(){            
             var search = $scope.data.search;
             var page = parseInt($scope.data.apiMetadata.page) +1;           
+            var status = $scope.data.status ? $scope.data.status : null;
+            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;       
             
             if($scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages)){
                 return;
             }
             
             $scope.data.findingPayments = true;
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page, status:status, paymentDate:paymentDate}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 
@@ -69,8 +98,6 @@
                 }
                 $scope.data.findingPayments = false;
             });
-
-           
         }
 
         angular.element($window).bind("scroll", function(){
@@ -82,7 +109,22 @@
                 }
             }
         });
-    
+        
+        $scope.$watch('data.filterDate', function(new_val, old_val) {            
+            var search = $scope.data.search;
+            $scope.data.filterDate = new_val;
+            console.log($scope.data.status)
+            var status = $scope.data.status ? $scope.data.status : null;
+            
+
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:new_val}).success(function (data, status, headers){
+
+                $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
+
+                $scope.data.payments = data;
+                
+            });
+        });
         
         $scope.savePayment = function (payment) {             
             RegistrationPaymentsService.update(payment).success(function () {
@@ -94,7 +136,6 @@
                 $scope.data.payments[index].amount = payment.amount;
                 $scope.data.payments[index].status = payment.status;
                 $scope.data.payments[index].payment_date = payment.payment_date;
-                
             });
         }
 
@@ -125,7 +166,6 @@
             for(var i = 0; i < checked.length; i++){
                 var payment = $scope.data.payments[checked[i]];
                 RegistrationPaymentsService.remove(payment);
-                
             }
 
             for(var i = 0; i < checked.length; i++){                

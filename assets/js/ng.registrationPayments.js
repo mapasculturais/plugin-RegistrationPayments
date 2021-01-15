@@ -56,7 +56,6 @@
                 
             });
         });
-       
         
         $scope.search = function (){
             var search = $scope.data.search;
@@ -112,11 +111,9 @@
         
         $scope.$watch('data.filterDate', function(new_val, old_val) {            
             var search = $scope.data.search;
-            $scope.data.filterDate = new_val;
-            console.log($scope.data.status)
+            $scope.data.filterDate = new_val;            
             var status = $scope.data.status ? $scope.data.status : null;
             
-
             RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:new_val}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
@@ -151,7 +148,6 @@
                 $scope.data.payments.splice(index,1);
             });
         }
-
         
         $scope.deleteSelectedPayments = function(){
             if(!confirm("Você tem certeza que deseja deletar os pagamentos selecionados?")){

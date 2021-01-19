@@ -40,7 +40,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $conn = $app->em->getConnection();
         
         $limit = isset($data['@limit']) ? $data['@limit'] : 50;
-        $page = isset($data['@page'] ) ? $data['@page'] : 1;
+        $page = isset($data['@page'] ) ? (int)$data['@page'] : 1;
         $search = isset($data['search']) ? $data['search'] : "";
         $status = isset($data['status']) ? $data['status'] : null;
         $paymentDate = (isset($data['paymentDate']) && !empty($data['paymentDate'])) ? new DateTime($data['paymentDate']) : null;         
@@ -67,7 +67,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
         
         //Busca os ids das inscrições
-        $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status
+        $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p
         ON r.id = p.registration_id WHERE
@@ -85,6 +85,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 "number" => $payment['number'],
                 "payment_date" => $payment['payment_date'],
                 "amount" => (float) $payment['amount'],
+                "metadata" => json_decode($payment['metadata']),
                 "status" => $payment['status']
             ];
         },$payments);

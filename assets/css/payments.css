@@ -47,9 +47,33 @@
     border-bottom: 1px solid #ccc;
     padding: 10px 0 10px 0;
     margin: 10px 0 10px 0;
+    overflow: hidden;
 }
+
 #payments-filter input {
     width: 100%;
+}
+
+#payments-filter .left {
+    box-sizing: border-box;
+    float: left;
+    padding-right: 15px;
+    width: 70%;
+}
+
+#payments-filter .right {
+    float: left;
+    width: 30%;
+}
+
+@media (max-width: 520px) {
+
+    #payments-filter .left,
+    #payments-filter .right {
+        float: none;
+        padding-right: 0;
+        width: 100%;
+    }
 }
 
 table th {

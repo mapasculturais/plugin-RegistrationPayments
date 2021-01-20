@@ -11,11 +11,14 @@ use MapasCulturais\i;
         <h3><?php i::_e("Pagamentos"); ?></h3>
     </header>
     <div id="payments-filter">
-        <span class="label"> <?php i::_e("Filtrar inscrição:"); ?> </span>
-        <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="Busque pelo número de inscrição" class="ng-pristine ng-untouched ng-valid ng-empty"> <br>   
-
-        <span class="label"><?php i::_e("Filtrar por data"); ?></span> 
-        <input type="date" ng-model="data.filterDate">    
+        <div class="left">
+            <span class="label"> <?php i::_e("Filtrar inscrição:"); ?> </span>
+            <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="<?php i::_e("Busque pelo número de inscrição"); ?>" class="ng-pristine ng-untouched ng-valid ng-empty"> <br>
+        </div>
+        <div class="right">
+            <span class="label"><?php i::_e("Filtrar por data"); ?></span>
+            <input type="date" ng-model="data.filterDate" placeholder="<?php i::_e("Busque pela data do pagamento"); ?>">
+        </div>
     </div>
     <!-- Tabela de pagamentos -->
     <table class="js-registration-list registrations-table">

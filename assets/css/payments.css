@@ -27,6 +27,10 @@
     margin-bottom: 0;
 }
 
+.payment-modal .fields {
+    overflow: hidden;
+}
+
 .payment-modal .fields > div {
     box-sizing: border-box;
     float: left;
@@ -63,6 +67,15 @@
 
 .payment-modal .fields > div > div {
     display: flex;
+}
+
+.payment-modal .label {
+    color: #999;
+    display: block;
+    font-size: 0.75rem;
+    font-style: italic;
+    font-weight: lighter;
+    margin-bottom: 0;
 }
 
 .bg-modal{

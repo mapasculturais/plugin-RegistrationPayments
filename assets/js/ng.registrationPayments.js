@@ -129,19 +129,14 @@
             });
         });
         
-        $scope.savePayment = function (payment) { 
-                 
+        $scope.savePayment = function (payment) {
             RegistrationPaymentsService.update(payment).success(function () {
                 MapasCulturais.Messages.success("Pagamento editado com sucesso");                
                 var index = $scope.data.payments.findIndex(function(value){ 
                     $scope.data.editPayment = null;
                     return payment.id === value.id;
-                });                
-                
-                console.log(payment)
+                });
                 $scope.data.payments[index] = payment;
-                      
-                
             });
         }
 
@@ -180,14 +175,11 @@
                 MapasCulturais.Messages.success("Pagamentos deletados com sucesso"); 
             }
         }
-
         
         $scope.updateSelectedPayments = function(){
            if($scope.data.editMultiplePayments){
                 var dataView = $scope.data.editMultiplePayments;
-                var payments = $scope.getSelectedPayments();
-                
-                console.log(dataView)
+                var payments = $scope.getSelectedPayments();               
                 var noDelected = false;
                 payments.forEach(function(payment){
                     var result = angular.copy(payment);
@@ -199,19 +191,18 @@
                     
                     RegistrationPaymentsService.update(result).success(function (){ 
                         var index = $scope.data.payments.indexOf(payment);                      
-                       $scope.data.payments[index] = result;
-
+                        $scope.data.payments[index] = result; 
+                        $scope.data.payments[index].checked = false;                                                                         
                     }).error(function(){                    
                         noDelected = true;  
                         return;                 
                     });
-                });
+                });               
 
                 if(!noDelected){
                     $scope.data.multiplePayments = false;
-                    $scope.data.editMultiplePayments = null;
-                    MapasCulturais.Messages.success("Pagamentos editados com sucesso"); 
-                    
+                    $scope.data.editMultiplePayments = null;                                                 
+                    MapasCulturais.Messages.success("Pagamentos editados com sucesso");
                 }
            }else{
                 $scope.data.multiplePayments = false;
@@ -257,6 +248,12 @@
                     return status
                     break;
             }
+        }
+
+        $scope.clearChecked = function(){
+            $scope.data.payments.forEach(function(payment){
+                payment.checked = false;
+            }); 
         }
         
         $scope.selectAll = function(){            
@@ -312,7 +309,7 @@
                     metadata: payment.metadata
                     
                 }
-                         
+                
                 var url = MapasCulturais.createUrl('payment', 'single', [payment.id]);                
                 return $http.patch(url, result);
             },

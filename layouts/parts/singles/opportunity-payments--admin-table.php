@@ -20,6 +20,38 @@ use MapasCulturais\i;
             <input type="date" ng-model="data.filterDate" placeholder="<?php i::_e("Busque pela data do pagamento"); ?>">
         </div>
     </div>
+
+     <!-- Modal de pagamentos em massa -->
+     <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div">
+        <div>
+        
+            <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
+        </div>
+        
+        <div>
+            <input type="date" ng-model="data.editMultiplePayments.payment_date"  value=""/>
+            <?php i::_e("R$"); ?> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="ex.: 3000,00"/>
+            <select ng-model="data.editMultiplePayments.status">
+                <option value="">Selecione</option>
+                <option value="0" ng-selected="data.editMultiplePayments.status === 0"><?php i::_e("Pendente"); ?></option>
+                <option value="1" ng-selected="data.editMultiplePayments.status === 1"><?php i::_e("Em processo"); ?></option>
+                <option value="2" ng-selected="data.editMultiplePayments.status === 2"><?php i::_e("Falha"); ?></option>
+                <option value="3" ng-selected="data.editMultiplePayments.status === 3"><?php i::_e("Exportado"); ?></option>
+                <option value="8" ng-selected="data.editMultiplePayments.status === 8"><?php i::_e("Disponível"); ?></option>
+                <option value="10" ng-selected="data.editMultiplePayments.status === 10"><?php i::_e("Pago"); ?></option>
+            </select>
+        </div>
+        
+        <div>
+            <?php $this->applyTemplateHook('payment-edit-modal-metadata','begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-modal-metadata','end'); ?>
+        </div>
+        <footer>
+            <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
+            <button class="btn btn-primary" ng-click="updateSelectedPayments(); clearChecked()" class="js-close" ><?php i::_e("Editar seleção"); ?></button>            
+        </footer>       
+    </div>
+
     <!-- Tabela de pagamentos -->
     <table class="js-registration-list registrations-table">
         <thead>
@@ -65,7 +97,7 @@ use MapasCulturais\i;
 
             <tr>
                 <td>
-                    <span ng-if="data.payments.length > 0"><input type="checkbox" id="selectAll" ng-click="selectAll()" title="<?php i::_e("Selecionar todos."); ?>"></span>
+                    <span ng-if="data.payments.length > 0"><input type="checkbox" ng-click="selectAll()" title="<?php i::_e("Selecionar todos."); ?>"></span>
                 </td>
                 <td colspan='5'>
                     <span ng-if="getSelectedPayments().length > 0" class="outher-actions"> 
@@ -77,7 +109,7 @@ use MapasCulturais\i;
 
             <tr ng-repeat="payment in data.payments" id="payment-{{payment.id}}">            
                <td>
-                    <input ng-model="payment.checked" ng-click ="selectPayment()" type="checkbox" id="checkedPayment-{{payment.id}}" name="checkedPayment[]" class="payment-item" value="{{fIndex}}" title="<?php i::_e("Selecionar pagamento {{payment.number}}"); ?>">
+                    <input ng-model="payment.checked" type="checkbox" id="checkedPayment-{{payment.id}}" class="payment-item" value="{{fIndex}}" title="<?php i::_e("Selecionar pagamento {{payment.number}}"); ?>">
                </td>
                 <td class="registration-id-col">
                     <a href='{{payment.url}}' rel='noopener noreferrer'>                       
@@ -141,38 +173,8 @@ use MapasCulturais\i;
             <button class="btn btn-default" ng-click="data.editPayment = null;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
             <button class="btn btn-primary" ng-click="savePayment(data.editPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
         </footer>       
-    </div>
+    </div>   
 
-    <!-- Modal de pagamentos em massa -->
-    <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div">
-        <div>
-        
-            <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
-        </div>
-        
-        <div>
-            <input type="date" ng-model="data.editMultiplePayments.payment_date"  value=""/>
-            <?php i::_e("R$"); ?> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="ex.: 3000,00"/>
-            <select ng-model="data.editMultiplePayments.status">
-                <option value="">Selecione</option>
-                <option value="0" ng-selected="data.editMultiplePayments.status === 0"><?php i::_e("Pendente"); ?></option>
-                <option value="1" ng-selected="data.editMultiplePayments.status === 1"><?php i::_e("Em processo"); ?></option>
-                <option value="2" ng-selected="data.editMultiplePayments.status === 2"><?php i::_e("Falha"); ?></option>
-                <option value="3" ng-selected="data.editMultiplePayments.status === 3"><?php i::_e("Exportado"); ?></option>
-                <option value="8" ng-selected="data.editMultiplePayments.status === 8"><?php i::_e("Disponível"); ?></option>
-                <option value="10" ng-selected="data.editMultiplePayments.status === 10"><?php i::_e("Pago"); ?></option>
-            </select>
-        </div>
-        
-        <div>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','begin'); ?>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','end'); ?>
-        </div>
-        <footer>
-            <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
-            <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close" ><?php i::_e("Editar seleção"); ?></button>            
-        </footer>       
-    </div>
-
-    <div ng-class="{hidden:!data.editPayment, hidden:!data.multiplePayments}" class="bg-modal"></div>
+    <div ng-class="{hidden:!data.editPayment}" class="bg-modal"></div>
+    <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal"></div>
 </div>

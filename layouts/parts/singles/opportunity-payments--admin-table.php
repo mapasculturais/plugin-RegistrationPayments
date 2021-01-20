@@ -16,30 +16,43 @@ use MapasCulturais\i;
             <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="<?php i::_e("Busque pelo número de inscrição"); ?>" class="ng-pristine ng-untouched ng-valid ng-empty"> <br>
         </div>
         <div class="right">
-            <span class="label"><?php i::_e("Filtrar por data"); ?></span>
+            <span class="label"><?php i::_e("Filtrar por data:"); ?></span>
             <input type="date" ng-model="data.filterDate" placeholder="<?php i::_e("Busque pela data do pagamento"); ?>">
         </div>
     </div>
 
-     <!-- Modal de pagamentos em massa -->
-     <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div">
-        <div>
-        
+      <!-- Modal de pagamentos em massa -->
+    <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div">
+        <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
-        </div>
+        </header>
         
-        <div>
-            <input type="date" ng-model="data.editMultiplePayments.payment_date"  value=""/>
-            <?php i::_e("R$"); ?> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="ex.: 3000,00"/>
-            <select ng-model="data.editMultiplePayments.status">
-                <option value="">Selecione</option>
-                <option value="0" ng-selected="data.editMultiplePayments.status === 0"><?php i::_e("Pendente"); ?></option>
-                <option value="1" ng-selected="data.editMultiplePayments.status === 1"><?php i::_e("Em processo"); ?></option>
-                <option value="2" ng-selected="data.editMultiplePayments.status === 2"><?php i::_e("Falha"); ?></option>
-                <option value="3" ng-selected="data.editMultiplePayments.status === 3"><?php i::_e("Exportado"); ?></option>
-                <option value="8" ng-selected="data.editMultiplePayments.status === 8"><?php i::_e("Disponível"); ?></option>
-                <option value="10" ng-selected="data.editMultiplePayments.status === 10"><?php i::_e("Pago"); ?></option>
-            </select>
+        <div class="fields">
+            
+            <div>
+                <label ng-model="data.editMultiplePayments.payment_date"><?php i::_e("Data"); ?></label>
+                <input type="date" ng-model="data.editMultiplePayments.payment_date" value="" />
+            </div>
+
+            <div>
+                <label ng-model="data.editMultiplePayments.amount"><?php i::_e("Valor"); ?></label>
+                <div>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="<?php i::_e("ex.: 3000,00"); ?>"/>
+                </div>
+            </div>
+
+            <div>
+                <label ng-model="data.editMultiplePayments.status"><?php i::_e("Status"); ?></label>
+                <select ng-model="data.editMultiplePayments.status">
+                    <option value=""><?php i::_e("Selecione"); ?></option>
+                    <option value="0" ng-selected="data.editMultiplePayments.status === 0"><?php i::_e("Pendente"); ?></option>
+                    <option value="1" ng-selected="data.editMultiplePayments.status === 1"><?php i::_e("Em processo"); ?></option>
+                    <option value="2" ng-selected="data.editMultiplePayments.status === 2"><?php i::_e("Falha"); ?></option>
+                    <option value="3" ng-selected="data.editMultiplePayments.status === 3"><?php i::_e("Exportado"); ?></option>
+                    <option value="8" ng-selected="data.editMultiplePayments.status === 8"><?php i::_e("Disponível"); ?></option>
+                    <option value="10" ng-selected="data.editMultiplePayments.status === 10"><?php i::_e("Pago"); ?></option>
+                </select>
+            </div>
         </div>
         
         <div>
@@ -48,7 +61,7 @@ use MapasCulturais\i;
         </div>
         <footer>
             <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
-            <button class="btn btn-primary" ng-click="updateSelectedPayments(); clearChecked()" class="js-close" ><?php i::_e("Editar seleção"); ?></button>            
+            <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close" ><?php i::_e("Editar seleção"); ?></button>            
         </footer>       
     </div>
 
@@ -146,23 +159,37 @@ use MapasCulturais\i;
     </table>
      <!-- Modal de edição de pagamentos únicos-->
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal payment-modal-div">
-        <div>
-       
+        <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamento:"); ?> {{data.editPayment.number}}</h2>
-        </div>
+        </header>
         
-        <div>
-            <input type="date" ng-model="data.editPayment.payment_date" value=""/>
-            <?php i::_e("R$"); ?> <input type="text" ng-model="data.editPayment.amount" placeholder="ex.: 3000,00"/>
-            <select ng-model="data.editPayment.status">
-                <option value="">Selecione</option>
-                <option value="0" ng-selected="data.editPayment.status === 0"><?php i::_e("Pendente"); ?></option>
-                <option value="1" ng-selected="data.editPayment.status === 1"><?php i::_e("Em processo"); ?></option>
-                <option value="2" ng-selected="data.editPayment.status === 2"><?php i::_e("Falha"); ?></option>
-                <option value="3" ng-selected="data.editPayment.status === 3"><?php i::_e("Exportado"); ?></option>
-                <option value="8" ng-selected="data.editPayment.status === 8"><?php i::_e("Disponível"); ?></option>
-                <option value="10" ng-selected="data.editPayment.status === 10"><?php i::_e("Pago"); ?></option>
-            </select>
+        <div class="fields">
+
+            <div>
+                <label ng-model="data.editPayment.payment_date"><?php i::_e("Data"); ?></label>
+                <input type="date" ng-model="data.editPayment.payment_date" value="" />
+            </div>
+
+            <div>
+                <label ng-model="data.editPayment.amount"><?php i::_e("Valor"); ?></label>
+                <div>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editPayment.amount" placeholder="<?php i::_e("ex.: 3000,00"); ?>"/>
+                </div>
+            </div>
+            
+            <div>
+                <label ng-model="data.editPayment.status"><?php i::_e("Status"); ?></label>
+                <select ng-model="data.editPayment.status">
+                    <option value="">Selecione</option>
+                    <option value="0" ng-selected="data.editPayment.status === 0"><?php i::_e("Pendente"); ?></option>
+                    <option value="1" ng-selected="data.editPayment.status === 1"><?php i::_e("Em processo"); ?></option>
+                    <option value="2" ng-selected="data.editPayment.status === 2"><?php i::_e("Falha"); ?></option>
+                    <option value="3" ng-selected="data.editPayment.status === 3"><?php i::_e("Exportado"); ?></option>
+                    <option value="8" ng-selected="data.editPayment.status === 8"><?php i::_e("Disponível"); ?></option>
+                    <option value="10" ng-selected="data.editPayment.status === 10"><?php i::_e("Pago"); ?></option>
+                </select>
+            </div>
+            
         </div>
         
         <div>
@@ -173,8 +200,8 @@ use MapasCulturais\i;
             <button class="btn btn-default" ng-click="data.editPayment = null;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
             <button class="btn btn-primary" ng-click="savePayment(data.editPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
         </footer>       
-    </div>   
-
+    </div>
+    
     <div ng-class="{hidden:!data.editPayment}" class="bg-modal"></div>
     <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal"></div>
 </div>

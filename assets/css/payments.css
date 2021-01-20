@@ -16,6 +16,55 @@
     overflow-y: auto;    
 }
 
+.payment-modal header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-modal header h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+.payment-modal .fields > div {
+    box-sizing: border-box;
+    float: left;
+    padding-right: 15px;
+    width: 33.3333%;
+}
+
+.payment-modal .fields > div:last-child {
+    padding-right: 0;
+}
+
+.payment-modal .fields div label {
+    color: #999;
+    display: block;
+    font-size: 0.75rem;
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.payment-modal .fields div .prefix {
+    height: 2rem;
+    line-height: 2rem;
+    padding-right: 5px;
+}
+
+.payment-modal .fields div input {
+    width: 100%;
+}
+
+.payment-modal .fields div select {
+    cursor: pointer;
+    width: 100%;
+}
+
+.payment-modal .fields > div > div {
+    display: flex;
+}
+
 .bg-modal{
     background-color: rgba(0, 0, 0, 0.6); 
     width: 100%; 

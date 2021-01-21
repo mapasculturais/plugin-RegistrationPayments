@@ -31,7 +31,7 @@ use MapasCulturais\i;
             
             <div>
                 <label ng-model="data.editMultiplePayments.payment_date"><?php i::_e("Data"); ?></label>
-                <input type="date" ng-model="data.editMultiplePayments.payment_date" value="" />
+                <input type="date" ng-model="data.editMultiplePayments.payment_date" value="" data-flatpickr="1"/>
             </div>
 
             <div>
@@ -173,7 +173,7 @@ use MapasCulturais\i;
 
             <div>
                 <label ng-model="data.editPayment.payment_date"><?php i::_e("Data"); ?></label>
-                <input type="date" ng-model="data.editPayment.payment_date" value="" />
+                <input type="date" ng-model="data.editPayment.payment_date" value="" data-flatpickr="1"/>
             </div>
 
             <div>

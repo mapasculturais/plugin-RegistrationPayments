@@ -16,65 +16,11 @@ use DateTime;
 class Controller extends \MapasCulturais\Controllers\EntityController
 {
 
-    use Traits\ControllerAPI;
-
-    static $changeStatusMap = [
-        Payment::STATUS_PENDING => [
-            Payment::STATUS_PENDING => null,
-            Payment::STATUS_PROCESSING => 'save',
-            Payment::STATUS_FAILED => 'save',
-            Payment::STATUS_EXPORTED => 'save',
-            Payment::STATUS_AVAILABLE => 'save',
-            Payment::STATUS_PAID => 'save'
-        ],
-        Payment::STATUS_PROCESSING => [
-            Payment::STATUS_PENDING => 'save',
-            Payment::STATUS_PROCESSING => null,
-            Payment::STATUS_FAILED => 'save',
-            Payment::STATUS_EXPORTED => 'save',
-            Payment::STATUS_AVAILABLE => 'save',
-            Payment::STATUS_PAID => 'save'
-        ],
-        Payment::STATUS_FAILED => [
-            Payment::STATUS_PENDING => 'save',
-            Payment::STATUS_PROCESSING => 'save',
-            Payment::STATUS_FAILED => null,
-            Payment::STATUS_EXPORTED => 'save',
-            Payment::STATUS_AVAILABLE => 'save',
-            Payment::STATUS_PAID => 'save'
-        ],
-        Payment::STATUS_EXPORTED => [
-            Payment::STATUS_PENDING => 'save',
-            Payment::STATUS_PROCESSING => 'save',
-            Payment::STATUS_FAILED => 'save',
-            Payment::STATUS_EXPORTED => null,
-            Payment::STATUS_AVAILABLE => 'save',
-            Payment::STATUS_PAID => 'save'
-        ],
-        Payment::STATUS_AVAILABLE => [
-            Payment::STATUS_PENDING => 'save',
-            Payment::STATUS_PROCESSING => 'save',
-            Payment::STATUS_FAILED => 'save',
-            Payment::STATUS_EXPORTED => 'save',
-            Payment::STATUS_AVAILABLE => null,
-            Payment::STATUS_PAID => 'save'
-        ],
-        Payment::STATUS_PAID => [
-            Payment::STATUS_PENDING => 'save',
-            Payment::STATUS_PROCESSING => 'save',
-            Payment::STATUS_FAILED => 'save',
-            Payment::STATUS_EXPORTED => 'save',
-            Payment::STATUS_AVAILABLE => 'save',
-            Payment::STATUS_PAID => null
-        ]
-    ];
+    use Traits\ControllerAPI;   
   
     public function __construct()
     {
         parent::__construct();
-
-        $app = App::i();
-
         $this->entityClassName = '\RegistrationPayments\Payment';
 
     }
@@ -84,62 +30,90 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      */
     function GET_findPayments($opportunity_id =  null)
     {
-       
-        
         $this->requireAuthentication();
 
         $opportunity_id = $this->data['opportunity'];
-        $data = $this->data;       
-
+        $data = $this->data;
+        $complement = "";       
+        
         $app = App::i();
         $conn = $app->em->getConnection();
-
         
         $limit = isset($data['@limit']) ? $data['@limit'] : 50;
-        $page = isset($data['@page'] ) ? $data['@page'] : 1;
+        $page = isset($data['@page'] ) ? (int)$data['@page'] : 1;
         $search = isset($data['search']) ? $data['search'] : "";
-        $max = ($page * $limit);
-        $offset = ($page -1) * $limit;    
-
-        //Busca os ids das inscrições
-        $payments = $conn->fetchAll("
-            SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.status
-            FROM registration r
-            RIGHT JOIN payment p
-            ON r.id = p.registration_id WHERE
-            p.opportunity_id = :opp AND
-            r.number like :search
-            LIMIT :limit
-            OFFSET :offset", [
-                "opp" => $opportunity_id, 
-                "search" => "%".$search."%", 
-                "limit" => $limit,
-                'offset' => $offset
-            ]); 
-
-            $paymentsResultString = array_map(function($payment) {
-                return [
-                    "id" => $payment['id'],
-                    "registration_id" => $payment['registration_id'],
-                    "number" => $payment['number'],
-                    "payment_date" => $payment['payment_date'],
-                    "amount" => (float) $payment['amount'],
-                    "status" => $payment['status']
-                ];
-            },$payments);            
+        $status = isset($data['status']) ? $data['status'] : null;
+        $paymentDate = (isset($data['paymentDate']) && !empty($data['paymentDate'])) ? new DateTime($data['paymentDate']) : null;         
+        $offset = ($page -1) * $limit;
         
-          
-      
-        //Pega o total de pagamentos cadastrados
-        $total = $conn->fetchAll("
-        SELECT count(p) as total
+        //Parametros basicos de pesquisa
+        $params = [
+            "opp" => $opportunity_id, 
+            "search" => "%".$search."%", 
+            "limit" => $limit,
+            'offset' => $offset
+        ]; 
+        
+        //incrementa parametros caso exista um filtro por status
+        if(is_numeric($status)){
+            $complement .= " AND p.status = :status";
+            $params['status']  = $status;
+        }
+
+        //incrementa parametros caso exista um filtro por data
+        if($paymentDate){
+            $complement .= " AND p.payment_date = :paymentDate";
+            $params['paymentDate']  = $paymentDate->format('Y-m-d');
+        }
+        
+        //Busca os ids das inscrições
+        $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p
         ON r.id = p.registration_id WHERE
-        p.opportunity_id = :opp ", ["opp" => $opportunity_id]);  
-      
-       
+        p.opportunity_id = :opp AND
+        (r.number like :search ) {$complement}
+        LIMIT :limit
+        OFFSET :offset";       
+        $payments = $conn->fetchAll($query, $params); 
 
+        //Remonta o retorno de pagamentos para fazer tratamentos nos valores
+        $paymentsResultString = array_map(function($payment) {
+            return [
+                "id" => $payment['id'],
+                "registration_id" => $payment['registration_id'],
+                "number" => $payment['number'],
+                "payment_date" => $payment['payment_date'],
+                "amount" => (float) $payment['amount'],
+                "metadata" => json_decode($payment['metadata']),
+                "status" => $payment['status']
+            ];
+        },$payments);
+        
+        //Pega o total de pagamentos cadastrados
+        $filter = [
+            "opp" => $opportunity_id
+        ];
+
+        //incrementa parametros caso exista um filtro por status
+        if(is_numeric($status)){
+            $filter['status']  = $status;
+        }
+
+        //incrementa parametros caso exista um filtro por pagamento
+        if($paymentDate){          
+            $filter['paymentDate']  = $paymentDate->format('Y-m-d');
+        }
+
+        //Faz a contabilização de resultados e devolve uma soma total de registros encontrados
+        $query = "SELECT count(p) as total
+        FROM registration r
+        RIGHT JOIN payment p
+        ON r.id = p.registration_id WHERE
+        p.opportunity_id = :opp {$complement}";
+        $total = $conn->fetchAll($query, $filter);       
+       
+        //Retorna os dados
         $this->apiAddHeaderMetadata($this->data, $payments, $total[0]['total']);
         $this->apiResponse($paymentsResultString);
     }

@@ -22,7 +22,7 @@ use MapasCulturais\i;
     </div>
 
       <!-- Modal de pagamentos em massa -->
-    <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div">
+    <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
         </header>
@@ -37,7 +37,7 @@ use MapasCulturais\i;
             <div>
                 <label ng-model="data.editMultiplePayments.amount"><?php i::_e("Valor"); ?></label>
                 <div>
-                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="<?php i::_e("ex.: 3000,00"); ?>"/>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
                 </div>
             </div>
 
@@ -56,16 +56,22 @@ use MapasCulturais\i;
         </div>
         
         <div>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','begin'); ?>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','end'); ?>
+            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata','begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata','end'); ?>
         </div>
         <footer>
-            <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
-            <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close" ><?php i::_e("Editar seleção"); ?></button>            
-        </footer>       
+            <div ng-if="data.editingPayments > 0">
+                <img src="<?php $this->asset('img/spinner_192.gif')?>" width="48">
+            </div>  
+            <div ng-if="data.editingPayments == 0">
+                <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
+                <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close" ><?php i::_e("Editar seleção"); ?></button>
+            </div>
+        </footer>
+             
     </div>
 
-    <!-- Tabela de pagamentos -->
+    <!-- Tabela de pagamentos -->    
     <table class="js-registration-list registrations-table">
         <thead>
             <tr> 
@@ -78,7 +84,7 @@ use MapasCulturais\i;
                 </th>
 
                 <th class="registration-payment-date-col">
-                    <?php i::_e("Data de Pagamento"); ?>
+                    <?php i::_e("Previsão de pagamento"); ?>
                 </th>
 
                 <th class="registration-amount-col">
@@ -158,7 +164,7 @@ use MapasCulturais\i;
         </tfoot>
     </table>
      <!-- Modal de edição de pagamentos únicos-->
-    <div ng-class="{hidden:!data.editPayment}" class="payment-modal payment-modal-div">
+    <div ng-class="{hidden:!data.editPayment}" class="payment-modal payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamento:"); ?> {{data.editPayment.number}}</h2>
         </header>
@@ -173,7 +179,7 @@ use MapasCulturais\i;
             <div>
                 <label ng-model="data.editPayment.amount"><?php i::_e("Valor"); ?></label>
                 <div>
-                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editPayment.amount" placeholder="<?php i::_e("ex.: 3000,00"); ?>"/>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.editPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
                 </div>
             </div>
             
@@ -193,8 +199,8 @@ use MapasCulturais\i;
         </div>
         
         <div>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','begin'); ?>
-            <?php $this->applyTemplateHook('payment-edit-modal-metadata','end'); ?>
+            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','end'); ?>
         </div>
         <footer>
             <button class="btn btn-default" ng-click="data.editPayment = null;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
@@ -202,6 +208,6 @@ use MapasCulturais\i;
         </footer>       
     </div>
     
-    <div ng-class="{hidden:!data.editPayment}" class="bg-modal"></div>
-    <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal"></div>
+    <div ng-class="{hidden:!data.editPayment}" class="bg-modal hidden"></div>
+    <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal hidden"></div>
 </div>

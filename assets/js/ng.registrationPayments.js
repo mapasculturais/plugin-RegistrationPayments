@@ -209,12 +209,23 @@
                 var payments = $scope.getSelectedPayments();
                 
                 payments.forEach(function(payment, i){
-                    
-                    console.log(payment);
-                    setTimeout(function(){
-                        $scope.data.editingPayments ++;                    
+                    setTimeout(function(){                       
+                        $scope.data.editingPayments ++;
+
+                        if(!dataView.amount){
+                            delete dataView.amount;
+                        } 
+                        
+                        if(!dataView.payment_date){
+                            delete dataView.payment_date;
+                        }
+                        
                         var result = angular.merge(payment, dataView);
-                        result.amount = (result.amount.replace(".","").replace(",","") / 100)
+
+                        if(typeof result.amount == "string"){
+                            result.amount = (result.amount.replace(".","").replace(",","") / 100);
+                        }
+
                         RegistrationPaymentsService.update(result).success(function (){
 
                             var index = $scope.data.payments.indexOf(payment);                      

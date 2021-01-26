@@ -32,6 +32,13 @@
     margin-bottom: 0;
 }
 
+.payment-modal header p {
+    color: #999;
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 0;
+}
+
 .payment-modal .fields {
     overflow: hidden;
 }
@@ -41,6 +48,11 @@
     float: left;
     padding-right: 15px;
     width: 33.3333%;
+}
+
+.payment-modal.create .fields > div:first-child {
+    padding-right: 0;
+    width: 100%;
 }
 
 .payment-modal .fields > div:last-child {

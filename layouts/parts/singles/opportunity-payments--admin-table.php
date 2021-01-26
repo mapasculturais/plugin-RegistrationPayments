@@ -26,6 +26,7 @@ use MapasCulturais\i;
     <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
+            <p><?php i::_e("Na edição em massa, as alterações serão aplicadas para todos pagamentos selecionados. Os campos que deixar em branco não serão alterados, mantendo os dados anteriores."); ?></p>
         </header>
         
         <div class="fields">
@@ -213,13 +214,15 @@ use MapasCulturais\i;
       <div ng-class="{hidden:!data.openModalCreate}" class="payment-modal create payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Criar pagamentos:"); ?></h2>
-        </header>        
+        </header>
+
+        <div class="fields">
+            
             <div>            
                 <label ng-model="data.createPayment.registration_id"><?php i::_e("Inscrições"); ?></label>
                 <textarea ng-model="data.createPayment.registration_id" cols="100" rows="5" placeholder="<?php i::_e("Informe uma ou mais inscrições separadas por virgula. Ex.: es-123456, es-654321 ou 123456,654321 "); ?>"></textarea>              
             </div>
 
-        <div class="fields">
             <div>            
                 <label ng-model="data.createPayment.payment_date"><?php i::_e("Previsão de pagamento"); ?></label>
                 <input type="date" ng-model="data.createPayment.payment_date" value="" data-flatpickr="1"/>

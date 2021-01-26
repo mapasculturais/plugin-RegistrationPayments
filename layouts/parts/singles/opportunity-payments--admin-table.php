@@ -6,11 +6,13 @@ use MapasCulturais\i;
 
 ?>
 
-<div ng-controller='RegistrationPayments'>    
+<div ng-controller='RegistrationPayments'>
+
     <header id="header-inscritos" class="clearfix">
         <h3><?php i::_e("Pagamentos"); ?></h3>
         <button ng-click="data.openModalCreate = true" class="btn btn-primary"> <?php i::_e("Adicionar pagamento"); ?></button>
     </header>
+
     <div id="payments-filter">
         <div class="left">
             <span class="label"> <?php i::_e("Filtrar inscrição:"); ?> </span>
@@ -22,24 +24,24 @@ use MapasCulturais\i;
         </div>
     </div>
 
-      <!-- Modal de pagamentos em massa -->
+    <!-- Modal de pagamentos em massa -->
     <div ng-class="{hidden:!data.multiplePayments}" class="payment-modal payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamentos:"); ?></h2>
             <p><?php i::_e("Na edição em massa, as alterações serão aplicadas para todos pagamentos selecionados. Os campos que deixar em branco não serão alterados, mantendo os dados anteriores."); ?></p>
         </header>
-        
+
         <div class="fields">
-            
+
             <div>
                 <label ng-model="data.editMultiplePayments.payment_date"><?php i::_e("Data"); ?></label>
-                <input type="date" ng-model="data.editMultiplePayments.payment_date" value="" data-flatpickr="1"/>
+                <input type="date" ng-model="data.editMultiplePayments.payment_date" value="" data-flatpickr="1" />
             </div>
 
             <div>
                 <label ng-model="data.editMultiplePayments.amount"><?php i::_e("Valor"); ?></label>
                 <div>
-                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input type="text" ng-model="data.editMultiplePayments.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00" />
                 </div>
             </div>
 
@@ -56,27 +58,27 @@ use MapasCulturais\i;
                 </select>
             </div>
         </div>
-        
+
         <div>
-            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata','begin'); ?>
-            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata','end'); ?>
+            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata', 'begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-multiple-modal-metadata', 'end'); ?>
         </div>
+
         <footer>
             <div ng-if="data.editingPayments > 0">
-                <img src="<?php $this->asset('img/spinner_192.gif')?>" width="48">
-            </div>  
+                <img src="<?php $this->asset('img/spinner_192.gif') ?>" width="48">
+            </div>
             <div ng-if="data.editingPayments == 0">
                 <button class="btn btn-default" ng-click="data.multiplePayments = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
-                <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close" ><?php i::_e("Editar seleção"); ?></button>
+                <button class="btn btn-primary" ng-click="updateSelectedPayments();" class="js-close"><?php i::_e("Editar seleção"); ?></button>
             </div>
         </footer>
-             
     </div>
 
-    <!-- Tabela de pagamentos -->    
+    <!-- Tabela de pagamentos -->
     <table class="js-registration-list registrations-table">
         <thead>
-            <tr> 
+            <tr>
                 <th class="registration-id-col">
                     <?php i::_e("Selecionar"); ?>
                 </th>
@@ -93,8 +95,8 @@ use MapasCulturais\i;
                     <?php i::_e("Valor"); ?>
                 </th>
 
-                <th class="registration-status-col">                                 
-                    <mc-select placeholder="<?php i::_e("Status"); ?>"  model="data.statusFilter[value]" data="data.statusFilter"></mc-select>
+                <th class="registration-status-col">
+                    <mc-select placeholder="<?php i::_e("Status"); ?>" model="data.statusFilter[value]" data="data.statusFilter"></mc-select>
                 </th>
 
                 <th class="registration-status-col">
@@ -104,7 +106,7 @@ use MapasCulturais\i;
         </thead>
         <tbody>
             <tr>
-                <td colspan='6'>                 
+                <td colspan='6'>
                     <span ng-if="data.apiMetadata.count === 0"><?php i::_e("Nenhum pagamento registrado."); ?></span>
                     <span ng-if="data.apiMetadata.count  === 1"><?php i::_e("1 pagamento encontrado."); ?></span>
                     <span ng-if="data.apiMetadata.count  > 1">{{data.payments.length}}
@@ -113,7 +115,7 @@ use MapasCulturais\i;
                         </span>
                         <?php i::_e("Pagamentos"); ?>
                     </span>
-                </td>                
+                </td>
             </tr>
 
             <tr>
@@ -121,31 +123,31 @@ use MapasCulturais\i;
                     <span ng-if="data.payments.length > 0"><input type="checkbox" ng-click="selectAll()" title="<?php i::_e("Selecionar todos."); ?>"></span>
                 </td>
                 <td colspan='5'>
-                    <span ng-if="getSelectedPayments().length > 0" class="outher-actions"> 
-                        <a  ng-click="data.multiplePayments = true" title="<?php i::_e("Editar pagamentos"); ?>"><i class="fas fa-edit"></i></a>
+                    <span ng-if="getSelectedPayments().length > 0" class="outher-actions">
+                        <a ng-click="data.multiplePayments = true" title="<?php i::_e("Editar pagamentos"); ?>"><i class="fas fa-edit"></i></a>
                         <a ng-click="deleteSelectedPayments(payment)" title="<?php i::_e("Excluir pagamentos selecionados"); ?>"><i class="far fa-trash-alt"></i></a>
-                    </span>                    
+                    </span>
                 </td>
             </tr>
 
-            <tr ng-repeat="payment in data.payments" id="payment-{{payment.id}}">            
-               <td>
+            <tr ng-repeat="payment in data.payments" id="payment-{{payment.id}}">
+                <td>
                     <input ng-model="payment.checked" type="checkbox" id="checkedPayment-{{payment.id}}" class="payment-item" value="{{fIndex}}" title="<?php i::_e("Selecionar pagamento {{payment.number}}"); ?>">
-               </td>
+                </td>
                 <td class="registration-id-col">
-                    <a href='{{payment.url}}' rel='noopener noreferrer'>                       
+                    <a href='{{payment.url}}' rel='noopener noreferrer'>
                         <strong>{{payment.number}}</strong>
                     </a>
                 </td>
 
-                <td class="registration-id-col">                
-                    {{getDatePaymentString(payment.payment_date)}}                    
+                <td class="registration-id-col">
+                    {{getDatePaymentString(payment.payment_date)}}
                 </td>
 
                 <td class="registration-id-col">
                     {{getAmountPaymentString(payment.amount)}}
                 </td>
-                
+
                 <td class="registration-id-col">
                     {{getPaymentStatusString(payment.status)}}
                 </td>
@@ -153,38 +155,39 @@ use MapasCulturais\i;
                     <a ng-click="data.editPayment=startEdition(payment);" title="<?php i::_e("Editar pagamento"); ?> {{payment.number}}"><i class="fas fa-edit"></i></a>
                     <a ng-click="deletePayment(payment)" title="<?php i::_e("Excluir pagamento"); ?> {{payment.number}}"><i class="far fa-trash-alt"></i></a>
                 </td>
-            </tr>           
+            </tr>
         </tbody>
         <tfoot>
             <tr>
-                <td colspan= "6" align="center">               
+                <td colspan="6" align="center">
                     <div ng-if="data.findingPayments">
-                        <img src="<?php $this->asset('img/spinner_192.gif')?>" width="48">
+                        <img src="<?php $this->asset('img/spinner_192.gif') ?>" width="48">
                     </div>
                 </td>
             </tr>
         </tfoot>
     </table>
-     <!-- Modal de edição de pagamentos únicos-->
+
+    <!-- Modal de edição de pagamentos únicos-->
     <div ng-class="{hidden:!data.editPayment}" class="payment-modal payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Editar pagamento:"); ?> {{data.editPayment.number}}</h2>
         </header>
-        
+
         <div class="fields">
 
             <div>
                 <label ng-model="data.editPayment.payment_date"><?php i::_e("Data"); ?></label>
-                <input type="date" ng-model="data.editPayment.payment_date" value="" data-flatpickr="1"/>
+                <input type="date" ng-model="data.editPayment.payment_date" value="" data-flatpickr="1" />
             </div>
 
             <div>
                 <label ng-model="data.editPayment.amount"><?php i::_e("Valor"); ?></label>
                 <div>
-                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.editPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.editPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00" />
                 </div>
             </div>
-            
+
             <div>
                 <label ng-model="data.editPayment.status"><?php i::_e("Status"); ?></label>
                 <select ng-model="data.editPayment.status">
@@ -197,43 +200,43 @@ use MapasCulturais\i;
                     <option value="10" ng-selected="data.editPayment.status === 10"><?php i::_e("Pago"); ?></option>
                 </select>
             </div>
-            
+
         </div>
-        
+
         <div>
-            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','begin');?>
-            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','end'); ?>
+            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata', 'begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata', 'end'); ?>
         </div>
+
         <footer>
-            <button class="btn btn-default" ng-click="data.editPayment = null;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
-            <button class="btn btn-primary" ng-click="savePayment(data.editPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
-        </footer>       
+            <button class="btn btn-default" ng-click="data.editPayment = null;" class="js-close"><?php i::_e("Cancelar"); ?></button>
+            <button class="btn btn-primary" ng-click="savePayment(data.editPayment);" class="js-close"><?php i::_e("Salvar"); ?></button>
+        </footer>
     </div>
 
-      <!-- Modal de criação de pagamento-->
-      <div ng-class="{hidden:!data.openModalCreate}" class="payment-modal create payment-modal-div hidden">
+    <!-- Modal de criação de pagamento-->
+    <div ng-class="{hidden:!data.openModalCreate}" class="payment-modal create payment-modal-div hidden">
         <header>
             <h2 class="payment-modal-title"><?php i::_e("Criar pagamentos:"); ?></h2>
         </header>
 
         <div class="fields">
-            
-            <div>            
+            <div>
                 <label ng-model="data.createPayment.registration_id"><?php i::_e("Inscrições"); ?></label>
-                <textarea ng-model="data.createPayment.registration_id" cols="100" rows="5" placeholder="<?php i::_e("Informe uma ou mais inscrições separadas por virgula. Ex.: es-123456, es-654321 ou 123456,654321 "); ?>"></textarea>              
+                <textarea ng-model="data.createPayment.registration_id" cols="100" rows="5" placeholder="<?php i::_e("Informe uma ou mais inscrições separadas por virgula. Ex.: es-123456, es-654321 ou 123456,654321 "); ?>"></textarea>
             </div>
 
-            <div>            
+            <div>
                 <label ng-model="data.createPayment.payment_date"><?php i::_e("Previsão de pagamento"); ?></label>
-                <input type="date" ng-model="data.createPayment.payment_date" value="" data-flatpickr="1"/>
+                <input type="date" ng-model="data.createPayment.payment_date" value="" data-flatpickr="1" />
             </div>
 
             <div>
                 <label ng-model="data.createPayment.amount"><?php i::_e("Valor"); ?></label>
                 <div>
-                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.createPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.createPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00" />
                 </div>
-            </div>           
+            </div>
             <div>
                 <label ng-model="data.createPayment.status"><?php i::_e("Status"); ?></label>
                 <select ng-model="data.createPayment.status">
@@ -246,19 +249,19 @@ use MapasCulturais\i;
                     <option value="10" ng-selected="data.createPayment.status === 10"><?php i::_e("Pago"); ?></option>
                 </select>
             </div>
-            
         </div>
-        
+
         <div>
-            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata','begin'); ?>
-            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata','end'); ?>
+            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata', 'begin'); ?>
+            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata', 'end'); ?>
         </div>
+
         <footer>
-            <button class="btn btn-default" ng-click="data.openModalCreate = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
-            <button class="btn btn-primary" ng-click="createPaymentData(data.createPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
-        </footer>       
+            <button class="btn btn-default" ng-click="data.openModalCreate = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
+            <button class="btn btn-primary" ng-click="createPaymentData(data.createPayment);" class="js-close"><?php i::_e("Salvar"); ?></button>
+        </footer>
     </div>
-    
+
     <div ng-class="{hidden:!data.editPayment}" class="bg-modal hidden"></div>
     <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal hidden"></div>
     <div ng-class="{hidden:!data.openModalCreate}" class="bg-modal hidden"></div>

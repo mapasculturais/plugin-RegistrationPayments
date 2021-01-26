@@ -36,7 +36,8 @@
                 {value: 10, label: "Pago"},
             ],
             getStatus: "",
-            filterDate: "",
+            filterDateFrom: "",
+            filterDateTo: "",
             selectAll: false,
             multiplePayments: false,
             editingPayments: 0,
@@ -58,9 +59,10 @@
         $scope.$watch('data.statusFilter[value]', function(new_val, old_val) {
             var search = $scope.data.search;
             $scope.data.status = new_val;
-            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;            
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;            
 
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:new_val, paymentDate:paymentDate}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:new_val, from:from, to:to}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 
@@ -87,10 +89,11 @@
             $scope.searchTimeOut = setTimeout(function(){
                 $scope.data.payments = [];
                 var search = $scope.data.search;
-                var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;
+                var from = $scope.data.filterDateFrom;
+                var to = $scope.data.filterDateTo;
                 var status = $scope.data.status ? $scope.data.status : null;
     
-                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:paymentDate}).success(function (data, status, headers){    
+                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, from:from, to:to}).success(function (data, status, headers){    
                     $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);    
                     $scope.data.payments = $scope.data.payments.concat(data);
                 });
@@ -101,14 +104,15 @@
             var search = $scope.data.search;
             var page = $scope.data.apiMetadata.page ? parseInt($scope.data.apiMetadata.page) +1 : 1;           
             var status = $scope.data.status ? $scope.data.status : null;
-            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;
             
             if($scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages)){
                 return;
             }
             
             $scope.data.findingPayments = true;
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page, status:status, paymentDate:paymentDate}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page, status:status, from:from, to:to}).success(function (data, status, headers){
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
                 $scope.data.payments = $scope.data.payments.concat(data);
                 $scope.data.findingPayments = false;
@@ -125,12 +129,14 @@
             }
         });
         
-        $scope.$watch('data.filterDate', function(new_val, old_val) {            
+        $scope.$watchGroup(['data.filterDateFrom','data.filterDateTo'], function(new_val, old_val) {               
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;
             var search = $scope.data.search;
             $scope.data.filterDate = new_val;            
             var status = $scope.data.status ? $scope.data.status : null;
             
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:new_val}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, from:from, to:to}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 

@@ -18,6 +18,12 @@
             payments: [],
             editPayment: null,
             editMultiplePayments: null,
+            createPayment: {
+                registration_id: null,
+                payment_date: null,
+                amount: null,
+                status: null,
+            },
             apiMetadata: {},
             search: "",
             statusFilter: [
@@ -34,7 +40,8 @@
             selectAll: false,
             multiplePayments: false,
             editingPayments: 0,
-            deletingPayments: 0
+            deletingPayments: 0,
+            openModalCreate: false,
         };
         
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
@@ -131,6 +138,39 @@
                 
             });
         });
+        
+
+        $scope.createPaymentData = function(){           
+            var fieldEmpty = false; 
+            Object.values($scope.data.createPayment).forEach(function(field){
+                if(!field){
+                    fieldEmpty = true;
+                }
+            });
+
+            if(fieldEmpty){
+                MapasCulturais.Messages.error("Preencha todos os campos");   
+                return;
+            }
+            
+            var dataView = angular.copy($scope.data.createPayment);
+            
+            RegistrationPaymentsService.create(dataView).success(function (data, status, headers) {
+                $scope.data.payments = [];
+
+                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
+                    $scope.data.payments = data;
+                });
+
+                $scope.data.openModalCreate = false;
+                $scope.data.openModalCreate = null;
+                MapasCulturais.Messages.success("Pagamento cadastrado com sucesso");
+
+            }).error(function (data, status, headers) {
+                MapasCulturais.Messages.error("Pagamento não cadastrado");
+                   
+            });         
+        }
         
         $scope.savePayment = function (payment) {
             payment.amount = (payment.amount.replace(".","").replace(",","") / 100);
@@ -372,6 +412,23 @@
             finish: function(){
                 var meta = $scope.data[meta_key];
                 return $scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages);
+            },
+
+            create: function(payment){
+                var url = MapasCulturais.createUrl('payment', 'createMultiple', {opportunity:MapasCulturais.entity.id});
+
+                payment.amount = (payment.amount.replace(".","").replace(",","") / 100);
+
+                payment.payment_date = moment(payment.payment_date).format('YYYY-MM-DD');
+
+                return $http.post(url, payment).success(function (data, status, headers) {                   
+                    $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
+
+                }).
+                error(function (data, status) {
+                    $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
+
+                });
             }
         };
     }]);

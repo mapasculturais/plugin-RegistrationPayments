@@ -9,6 +9,7 @@ use MapasCulturais\i;
 <div ng-controller='RegistrationPayments'>    
     <header id="header-inscritos" class="clearfix">
         <h3><?php i::_e("Pagamentos"); ?></h3>
+        <button ng-click="data.openModalCreate = true" class="btn btn-primary"> <?php i::_e("Adicionar pagamento"); ?></button>
     </header>
     <div id="payments-filter">
         <div class="left">
@@ -199,7 +200,7 @@ use MapasCulturais\i;
         </div>
         
         <div>
-            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','begin'); ?>
+            <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','begin');?>
             <?php $this->applyTemplateHook('payment-edit-single-modal-metadata','end'); ?>
         </div>
         <footer>
@@ -207,7 +208,55 @@ use MapasCulturais\i;
             <button class="btn btn-primary" ng-click="savePayment(data.editPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
         </footer>       
     </div>
+
+      <!-- Modal de criação de pagamento-->
+      <div ng-class="{hidden:!data.openModalCreate}" class="payment-modal create payment-modal-div hidden">
+        <header>
+            <h2 class="payment-modal-title"><?php i::_e("Criar pagamentos:"); ?></h2>
+        </header>        
+            <div>            
+                <label ng-model="data.createPayment.registration_id"><?php i::_e("Inscrições"); ?></label>
+                <textarea ng-model="data.createPayment.registration_id" cols="100" rows="5" placeholder="<?php i::_e("Informe uma ou mais inscrições separadas por virgula. Ex.: es-123456, es-654321 ou 123456,654321 "); ?>"></textarea>              
+            </div>
+
+        <div class="fields">
+            <div>            
+                <label ng-model="data.createPayment.payment_date"><?php i::_e("Previsão de pagamento"); ?></label>
+                <input type="date" ng-model="data.createPayment.payment_date" value="" data-flatpickr="1"/>
+            </div>
+
+            <div>
+                <label ng-model="data.createPayment.amount"><?php i::_e("Valor"); ?></label>
+                <div>
+                    <span class="prefix"><?php i::_e("R$"); ?></span> <input ng-model="data.createPayment.amount" placeholder="<?php i::_e("Ex.: 3.000,00"); ?>" js-mask="###.###.###.###.##0,00"/>
+                </div>
+            </div>           
+            <div>
+                <label ng-model="data.createPayment.status"><?php i::_e("Status"); ?></label>
+                <select ng-model="data.createPayment.status">
+                    <option value="">Selecione</option>
+                    <option value="0" ng-selected="data.createPayment.status === 0"><?php i::_e("Pendente"); ?></option>
+                    <option value="1" ng-selected="data.createPayment.status === 1"><?php i::_e("Em processo"); ?></option>
+                    <option value="2" ng-selected="data.createPayment.status === 2"><?php i::_e("Falha"); ?></option>
+                    <option value="3" ng-selected="data.createPayment.status === 3"><?php i::_e("Exportado"); ?></option>
+                    <option value="8" ng-selected="data.createPayment.status === 8"><?php i::_e("Disponível"); ?></option>
+                    <option value="10" ng-selected="data.createPayment.status === 10"><?php i::_e("Pago"); ?></option>
+                </select>
+            </div>
+            
+        </div>
+        
+        <div>
+            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata','begin'); ?>
+            <?php $this->applyTemplateHook('payment-create-multiple-modal-metadata','end'); ?>
+        </div>
+        <footer>
+            <button class="btn btn-default" ng-click="data.openModalCreate = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>            
+            <button class="btn btn-primary" ng-click="createPaymentData(data.createPayment);" class="js-close"><?php i::_e("Salvar"); ?></button> 
+        </footer>       
+    </div>
     
     <div ng-class="{hidden:!data.editPayment}" class="bg-modal hidden"></div>
     <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal hidden"></div>
+    <div ng-class="{hidden:!data.openModalCreate}" class="bg-modal hidden"></div>
 </div>

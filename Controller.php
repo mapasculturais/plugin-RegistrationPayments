@@ -2,10 +2,11 @@
 
 namespace RegistrationPayments;
 
+use DateTime;
 use MapasCulturais\i;
 use MapasCulturais\App;
 use MapasCulturais\Traits;
-use DateTime;
+use RegistrationPayments\Payment;
 
 /**
  * Payment Controller
@@ -163,4 +164,56 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $this->_finishRequest($entity, true, $function);
     }
 
+    /**
+     * 
+     * @apiDefine APIPost
+     * @apiDescription Cria uma entidade.
+     * @apiParam {Array} [data] Array com valores para popular os atributos da entidade. Use o método describe para descobrir os atributos. 
+     */
+    function POST_createMultiple($data = null) {      
+       
+        $this->requireAuthentication();
+
+        $app = App::i();
+
+        $user = $app->getUser();
+
+        $data = $this->data;
+        $ids = explode(",", $data['registration_id']);
+
+        $ids = array_map(function($id){
+            return trim(preg_replace('/[^0-9]/i', '', $id));
+        },$ids);
+        
+       $ids = array_filter($ids);
+       
+       $errors = [];
+  
+        $registrations = $app->repo('Registration')->findBy(['id' => $ids]);        
+        
+        if(!$registrations){            
+            $this->errorJson($errors, 400);
+        }
+        
+        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+        
+        foreach($registrations as $registration){ 
+            $payment = new Payment();        
+            $payment->opportunity = $opportunity;
+            $payment->createdByUser = $user;     
+            $payment->registration = $registration;          
+            $payment->paymentDate = new DateTime($data['payment_date']);
+            $payment->amount = (float)$data['amount'];
+            $payment->status = $data['status'] ?? 1;
+            $payment->metadata = $data['metadata'] ?? (object)[];    
+            if($errors = $payment->getValidationErrors()){
+                $this->errorJson($errors, 400);
+            }        
+            $payment->save();
+        }
+
+        $app->em->flush();
+
+        $this->finish($payment);
+    }
 }

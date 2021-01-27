@@ -151,7 +151,6 @@
 }
 
 @media (max-width: 520px) {
-
     #payments-filter .left,
     #payments-filter .right {
         float: none;
@@ -160,15 +159,35 @@
     }
 }
 
-table th {
+#payments-filter .right > div {
+    box-sizing: border-box;
+    float: left;
+    padding-right: 15px;
+    width: 50%;
+}
+
+#payments-filter .right > div:last-child {
+    padding-right: 0;
+}
+
+#payments-filter > div:last-child {
+    text-align: right;
+}
+
+/* Table */
+.payments-table .payment-status-col .dropdown .placeholder {
+    text-align: center;
+}
+
+.payments-table table th {
     width: 18%;
 }
 
-footer{
+.payments-table footer{
     text-align: right;
     margin-top:1em;
 }
 
-textarea{
+.payments-table textarea{
     width: 100%;
 }

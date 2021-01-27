@@ -18,15 +18,18 @@ use MapasCulturais\i;
             <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="<?php i::_e("Busque pelo número de inscrição"); ?>" class="ng-pristine ng-untouched ng-valid ng-empty"> <br>
         </div>
         <div class="right">
-            <span class="label"><?php i::_e("Data inicial:"); ?></span>
-            <input type="date" ng-model="data.filterDateFrom" placeholder="<?php i::_e("Informe a data inicial"); ?>">
+            <div>
+                <span class="label"><?php i::_e("Data inicial:"); ?></span>
+                <input type="date" ng-model="data.filterDateFrom" placeholder="<?php i::_e("Informe a data inicial"); ?>">
+            </div>
 
-            <span class="label"><?php i::_e("Data final:"); ?></span>
-            <input type="date" ng-model="data.filterDateTo" placeholder="<?php i::_e("Informe a data final"); ?>">
+            <div>
+                <span class="label"><?php i::_e("Data final:"); ?></span>
+                <input type="date" ng-model="data.filterDateTo" placeholder="<?php i::_e("Informe a data final"); ?>">
+            </div>
         </div>
-            <button ng-if="data.payments.length > 0" ng-click="exportPaymentsFilter()" class="btn btn-primary"> <?php i::_e("Exportar resultados"); ?></button>
         <div>
-
+            <button ng-if="data.payments.length > 0" ng-click="exportPaymentsFilter()" class="btn btn-default download"> <?php i::_e("Exportar resultados"); ?></button>
         </div>
     </div>
 
@@ -82,7 +85,7 @@ use MapasCulturais\i;
     </div>
 
     <!-- Tabela de pagamentos -->
-    <table class="js-registration-list registrations-table">
+    <table class="js-registration-list registrations-table payments-table">
         <thead>
             <tr>
                 <th class="registration-id-col">
@@ -101,8 +104,8 @@ use MapasCulturais\i;
                     <?php i::_e("Valor"); ?>
                 </th>
 
-                <th class="registration-status-col">
-                    <?php i::_e("Status"); ?>                   
+                <th class="registration-status-col payment-status-col">
+                    <?php i::_e("Status"); ?>
                     <mc-select placeholder="<?php i::_e("Status"); ?>" model="data.statusFilter[value]" data="data.statusFilter"></mc-select>
                 </th>
 

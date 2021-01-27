@@ -360,7 +360,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
         
         $dateExport = new DateTime('now');
-        $fileName = "result-filter-payments-opp-".$data['opportunity']."-".md5(json_encode($payments))."-".$dateExport->format('dmY');
+        $fileName = "result-filter-payments-opp-".$data['opportunity'].md5(json_encode($payments))."-".$dateExport->format('dmY');
         $csv->output($fileName.".csv");
     }
 }

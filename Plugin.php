@@ -60,7 +60,11 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+            $paymentsTabEnabled = $entity->paymentsTabEnabled ?? null;
+
+            if ($paymentsTabEnabled) {
+                $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
+            }
 
         });
 
@@ -72,7 +76,23 @@ class Plugin extends \MapasCulturais\Plugin{
             }
 
             $entity = $this->controller->requestedEntity;
-            $this->part('singles/opportunity-payments', ['entity' => $entity]);
+            $paymentsTabEnabled = $entity->paymentsTabEnabled ?? null;
+
+            if ($paymentsTabEnabled) {
+                $this->part('singles/opportunity-payments', ['entity' => $entity]);
+            }
+
+        });
+
+        // Adiciona campo para selecionar se a oportunidade usará ou não a aba de pagamentos nas oportunidades
+        $app->hook('view.partial(singles/opportunity-registrations--importexport):before', function () use ($app) {
+
+            if (!$app->user->is('admin')) {
+                return;
+            }
+
+            $entity = $this->controller->requestedEntity;
+            $this->part('singles/opportunity-payments-config', ['entity' => $entity]);
 
         });
 
@@ -123,6 +143,19 @@ class Plugin extends \MapasCulturais\Plugin{
             'type' => 'string',
             'private' => true,
         ]);
+
+        $this->registerMetadata('MapasCulturais\Entities\Opportunity',
+            'paymentsTabEnabled',
+            [
+                'label' => 'Habilitar aba de pagamentos',
+                'type' => 'select',
+                'options' => (object)[
+                    "0" => i::__('Desabilitar'),
+                    "1" => i::__('Habilitar'),
+                ],
+                'default_value' => (string) "0",
+            ]
+        );
     }
 
     /**

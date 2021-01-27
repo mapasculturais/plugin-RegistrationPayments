@@ -216,4 +216,25 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $this->finish($payment);
     }
+
+    /**
+     * 
+     * @apiDefine APIPATCH
+     * @apiDescription Atualiza as configurações de exibição dos pagamentos.
+     * @apiParam {Array} [data] Array com valores para atualizar os atributos da entidade. Use o método describe para descobrir os atributos. 
+     */
+    function PATCH_savePaymentConfig() {
+
+        $this->requireAuthentication();
+
+        $app = App::i();
+        $data = $this->data;
+
+        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+        $opportunity->paymentsTabEnabled = $data['value'];
+        $opportunity->save(true);
+
+        $this->_finishRequest($opportunity, true);
+
+    }
 }

@@ -29,7 +29,7 @@ use MapasCulturais\i;
             </div>
         </div>
         <div>
-            <button ng-click="exportPaymentsFilter()" class="btn btn-default download"> <?php i::_e("Exportar resultados"); ?></button>
+            <button ng-if="data.payments.length > 0" ng-click="exportPaymentsFilter()" class="btn btn-default download"> <?php i::_e("Exportar resultados"); ?></button>
         </div>
     </div>
 

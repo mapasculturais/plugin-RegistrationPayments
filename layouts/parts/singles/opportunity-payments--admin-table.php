@@ -19,8 +19,11 @@ use MapasCulturais\i;
             <input ng-model="data.search" id="search" ng-keyup="search()" placeholder="<?php i::_e("Busque pelo número de inscrição"); ?>" class="ng-pristine ng-untouched ng-valid ng-empty"> <br>
         </div>
         <div class="right">
-            <span class="label"><?php i::_e("Filtrar por data:"); ?></span>
-            <input type="date" ng-model="data.filterDate" placeholder="<?php i::_e("Busque pela data do pagamento"); ?>">
+            <span class="label"><?php i::_e("Data inicial:"); ?></span>
+            <input type="date" ng-model="data.filterDateFrom" placeholder="<?php i::_e("Informe a data inicial"); ?>">
+
+            <span class="label"><?php i::_e("Data final:"); ?></span>
+            <input type="date" ng-model="data.filterDateTo" placeholder="<?php i::_e("Informe a data final"); ?>">
         </div>
     </div>
 
@@ -96,6 +99,7 @@ use MapasCulturais\i;
                 </th>
 
                 <th class="registration-status-col">
+                    <?php i::_e("Status"); ?>                   
                     <mc-select placeholder="<?php i::_e("Status"); ?>" model="data.statusFilter[value]" data="data.statusFilter"></mc-select>
                 </th>
 

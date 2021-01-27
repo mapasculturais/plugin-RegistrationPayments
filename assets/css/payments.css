@@ -100,6 +100,10 @@
     margin-bottom: 0;
 }
 
+.payment-modal textarea{
+    width: 100%;
+}
+
 .bg-modal{
     background-color: rgba(0, 0, 0, 0.6); 
     width: 100%; 
@@ -179,15 +183,6 @@
     text-align: center;
 }
 
-.payments-table table th {
+table.payments-table th {
     width: 18%;
-}
-
-.payments-table footer{
-    text-align: right;
-    margin-top:1em;
-}
-
-.payments-table textarea{
-    width: 100%;
 }

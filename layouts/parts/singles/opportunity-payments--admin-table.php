@@ -24,7 +24,7 @@ use MapasCulturais\i;
             <span class="label"><?php i::_e("Data final:"); ?></span>
             <input type="date" ng-model="data.filterDateTo" placeholder="<?php i::_e("Informe a data final"); ?>">
         </div>
-            <button ng-click="exportPaymentsFilter()" class="btn btn-primary"> <?php i::_e("Exportar resultados"); ?></button>
+            <button ng-if="data.payments.length > 0" ng-click="exportPaymentsFilter()" class="btn btn-primary"> <?php i::_e("Exportar resultados"); ?></button>
         <div>
 
         </div>

@@ -3,8 +3,9 @@
 namespace RegistrationPayments;
 
 use DateTime;
-use MapasCulturais\App;
 use MapasCulturais\i;
+use League\Csv\Writer;
+use MapasCulturais\App;
 use MapasCulturais\Traits;
 use RegistrationPayments\Payment;
 
@@ -255,5 +256,109 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $this->_finishRequest($opportunity, true);
 
+    }
+
+    public function GET_exportFilter()
+    {
+        $this->requireAuthentication();
+
+        $app = App::i();
+        $conn = $app->em->getConnection();
+
+        $data = $this->data;
+        $opportunity_id = $this->data['opportunity'];
+        $search = isset($data['search']) ? $data['search'] : "";
+        $complement = "";
+        $status = isset($data['status']) ? $data['status'] : null;
+        
+        
+        $params = [
+            "opp" => $opportunity_id,
+            "search" => "%" . $search . "%",
+            "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
+            "documento" => '%"documento":"' . $search . '%',                    
+        ];
+
+         //incrementa parametros caso exista um filtro por data
+         if (isset($data['from']) && !empty($data['from'])) {
+            $from = new DateTime($data['from']);
+            $params['from'] = $from->format('Y-m-d');
+            $complement .= " AND p.payment_date >= :from";
+
+            if (isset($data['to']) && !empty($data['to'])) {
+                $to = new DateTime($data['to']);
+                $params['to'] = $to->format('Y-m-d');
+                $complement .= " AND p.payment_date <= :to";
+            }
+        }
+
+        //incrementa parametros caso exista um filtro por status
+        if (is_numeric($status)) {
+            $complement .= " AND p.status = :status";
+            $params['status'] = $status;
+        }
+
+         //Busca os ids das inscrições
+         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
+         FROM registration r
+         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
+         (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
+ 
+         $dataPayments = $conn->fetchAll($query, $params);
+        
+         $payments = array_map(function ($payment){
+            $date = new DateTime($payment['payment_date']);
+
+            switch ($payment['status']) {
+                case 0:
+                    $status = "Pendente";
+                    break;
+                case 1:
+                    $status = "Processando";
+                    break;
+                case 2:
+                    $status = "Falha";
+                    break;
+                case 3:
+                    $status = "Exportado";
+                    break;
+                case 8:
+                    $status = "Disponível";
+                    break;
+                case 10:
+                    $status = "Pago";
+                    break;
+            
+                default:
+                    $status = $payment['paymentDate'];
+                    break;
+            }
+            return [
+                'inscricao' => $payment['number'],
+                'previsaoPagamento' => $date->format('d/m/Y'),
+                'valor' => $payment['amount'],              
+                'status' => $status,
+                'metadata' => $payment['metadata']
+                
+            ];
+        }, $dataPayments);        
+        
+        $csv = Writer::createFromString();
+
+        $csv->setDelimiter(";");
+
+        $csv->insertOne([
+            'INSCRICAO',
+            'PREVISAO_PAGAMENTO',
+            'VALOR',
+            'STATUS',
+            'METADADO'
+        ]);
+        
+        foreach($payments as $payment){
+            $csv->insertOne($payment);           
+        }
+        
+        $csv->output("result.csv");
     }
 }

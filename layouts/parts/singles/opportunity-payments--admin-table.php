@@ -12,7 +12,6 @@ use MapasCulturais\i;
         <h3><?php i::_e("Pagamentos"); ?></h3>
         <button ng-click="data.openModalCreate = true" class="btn btn-primary"> <?php i::_e("Adicionar pagamento"); ?></button>
     </header>
-
     <div id="payments-filter">
         <div class="left">
             <span class="label"> <?php i::_e("Filtrar inscrição:"); ?> </span>
@@ -24,6 +23,10 @@ use MapasCulturais\i;
 
             <span class="label"><?php i::_e("Data final:"); ?></span>
             <input type="date" ng-model="data.filterDateTo" placeholder="<?php i::_e("Informe a data final"); ?>">
+        </div>
+            <button ng-click="exportPaymentsFilter()" class="btn btn-primary"> <?php i::_e("Exportar resultados"); ?></button>
+        <div>
+
         </div>
     </div>
 

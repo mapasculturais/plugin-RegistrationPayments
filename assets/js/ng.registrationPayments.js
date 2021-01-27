@@ -203,6 +203,17 @@
                 $scope.data.payments.splice(index,1);
             });
         }
+
+        $scope.exportPaymentsFilter = function(){
+           
+            var search = $scope.data.search;
+            var status = $scope.data.status ? $scope.data.status : null;
+            var from = $scope.data.filterDateFrom ? moment($scope.data.filterDateFrom).format('YYYY-MM-DD') : "";
+            var to = $scope.data.filterDateTo ? moment($scope.data.filterDateTo).format('YYYY-MM-DD') : "";
+            var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id, search: search, from:from, to:to, status:status});
+          
+            document.location = url;
+        }
         
         $scope.deletingPayemntTimeOut = null;
         $scope.deleteSelectedPayments = function(){
@@ -430,6 +441,17 @@
                 return $http.post(url, payment).success(function (data, status, headers) {                   
                     $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
 
+                }).
+                error(function (data, status) {
+                    $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
+
+                });
+            },
+            export: function(payments){
+                var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id});
+
+                return $http.post(url, {payments:payments}).success(function (data, status, headers) {                   
+                    $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
                 }).
                 error(function (data, status) {
                     $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});

@@ -19,7 +19,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 {
 
     use Traits\ControllerAPI;
-
     public function __construct()
     {
         parent::__construct();
@@ -45,8 +44,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $page = isset($data['@page']) ? (int) $data['@page'] : 1;
         $search = isset($data['search']) ? $data['search'] : "";
         $status = isset($data['status']) ? $data['status'] : null;
-
-        $paymentDate = (isset($data['paymentDate']) && !empty($data['paymentDate'])) ? new DateTime($data['paymentDate']) : null;
         $offset = ($page - 1) * $limit;
 
         //Parametros basicos de pesquisa
@@ -258,6 +255,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
     }
 
+    /**
+     * 
+     * @apiDefine APIGET
+     * @apiDescription Exporta um arquivo CSV com os dados de pagamento filtraos.
+     */
     public function GET_exportFilter()
     {
         $this->requireAuthentication();
@@ -269,8 +271,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $opportunity_id = $this->data['opportunity'];
         $search = isset($data['search']) ? $data['search'] : "";
         $complement = "";
-        $status = isset($data['status']) ? $data['status'] : null;
-        
+        $status = isset($data['status']) ? $data['status'] : null;        
         
         $params = [
             "opp" => $opportunity_id,
@@ -280,7 +281,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         ];
 
          //incrementa parametros caso exista um filtro por data
-         if (isset($data['from']) && !empty($data['from'])) {
+        if(isset($data['from']) && !empty($data['from'])) {
             $from = new DateTime($data['from']);
             $params['from'] = $from->format('Y-m-d');
             $complement .= " AND p.payment_date >= :from";
@@ -298,15 +299,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $params['status'] = $status;
         }
 
-         //Busca os ids das inscrições
-         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
-         FROM registration r
-         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
+        //Busca os ids das inscrições
+        $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
+        FROM registration r
+        RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
          (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
  
-         $dataPayments = $conn->fetchAll($query, $params);
+        $dataPayments = $conn->fetchAll($query, $params);
         
-         $payments = array_map(function ($payment){
+        $payments = array_map(function ($payment){
             $date = new DateTime($payment['payment_date']);
 
             switch ($payment['status']) {

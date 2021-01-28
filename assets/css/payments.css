@@ -1,3 +1,8 @@
+.payments-help {
+    font-style: italic;
+    color: #999;
+}
+
 .payment-modal{
     position: fixed;
     width: 500px;
@@ -16,6 +21,11 @@
     overflow-y: auto;    
 }
 
+.payment-modal.create{
+    width: 650px;
+    max-height: 500px;
+}
+
 .payment-modal header {
     margin-bottom: 0.75rem;
     padding-bottom: 0.75rem;
@@ -24,6 +34,13 @@
 
 .payment-modal header h2 {
     font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+.payment-modal header p {
+    color: #999;
+    display: block;
+    font-size: 0.75rem;
     margin-bottom: 0;
 }
 
@@ -36,6 +53,11 @@
     float: left;
     padding-right: 15px;
     width: 33.3333%;
+}
+
+.payment-modal.create .fields > div:first-child {
+    padding-right: 0;
+    width: 100%;
 }
 
 .payment-modal .fields > div:last-child {
@@ -76,6 +98,10 @@
     font-style: italic;
     font-weight: lighter;
     margin-bottom: 0;
+}
+
+.payment-modal textarea{
+    width: 100%;
 }
 
 .bg-modal{
@@ -120,16 +146,15 @@
     box-sizing: border-box;
     float: left;
     padding-right: 15px;
-    width: 70%;
+    width: 50%;
 }
 
 #payments-filter .right {
     float: left;
-    width: 30%;
+    width: 50%;
 }
 
 @media (max-width: 520px) {
-
     #payments-filter .left,
     #payments-filter .right {
         float: none;
@@ -138,15 +163,26 @@
     }
 }
 
-table th {
-    width: 18%;
+#payments-filter .right > div {
+    box-sizing: border-box;
+    float: left;
+    padding-right: 15px;
+    width: 50%;
 }
 
-footer{
+#payments-filter .right > div:last-child {
+    padding-right: 0;
+}
+
+#payments-filter > div:last-child {
     text-align: right;
-    margin-top:1em;
 }
 
-textarea{
-    width: 100%;
+/* Table */
+.payments-table .payment-status-col .dropdown .placeholder {
+    text-align: center;
+}
+
+table.payments-table th {
+    width: 18%;
 }

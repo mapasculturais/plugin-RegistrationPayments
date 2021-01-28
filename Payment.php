@@ -149,4 +149,24 @@ class Payment extends \MapasCulturais\Entity {
         $this->registration = $registration;
         $this->opportunity = $registration->opportunity;
     } 
+
+    protected function canUserCreate($user)
+    {
+        $can = $this->genericPermissionVerification($user);
+        if($can){
+            $can = $this->opportunity->canUser("@control", $user);
+        }
+
+        return $can;
+    }
+
+    protected function canUserModify($user)
+    {
+        $can = $this->genericPermissionVerification($user);
+        if($can){
+            $can = $this->opportunity->canUser("@control", $user);
+        }
+
+        return $can;
+    }
 }

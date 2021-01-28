@@ -18,6 +18,12 @@
             payments: [],
             editPayment: null,
             editMultiplePayments: null,
+            createPayment: {
+                registration_id: null,
+                payment_date: null,
+                amount: null,
+                status: null,
+            },
             apiMetadata: {},
             search: "",
             statusFilter: [
@@ -30,11 +36,13 @@
                 {value: 10, label: "Pago"},
             ],
             getStatus: "",
-            filterDate: "",
+            filterDateFrom: "",
+            filterDateTo: "",
             selectAll: false,
             multiplePayments: false,
             editingPayments: 0,
-            deletingPayments: 0
+            deletingPayments: 0,
+            openModalCreate: false,
         };
         
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
@@ -51,9 +59,10 @@
         $scope.$watch('data.statusFilter[value]', function(new_val, old_val) {
             var search = $scope.data.search;
             $scope.data.status = new_val;
-            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;            
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;            
 
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:new_val, paymentDate:paymentDate}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:new_val, from:from, to:to}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 
@@ -80,10 +89,11 @@
             $scope.searchTimeOut = setTimeout(function(){
                 $scope.data.payments = [];
                 var search = $scope.data.search;
-                var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;
+                var from = $scope.data.filterDateFrom;
+                var to = $scope.data.filterDateTo;
                 var status = $scope.data.status ? $scope.data.status : null;
     
-                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:paymentDate}).success(function (data, status, headers){    
+                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, from:from, to:to}).success(function (data, status, headers){    
                     $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);    
                     $scope.data.payments = $scope.data.payments.concat(data);
                 });
@@ -94,14 +104,15 @@
             var search = $scope.data.search;
             var page = $scope.data.apiMetadata.page ? parseInt($scope.data.apiMetadata.page) +1 : 1;           
             var status = $scope.data.status ? $scope.data.status : null;
-            var paymentDate = $scope.data.filterDate ? $scope.data.filterDate : null;
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;
             
             if($scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages)){
                 return;
             }
             
             $scope.data.findingPayments = true;
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page, status:status, paymentDate:paymentDate}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, "@page":page, status:status, from:from, to:to}).success(function (data, status, headers){
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
                 $scope.data.payments = $scope.data.payments.concat(data);
                 $scope.data.findingPayments = false;
@@ -118,12 +129,14 @@
             }
         });
         
-        $scope.$watch('data.filterDate', function(new_val, old_val) {            
+        $scope.$watchGroup(['data.filterDateFrom','data.filterDateTo'], function(new_val, old_val) {               
+            var from = $scope.data.filterDateFrom;
+            var to = $scope.data.filterDateTo;
             var search = $scope.data.search;
             $scope.data.filterDate = new_val;            
             var status = $scope.data.status ? $scope.data.status : null;
             
-            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, paymentDate:new_val}).success(function (data, status, headers){
+            RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:search, status:status, from:from, to:to}).success(function (data, status, headers){
 
                 $scope.data.apiMetadata = JSON.parse(headers()['api-metadata']);
 
@@ -131,6 +144,39 @@
                 
             });
         });
+        
+
+        $scope.createPaymentData = function(){           
+            var fieldEmpty = false; 
+            Object.values($scope.data.createPayment).forEach(function(field){
+                if(!field){
+                    fieldEmpty = true;
+                }
+            });
+
+            if(fieldEmpty){
+                MapasCulturais.Messages.error("Preencha todos os campos");   
+                return;
+            }
+            
+            var dataView = angular.copy($scope.data.createPayment);
+            
+            RegistrationPaymentsService.create(dataView).success(function (data, status, headers) {
+                $scope.data.payments = [];
+
+                RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
+                    $scope.data.payments = data;
+                });
+
+                $scope.data.openModalCreate = false;
+                $scope.data.openModalCreate = null;
+                MapasCulturais.Messages.success("Pagamento cadastrado com sucesso");
+
+            }).error(function (data, status, headers) {
+                MapasCulturais.Messages.error("Pagamento não cadastrado");
+                   
+            });         
+        }
         
         $scope.savePayment = function (payment) {
             payment.amount = (payment.amount.replace(".","").replace(",","") / 100);
@@ -156,6 +202,17 @@
                 
                 $scope.data.payments.splice(index,1);
             });
+        }
+
+        $scope.exportPaymentsFilter = function(){
+           
+            var search = $scope.data.search;
+            var status = $scope.data.status ? $scope.data.status : null;
+            var from = $scope.data.filterDateFrom ? moment($scope.data.filterDateFrom).format('YYYY-MM-DD') : "";
+            var to = $scope.data.filterDateTo ? moment($scope.data.filterDateTo).format('YYYY-MM-DD') : "";
+            var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id, search: search, from:from, to:to, status:status});
+          
+            document.location = url;
         }
         
         $scope.deletingPayemntTimeOut = null;
@@ -372,6 +429,34 @@
             finish: function(){
                 var meta = $scope.data[meta_key];
                 return $scope.data.apiMetadata.numPages && parseInt($scope.data.apiMetadata.page) >= parseInt($scope.data.apiMetadata.numPages);
+            },
+
+            create: function(payment){
+                var url = MapasCulturais.createUrl('payment', 'createMultiple', {opportunity:MapasCulturais.entity.id});
+
+                payment.amount = (payment.amount.replace(".","").replace(",","") / 100);
+
+                payment.payment_date = moment(payment.payment_date).format('YYYY-MM-DD');
+
+                return $http.post(url, payment).success(function (data, status, headers) {                   
+                    $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
+
+                }).
+                error(function (data, status) {
+                    $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
+
+                });
+            },
+            export: function(payments){
+                var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id});
+
+                return $http.post(url, {payments:payments}).success(function (data, status, headers) {                   
+                    $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
+                }).
+                error(function (data, status) {
+                    $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
+
+                });
             }
         };
     }]);

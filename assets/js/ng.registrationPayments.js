@@ -220,8 +220,11 @@
         }
 
         $scope.getHistoryPayment = function(payment){            
-            RegistrationPaymentsService.getHistory(payment.id).success(function(data, status, headers){                
+            RegistrationPaymentsService.getHistory(payment.id).success(function(data, status, headers){ 
+                $scope.data.dataRevision = null;
+                $scope.data.dataRevsionShow = false;               
                 var result = data.revisions.map(function(revision){
+                    revision.message = revision.message.replace(".","");
                     revision.createTimestamp.date = moment(revision.createTimestamp.date).format('DD/MM/YYYY');
                     return revision;
                 });
@@ -415,10 +418,12 @@
                 
                 return $http.get(url, {params:data}).
                     success(function (data, status, headers) {
+                       
                         for(var i = 0; i < data.length; i++) {
+                             var url = MapasCulturais.createUrl('inscricao',data[i].registration_id);
                             data[i].payment_date = new Date(data[i].payment_date+ " 12:00");
+                            data[i].url = url;
                         }
-                        
                         $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
                     }).
                     error(function (data, status) {

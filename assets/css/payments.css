@@ -186,3 +186,41 @@
 table.payments-table th {
     width: 18%;
 }
+
+.payment-modal.history {
+    max-height: 440px;
+}
+
+.payment-modal.history .revisions {
+    box-sizing: border-box;
+    float: left;
+    width: 50%;
+    border-right: 1px solid #0000001c;
+}
+
+.payment-modal.history .dataRevision {
+    box-sizing: border-box;
+    float: left;
+    width: 50%;
+    padding-left: 15px;
+    line-height: 1.5rem;
+    font-size: 0.875rem;
+
+   
+}
+
+.payment-modal.history footer {
+    width: 100%;
+    display: block;
+    overflow: hidden;
+}
+
+.payment-modal.history .dataRevision span {
+    color: #000;
+    font-weight: bold;   
+}
+
+.payment-modal.history .revisions small {
+    line-height: 1.25rem;
+}
+

@@ -306,6 +306,13 @@ class Controller extends \MapasCulturais\Controllers\EntityController
          (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
  
         $dataPayments = $conn->fetchAll($query, $params);
+
+        $header = [
+            'INSCRICAO',
+            'PREVISAO_PAGAMENTO',
+            'VALOR',
+            'STATUS'
+        ];
         
         $payments = array_map(function ($payment){
             $date = new DateTime($payment['payment_date']);
@@ -339,23 +346,16 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'previsaoPagamento' => $date->format('d/m/Y'),
                 'valor' => $payment['amount'],              
                 'status' => $status,
-                'metadata' => $payment['metadata']
-                
             ];
-        }, $dataPayments);        
+        }, $dataPayments);    
+        
+        $app->applyHook('opportunity.payments.reportCSV', [&$dataPayments, &$header, &$payments]);
         
         $csv = Writer::createFromString();
 
         $csv->setDelimiter(";");
 
-        $csv->insertOne([
-            'INSCRICAO',
-            'PREVISAO_PAGAMENTO',
-            'VALOR',
-            'STATUS',
-            'METADADO'
-        ]);
-        
+        $csv->insertOne($header);
         foreach($payments as $payment){
             $csv->insertOne($payment);           
         }

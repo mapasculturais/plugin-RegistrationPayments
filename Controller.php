@@ -364,4 +364,33 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $fileName = "result-filter-payments-opp-".$data['opportunity'].md5(json_encode($payments))."-".$dateExport->format('dmY');
         $csv->output($fileName.".csv");
     }
+
+    /**
+     * 
+     * @apiDefine APIGET
+     * @apiDescription Retorna o historico de alterações de um pagamento.
+     */
+    public function GET_revision(){
+       
+        $app = App::i();
+        
+        $paymentId = $this->data['paymentId'];
+
+        $dataRevisions = [];
+        $payment = $app->repo('RegistrationPayments\\Payment')->find($paymentId);
+        $entityRevisions = $app->repo("EntityRevision")->findEntityRevisions($payment);
+        
+
+        foreach($entityRevisions as $value){
+            $dataRevisions[$value->id] = $value->getRevisionData();
+        }
+        
+        $return = [
+            'revisions' => $entityRevisions,
+            'dataRevisions' => $dataRevisions
+        ];
+        
+        $this->apiResponse($return);
+        
+    }
 }

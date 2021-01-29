@@ -95,7 +95,6 @@ class Plugin extends \MapasCulturais\Plugin{
             $this->part('singles/opportunity-payments-config', ['entity' => $entity]);
 
         });
-
     }
 
     function enqueueScriptsAndStyles() {

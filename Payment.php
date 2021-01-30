@@ -28,6 +28,10 @@ use MapasCulturais\Traits;
  * @ORM\entity(repositoryClass="MapasCulturais\Repository")
  */
 class Payment extends \MapasCulturais\Entity {
+
+    use Traits\ControllerAPI,
+        Traits\EntityRevision;
+        
     const STATUS_PENDING = 0;
     const STATUS_PROCESSING = 1;
     const STATUS_FAILED = 2;
@@ -168,5 +172,10 @@ class Payment extends \MapasCulturais\Entity {
         }
 
         return $can;
+    }
+
+    public function getControllerId()
+    {
+        return "payment";
     }
 }

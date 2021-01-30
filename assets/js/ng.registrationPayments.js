@@ -43,6 +43,10 @@
             editingPayments: 0,
             deletingPayments: 0,
             openModalCreate: false,
+            historyPayment: false,
+            revisions: [],
+            dataRevision: [],
+            dataRevsionShow: false
         };
         
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
@@ -213,6 +217,25 @@
             var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id, search: search, from:from, to:to, status:status});
           
             document.location = url;
+        }
+
+        $scope.getHistoryPayment = function(payment){            
+            RegistrationPaymentsService.getHistory(payment.id).success(function(data, status, headers){ 
+                $scope.data.dataRevision = null;
+                $scope.data.dataRevsionShow = false;               
+                var result = data.revisions.map(function(revision){
+                    revision.message = revision.message.replace(".","");
+                    revision.createTimestamp.date = moment(revision.createTimestamp.date).format('DD/MM/YYYY');
+                    return revision;
+                });
+                $scope.data.revisions = result;
+                $scope.data.dataRevision = data.dataRevisions;
+            });
+        }
+
+        $scope.getDataRevisions = function(revisonId){
+            $scope.data.dataRevsionShow = true;
+            $scope.data.dataRevsionView = $scope.data.dataRevision[revisonId];
         }
         
         $scope.deletingPayemntTimeOut = null;
@@ -395,10 +418,12 @@
                 
                 return $http.get(url, {params:data}).
                     success(function (data, status, headers) {
+                       
                         for(var i = 0; i < data.length; i++) {
+                             var url = MapasCulturais.createUrl('inscricao',data[i].registration_id);
                             data[i].payment_date = new Date(data[i].payment_date+ " 12:00");
+                            data[i].url = url;
                         }
-                        
                         $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
                     }).
                     error(function (data, status) {
@@ -451,6 +476,17 @@
                 var url = MapasCulturais.createUrl('payment', 'exportFilter', {opportunity:MapasCulturais.entity.id});
 
                 return $http.post(url, {payments:payments}).success(function (data, status, headers) {                   
+                    $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
+                }).
+                error(function (data, status) {
+                    $rootScope.$emit('error', {message: "Payments not found for this opportunity", data: data, status: status});
+
+                });
+            },
+            getHistory: function(paymentId){
+                var url = MapasCulturais.createUrl('payment', 'revision', {paymentId:paymentId});
+
+                return $http.get(url, {paymentId:paymentId}).success(function (data, status, headers) {                   
                     $rootScope.$emit('registration.create', {message: "Payments found", data: data, status: status});
                 }).
                 error(function (data, status) {

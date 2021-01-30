@@ -164,6 +164,7 @@ use MapasCulturais\i;
                 <td class="registration-id-col actions-icons">
                     <a ng-click="data.editPayment=startEdition(payment);" title="<?php i::_e("Editar pagamento"); ?> {{payment.number}}"><i class="fas fa-edit"></i></a>
                     <a ng-click="deletePayment(payment)" title="<?php i::_e("Excluir pagamento"); ?> {{payment.number}}"><i class="far fa-trash-alt"></i></a>
+                    <a ng-click="data.historyPayment = true; getHistoryPayment(payment)" title="<?php i::_e("Histórico de alterações"); ?> {{payment.number}}"><i class="fas fa-history"></i></a>
                 </td>
             </tr>
         </tbody>
@@ -272,7 +273,48 @@ use MapasCulturais\i;
         </footer>
     </div>
 
+     <!-- Modal de histórico de pagamento-->
+     <div ng-class="{hidden:!data.historyPayment}" class="payment-modal history payment-modal-div hidden">
+        <header>
+            <h2 class="payment-modal-title"><?php i::_e("Histórico de alterações:"); ?></h2>
+        </header>
+            <div class="revisions">
+                <h3><?php i::_e("Revisões"); ?></h3>                        
+                <div class="widget">
+                    <ul class="widget-list js-slimScroll horizontalScroll">               
+                        <li ng-repeat="revision in data.revisions" id="revision-{{revision.id}}" class="widget-list-item" >
+                            <div class="revision">
+                                <a class="js-metalist-item-display" ng-click="getDataRevisions(revision.id)"><span>{{revision.message}}<?php i::_e(" em "); ?>{{revision.createTimestamp.date}}</span></a>                                
+                                <small ng-if="revision.user.profile.name.length > 0">Por: {{revision.user.profile.name}}</small>
+                            </div>                            
+                        </li>
+                    </ul>
+                </div>           
+            </div>
+            <div ng-class="{hidden:data.dataRevsionShow}" class="dataRevision">
+                <h3><?php i::_e("Detalhes"); ?></h3>   
+                <?php i::_e("Selecione uma revisão para visualizar os detalhes."); ?>
+            </div>
+            <div ng-class="{hidden:!data.dataRevsionShow}" class="dataRevision">
+                <h3><?php i::_e("Detalhes"); ?></h3>   
+                <?php $this->applyTemplateHook('payment-dataRevision-view', 'begin'); ?>
+
+                <div><span>Data:</span> {{getDatePaymentString(data.dataRevsionView.paymentDate.value.date)}}</div>
+                <div><span>Valor:</span> {{getAmountPaymentString(data.dataRevsionView.amount.value)}}</div> 
+                <div><span>Status:</span> {{getPaymentStatusString(data.dataRevsionView.status.value)}}</div>
+            
+                <?php $this->applyTemplateHook('payment-dataRevision-view', 'end'); ?>
+           
+            
+            </div>            
+        <footer>
+            <button class="btn btn-default" ng-click="data.historyPayment = false;" class="js-close"><?php i::_e("Cancelar"); ?></button>
+        </footer>
+    </div>
+
     <div ng-class="{hidden:!data.editPayment}" class="bg-modal hidden"></div>
     <div ng-class="{hidden:!data.multiplePayments}" class="bg-modal hidden"></div>
     <div ng-class="{hidden:!data.openModalCreate}" class="bg-modal hidden"></div>
+    <div ng-class="{hidden:!data.historyPayment}" class="bg-modal hidden"></div>
+
 </div>

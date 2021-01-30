@@ -96,6 +96,10 @@ class Plugin extends \MapasCulturais\Plugin{
 
         });
 
+        $app->hook('doctrine.emum(object_type).values', function(&$values) {
+            $values['Payment'] = Payment::class;
+        });
+
     }
 
     function enqueueScriptsAndStyles() {

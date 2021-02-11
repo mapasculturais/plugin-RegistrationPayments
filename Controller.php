@@ -308,6 +308,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $dataPayments = $conn->fetchAll($query, $params);
 
         $header = [
+            'ID',
             'INSCRICAO',
             'PREVISAO_PAGAMENTO',
             'VALOR',
@@ -342,6 +343,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     break;
             }
             return [
+                'id' => $payment['id'],
                 'inscricao' => $payment['number'],
                 'previsaoPagamento' => $date->format('d/m/Y'),
                 'valor' => $payment['amount'],              

@@ -85,7 +85,7 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         // Adiciona campo para selecionar se a oportunidade usará ou não a aba de pagamentos nas oportunidades
-        $app->hook('view.partial(singles/opportunity-registrations--importexport):before', function () use ($app) {
+        $app->hook('view.partial(singles/opportunity-registrations--export):before', function () use ($app) {
 
             if (!$app->user->is('admin')) {
                 return;

@@ -30,7 +30,7 @@ if ($this->isEditable()) : ?>
                         },
                         dataType: "json",
                         success: function(response) {
-                            console.log('Edições salvas.');
+                            MapasCulturais.Messages.success("Alteração salva com sucesso");
                         }
                     });
                 });

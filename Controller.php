@@ -256,68 +256,58 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     }
 
     /**
-     * 
+     *
      * @apiDefine APIGET
      * @apiDescription Exporta um arquivo CSV com os dados de pagamento filtraos.
      */
     public function GET_exportFilter()
     {
         $this->requireAuthentication();
-
         $app = App::i();
         $conn = $app->em->getConnection();
-
         $data = $this->data;
-        $opportunity_id = $this->data['opportunity'];
-        $search = isset($data['search']) ? $data['search'] : "";
+        $opportunity_id = $this->data["opportunity"];
+        $search = isset($data["search"]) ? $data["search"] : "";
         $complement = "";
-        $status = isset($data['status']) ? $data['status'] : null;        
-        
+        $status = isset($data["status"]) ? $data["status"] : null;
         $params = [
             "opp" => $opportunity_id,
             "search" => "%" . $search . "%",
             "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
-            "documento" => '%"documento":"' . $search . '%',                    
+            "documento" => '%"documento":"' . $search . '%',
         ];
-
          //incrementa parametros caso exista um filtro por data
-        if(isset($data['from']) && !empty($data['from'])) {
-            $from = new DateTime($data['from']);
-            $params['from'] = $from->format('Y-m-d');
+        if (isset($data["from"]) && !empty($data["from"])) {
+            $from = new DateTime($data["from"]);
+            $params["from"] = $from->format("Y-m-d");
             $complement .= " AND p.payment_date >= :from";
-
-            if (isset($data['to']) && !empty($data['to'])) {
-                $to = new DateTime($data['to']);
-                $params['to'] = $to->format('Y-m-d');
+            if (isset($data["to"]) && !empty($data["to"])) {
+                $to = new DateTime($data["to"]);
+                $params["to"] = $to->format("Y-m-d");
                 $complement .= " AND p.payment_date <= :to";
             }
         }
-
         //incrementa parametros caso exista um filtro por status
         if (is_numeric($status)) {
             $complement .= " AND p.status = :status";
-            $params['status'] = $status;
+            $params["status"] = $status;
         }
-
         //Busca os ids das inscrições
         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
          (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
- 
         $dataPayments = $conn->fetchAll($query, $params);
-
         $header = [
-            'INSCRICAO',
-            'PREVISAO_PAGAMENTO',
-            'VALOR',
-            'STATUS'
+            "ID",
+            "INSCRICAO",
+            "PREVISAO_PAGAMENTO",
+            "VALOR",
+            "STATUS"
         ];
-        
-        $payments = array_map(function ($payment){
-            $date = new DateTime($payment['payment_date']);
-
-            switch ($payment['status']) {
+        $payments = array_map(function ($payment) {
+            $date = new DateTime($payment["payment_date"]);
+            switch ($payment["status"]) {
                 case 0:
                     $status = "Pendente";
                     break;
@@ -336,33 +326,29 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 case 10:
                     $status = "Pago";
                     break;
-            
                 default:
-                    $status = $payment['paymentDate'];
+                    $status = $payment["paymentDate"];
                     break;
             }
             return [
-                'inscricao' => $payment['number'],
-                'previsaoPagamento' => $date->format('d/m/Y'),
-                'valor' => $payment['amount'],              
-                'status' => $status,
+                "id" => $payment["id"],
+                "inscricao" => $payment["number"],
+                "previsaoPagamento" => $date->format("d/m/Y"),
+                "valor" => $payment["amount"],
+                "status" => $status,
             ];
-        }, $dataPayments);    
-        
-        $app->applyHook('opportunity.payments.reportCSV', [&$dataPayments, &$header, &$payments]);
-        
+        }, $dataPayments);
+        $app->applyHook("opportunity.payments.reportCSV", [&$dataPayments, &$header, &$payments]);
         $csv = Writer::createFromString();
-
         $csv->setDelimiter(";");
-
         $csv->insertOne($header);
-        foreach($payments as $payment){
-            $csv->insertOne($payment);           
+        foreach($payments as $payment) {
+            $csv->insertOne($payment);
         }
-        
-        $dateExport = new DateTime('now');
-        $fileName = "result-filter-payments-opp-".$data['opportunity'].md5(json_encode($payments))."-".$dateExport->format('dmY');
+        $dateExport = new DateTime("now");
+        $fileName = "result-filter-payments-opp-".$data["opportunity"].md5(json_encode($payments))."-".$dateExport->format("dmY");
         $csv->output($fileName.".csv");
+        return;
     }
 
     /**

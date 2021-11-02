@@ -550,9 +550,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $file_name = "{$identifier}-{$fileType}-opp-{$opportunity->id}-canb240.txt";
 
 
-        var_dump($file_name);
-        exit;
-
         $dir = BASE_PATH . '/cnab/';
 
         $patch = $dir . $file_name;

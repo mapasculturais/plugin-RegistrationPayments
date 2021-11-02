@@ -2,14 +2,73 @@
 
 namespace RegistrationPayments;
 
-use BankValidator\classes\exceptions\NotRegistredBankCode;
-use MapasCulturais\App;
+use CnabPHP\Remessa;
 use MapasCulturais\i;
-use BankValidator\Validator as BankValidator;
+use MapasCulturais\App;
 use BankValidator\classes\BankCodeMapping;
+use BankValidator\Validator as BankValidator;
+use BankValidator\classes\exceptions\NotRegistredBankCode;
 
-
+require_once 'vendor/autoload.php';
 class Plugin extends \MapasCulturais\Plugin{
+
+    protected static $instance = null;
+
+    function __construct(array $config = [])
+    {
+        $config += [
+            'cnab240_enabled' => false,
+            'opportunitysCnab' => [],
+            'treatments' => [
+                'social_type' => function($registration, $field_id, $settings, $metadata, $dependence){
+                    return $settings['social_type'][$metadata[$field_id]];
+                },
+                'proponent_name' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'proponent_document' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'address' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'number' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'complement' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'zipcode' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'city' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'account_type' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'bank' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'branch' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'branch_dv' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'account' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                },
+                'account_dv' => function($registration, $field_id, $settings,$metadata, $dependence){
+                    return $metadata[$field_id] ?? null;
+                }
+            ],
+        ];
+
+        parent::__construct($config);
+
+        self::$instance = $this;
+    }
 
     function _init() {
         $app = App::i();

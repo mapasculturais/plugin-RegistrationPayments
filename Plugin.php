@@ -183,6 +183,12 @@ class Plugin extends \MapasCulturais\Plugin{
             $self->enqueueScriptsAndStyles();
         });
 
+        $this->registerMetadata('RegistrationPayments\\Payment','payment_identifier', [
+            'label' => i::__('Identificação do pagamento'),
+            'type' => 'string',
+            'private' => true,
+        ]);
+
         $this->registerAgentMetadata('payment_bank_account_type', [
             'label' => i::__('Tipo da conta bancária para pagamentos'),
             'type' => 'string',

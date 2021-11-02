@@ -287,5 +287,27 @@ class Plugin extends \MapasCulturais\Plugin{
         
         return $result;
     }
+
+    /**
+     * Devolve a instância do plugin
+     *
+     */
+    public static function getInstance()
+    {
+        return self::$instance;
+    }
+    
+    /**
+     * Devolve a instância do CNAB
+     *
+     * @param  mixed $bank
+     * @param  string $layout
+     * @param  array $params
+     * @return void
+     */
+    public function getCanbInstace($bank, $layout, array $params)
+    {
+        return new Remessa($bank, $layout, $params);
+    }
     
 }

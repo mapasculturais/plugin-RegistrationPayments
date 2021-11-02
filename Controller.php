@@ -3,11 +3,12 @@
 namespace RegistrationPayments;
 
 use DateTime;
-use MapasCulturais\i;
 use League\Csv\Writer;
 use MapasCulturais\App;
+use MapasCulturais\Entities\Opportunity;
 use MapasCulturais\Traits;
 use RegistrationPayments\Payment;
+use RegistrationPayments\Plugin;
 
 /**
  * Payment Controller
@@ -252,7 +253,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $opportunity->save(true);
 
         $this->_finishRequest($opportunity, true);
-
     }
 
     /**
@@ -276,7 +276,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
             "documento" => '%"documento":"' . $search . '%',
         ];
-         //incrementa parametros caso exista um filtro por data
+        //incrementa parametros caso exista um filtro por data
         if (isset($data["from"]) && !empty($data["from"])) {
             $from = new DateTime($data["from"]);
             $params["from"] = $from->format("Y-m-d");
@@ -303,7 +303,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             "INSCRICAO",
             "PREVISAO_PAGAMENTO",
             "VALOR",
-            "STATUS"
+            "STATUS",
         ];
         $payments = array_map(function ($payment) {
             $date = new DateTime($payment["payment_date"]);
@@ -338,16 +338,16 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 "status" => $status,
             ];
         }, $dataPayments);
-        $app->applyHook("opportunity.payments.reportCSV", [&$dataPayments, &$header, &$payments]);
+        $app->applyHook("opportunity.payments.reportCSV", [ & $dataPayments, &$header, &$payments]);
         $csv = Writer::createFromString();
         $csv->setDelimiter(";");
         $csv->insertOne($header);
-        foreach($payments as $payment) {
+        foreach ($payments as $payment) {
             $csv->insertOne($payment);
         }
         $dateExport = new DateTime("now");
-        $fileName = "result-filter-payments-opp-".$data["opportunity"].md5(json_encode($payments))."-".$dateExport->format("dmY");
-        $csv->output($fileName.".csv");
+        $fileName = "result-filter-payments-opp-" . $data["opportunity"] . md5(json_encode($payments)) . "-" . $dateExport->format("dmY");
+        $csv->output($fileName . ".csv");
         return;
     }
 
@@ -375,8 +375,251 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'revisions' => $entityRevisions,
             'dataRevisions' => $dataRevisions
         ];
-        
+
         $this->apiResponse($return);
-        
     }
+
+    public function ALL_generateCnab()
+    {
+        $this->requireAuthentication();
+
+         //Seta o timeout
+         ini_set('max_execution_time', 0);
+         ini_set('memory_limit', '768M');
+
+        $app = App::i();
+
+        // Verifica se o usuário é do grupo ADMIN
+        if(!$app->user->is('admin')){
+            echo "Não Autorizado";
+            exit;
+        }
+
+        // Pega a instancia do plugin
+        $plugin = Plugin::getInstance();
+
+        // Verifica se o CNAB esta ativo
+        if(!$plugin->config['cnab240_enabled']){
+            echo "Habilite o CANB240 nas configurações";
+            exit;
+        }
+
+        // Veirfica se o Lote esta informado
+        if(!isset($this->data['lotType'])){
+            echo "Informe o tipo de lote <br> 1 Corrente BB<br> 2 Poupança BB<br> 3 Outros bancos";
+            exit;
+        }
+       
+
+        // Pega a oportunidade
+        $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
+        $this->registerRegistrationMetadata($opportunity);
+
+        // Pega o tipo de lote a ser exportado
+        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
+
+
+        /** 
+         * Instancia o CANB
+         * @var Remessa  $arquivo
+        */
+        $arquivo = $plugin->getCanbInstace('001', 'Cnab240', [
+            'nome_empresa' => "Secretaria de cultura PE",
+            'tipo_inscricao' => 2, 
+            'numero_inscricao' => "13.270.478/0001-83",
+            'agencia' => '3234', 
+            'agencia_dv' => '4', 
+            'conta' => '11914', 
+            'conta_dv' => '8', 
+            'numero_sequencial_arquivo' => 1, 
+            'convenio' => '264470',
+            'carteira' => '',
+            'situacao_arquivo' => 'TS', 
+            'uso_bb1' => '264470', 
+            'operacao' => 'C',
+            'tipo_lancamento' => $lot,
+
+        ]);
+
+        // Seta o tipo do lote
+        $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
+
+
+        // Pega os ID's das inscrições
+        $registration_ids = $this->getRegistrationsIds($opportunity);
+
+        foreach($registration_ids as $key => $id){
+            $app = App::i();
+
+            // Pega a inscrição pelo ID
+            $registration = $app->repo("Registration")->find(['id' => $id]);
+
+            // Pega o pagamento
+            $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['registration' => $registration->id]);
+
+            // Insere 1 lote
+            $lote->inserirDetalhe(array(
+               
+                //Dados pessoais
+                'nome_favorecido' => $this->processValues('proponent_name', $registration),
+                'endereco_residencia_favorecido' => $this->processValues('address', $registration),
+                'numero_residencia_favorecido' => (int) $this->processValues('number', $registration),
+                'complemento_residencia_favorecido' => $this->processValues('complement', $registration),
+                'cidade_residencia_favorecido' => $this->processValues('city', $registration),
+                'cep_residencia_favorecido' => $this->processValues('zipcode', $registration),
+                'estado_residencia_favorecido' => 'PE',
+                'data_emissao' => '2016-04-09', 
+                'data_vencimento' => '2016-04-09',
+                'data_real' => '2021-10-29',
+
+
+                //Dados para pagamento
+                'codigo_banco_favorecido' => substr(preg_replace('/[^0-9]/', '', $this->processValues('bank', $registration)), 0, 3),
+                'agencia_favorecido' => $this->processValues('branch', $registration),
+                'agencia_favorecido_dv' => $this->processValues('branch_dv', $registration),
+                'conta_favorecido' => $this->processValues('account', $registration),
+                'conta_favorecido_dv' => $this->processValues('account_dv', $registration),
+                'data_pagamento' => '2021-10-29',
+                'valor_pagamento' => $payment->amount, 
+                'tipo_inscricao' => $this->processValues('social_type', $registration), 
+                'numero_inscricao' => $this->processValues('proponent_document', $registration),
+
+            ));
+            
+        }
+      
+        $file_name = 'canb240.txt';
+
+        $dir = BASE_PATH . '/cnab/';
+
+        $patch = $dir . $file_name;
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
+
+        $stream = fopen($patch, 'w');
+
+        fwrite($stream, $arquivo->getText());
+
+        fclose($stream);
+
+
+        header('Content-Type: application/txt');
+        header('Content-Disposition: attachment; filename=' . $file_name);
+        header('Pragma: no-cache');
+        readfile($patch);
+    }
+
+    /**
+     * Retorna as inscrições
+     *
+     * @param mixed $opportunity
+     * @return \MapasCulturais\Entities\Registration[]
+     */
+    public function getRegistrationsIds(Opportunity $opportunity)
+    {
+        $this->requireAuthentication();
+
+        $app = App::i();
+
+        $plugin = Plugin::getInstance();       
+
+      
+        $params = [];
+
+        $complement_join = "";
+        $complement_where = "";
+        $conn = $app->em->getConnection();
+
+        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
+
+        if($lot == '01' || $lot == '05'){
+            if($lot == '01'){
+                $acount = 'Conta corrente';
+            }else if($lot == '05'){
+                $acount = 'Conta poupança';
+            }
+
+            $complement_join .= " join registration_meta account on r.id = account.object_id";
+            $complement_where .= " AND account.key = :field_type_account";
+            $complement_where .= " AND account.value = :account";
+            $params['field_type_account'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['account_type'];
+            $params['account'] = $acount;
+
+
+            
+            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
+            $complement_where .= " AND bank.key = :field_bank";
+            $complement_where .= " AND bank.value = :bank_name";
+            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
+            $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
+            
+        }else if($lot == '03'){
+            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
+            $complement_where .= " AND bank.key = :field_bank";
+            $complement_where .= " AND bank.value <> :bank_name";
+            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
+            $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
+        }
+
+        
+        
+        $query = "SELECT r.id FROM registration r 
+                  JOIN payment p on r.id = p.registration_id {$complement_join}
+                  WHERE 
+                  r.status > :r_status AND 
+                  r.opportunity_id = :opportunity_id AND 
+                  p.status = :p_status {$complement_where}";
+
+        $params += [
+            'opportunity_id' => $opportunity->id,
+            'r_status' => 0,
+            'p_status' => 0
+        ];
+
+       
+        $registrations_ids = $conn->fetchAll($query, $params);
+
+        
+        $ids = [];
+        foreach ($registrations_ids as $value) {
+            $ids[] = $value['id'];
+        }
+
+        return $ids;
+    }
+    
+    /**
+     * Processa os valores devolvendo os dados que devem ser exibidos
+     *
+     * @param  mixed $value
+     * @param  Registration $registration
+     * @return string
+     */
+    public function processValues($value, \MapasCulturais\Entities\Registration $registration)
+    {
+       
+        $plugin = Plugin::getInstance();
+
+        $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'];
+
+        $field_id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$value] ?? null;
+       
+        $tratament = $plugin->config['treatments'][$value] ?? null;
+
+        $metadata = $registration->getMetadata();
+
+        $dependence = null;
+        if(is_array($field_id) && isset($field_id['dependence'])){
+            $id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
+            $dependence = $settings[$field_id['dependence']][$metadata['field_'.$id]]; 
+            $field_id = $field_id[$dependence];            
+        }
+        
+        return $tratament ? $tratament($registration, "field_" . $field_id, $settings, $metadata, $dependence) : $value;
+    }
+    
+
+    
 }

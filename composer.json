@@ -1,0 +1,17 @@
+{
+    "name": "elljsistemas/registration-payments",
+    "autoload": {
+        "psr-4": {
+            "Elljsistemas\\RegistrationPayments\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "erleibiazzio",
+            "email": "erleibiazzio@gmail.com"
+        }
+    ],
+    "require": {
+        "quilhasoft/opencnabphp": "dev-master" 
+    }
+}

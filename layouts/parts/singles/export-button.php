@@ -29,6 +29,11 @@ $url = $app->createUrl('payment', 'generateCnab');
             <input type="hidden" name="opportunity_id" value="<?=$entity->id?>">
             <button class="btn btn-primary download" type="submit">Exportar</button><br>
 
+            <label for="">
+                <input type="checkbox", name="ts_lot" id="ts_lot">
+                Exportar lote de teste
+            </label> <br>
+
             <small>OBS.: Para exportar um arquivo de teste, insira o código 9999 no campo de identificação do lote</small> 
 
         </form>

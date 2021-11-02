@@ -398,7 +398,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             exit;
         }
 
-
+   
         // Pega a oportunidade
         $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
         $this->registerRegistrationMetadata($opportunity);
@@ -475,7 +475,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'numero_sequencial_arquivo' => 1, 
             'convenio' => '264470',
             'carteira' => '',
-            'situacao_arquivo' => ($identifier != "lote-9999") ? 'TS' : ' ', 
+            'situacao_arquivo' => (isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on') ? 'TS' : ' ', 
             'uso_bb1' => '264470', 
             'operacao' => 'C',
             'tipo_lancamento' => $lot,

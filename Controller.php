@@ -475,7 +475,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'numero_sequencial_arquivo' => 1, 
             'convenio' => '264470',
             'carteira' => '',
-            'situacao_arquivo' => 'TS', 
+            'situacao_arquivo' => ($identifier != "lote-9999") ? 'TS' : ' ', 
             'uso_bb1' => '264470', 
             'operacao' => 'C',
             'tipo_lancamento' => $lot,

@@ -19,6 +19,11 @@ class Plugin extends \MapasCulturais\Plugin{
         $config += [
             'cnab240_enabled' => false,
             'opportunitysCnab' => [],
+            'file_type' => [
+                1 => 'Corrente BB', // Corrente BB
+                2 => 'Poupança BB', // Poupança BB
+                3 => 'Outros bancos' // Outros bancos
+            ],
             'treatments' => [
                 'social_type' => function($registration, $field_id, $settings, $metadata, $dependence){
                     return $settings['social_type'][$metadata[$field_id]];
@@ -75,6 +80,8 @@ class Plugin extends \MapasCulturais\Plugin{
 
         $driver = $app->em->getConfiguration()->getMetadataDriverImpl();
         $driver->addPaths([__DIR__]);
+
+        $plugin = $this;
         
         // @todo implementar cache para não fazer essa consulta a cada requisição
         if (!$app->repo('DbUpdate')->findBy(['name' => 'create table payment'])) {
@@ -110,6 +117,16 @@ class Plugin extends \MapasCulturais\Plugin{
             $app->enableAccessControl();
             $conn->commit();
         }
+
+        // Exibe Botão para exportação CNAB240
+        $app->hook('template(opportunity.<<single|edit>>.sidebar-right):begin', function () use ($plugin) {
+
+            if($plugin->config['cnab240_enabled']){
+                $entity = $this->controller->requestedEntity;
+                $this->part('singles/export-button', ['entity' => $entity]);
+            }
+           
+        });
 
         // Adiciona tab de Pagamentos na single da Oportunidade
         $app->hook('template(opportunity.single.tabs):end', function () use ($app) {
@@ -186,6 +203,12 @@ class Plugin extends \MapasCulturais\Plugin{
         $this->registerMetadata('RegistrationPayments\\Payment','payment_identifier', [
             'label' => i::__('Identificação do pagamento'),
             'type' => 'string',
+            'private' => true,
+        ]);
+
+        $this->registerMetadata('MapasCulturais\Entities\Opportunity','payment_lot_export', [
+            'label' => i::__('Lotes exportados'),
+            'type' => 'json',
             'private' => true,
         ]);
 

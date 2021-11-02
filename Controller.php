@@ -389,14 +389,42 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $app = App::i();
 
+        // Pega a instancia do plugin
+        $plugin = Plugin::getInstance();
+
         // Verifica se o usuário é do grupo ADMIN
         if(!$app->user->is('admin')){
             echo "Não Autorizado";
             exit;
         }
 
-        // Pega a instancia do plugin
-        $plugin = Plugin::getInstance();
+
+        // Pega a oportunidade
+        $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
+        $this->registerRegistrationMetadata($opportunity);
+
+
+         // Pega o identificador
+         $identifier = "lote-". str_pad($this->data['identifier'] , 4 , '0' , STR_PAD_LEFT);
+         
+
+        // Pega os ID's das inscrições
+        $registration_ids = $this->getRegistrationsIds($opportunity,  $identifier);
+        
+
+        // Veirfica se o Lote esta informado
+        if(!$registration_ids){
+            echo "Nao foram encontrado inscrições";
+            exit;
+        }
+
+         // Veirfica existe identificaçõ do lote
+         if(!isset($this->data['identifier'])){
+            echo "Informe o número de identificaçõ do lote Ex.: 001";
+            exit;
+        }
+
+       
 
         // Verifica se o CNAB esta ativo
         if(!$plugin->config['cnab240_enabled']){
@@ -409,15 +437,28 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             echo "Informe o tipo de lote <br> 1 Corrente BB<br> 2 Poupança BB<br> 3 Outros bancos";
             exit;
         }
-       
 
-        // Pega a oportunidade
-        $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
-        $this->registerRegistrationMetadata($opportunity);
+             
+        // Pega todos os lotes ja exportados
+        $payment_lot_export = json_decode($opportunity->payment_lot_export, true);
+
+        // Verifica se o lote ja foi exportado anteriormente
+        if(in_array($identifier, $payment_lot_export ?? [])){
+            echo "{$identifier} Já exportado anteriormente";
+            exit;
+        }
+
+        // Salva a refêrencia do lote na oportunidade
+        $app->disableAccessControl();
+        if($identifier != "lote-9999"){
+            $payment_lot_export[] = $identifier;
+            $opportunity->payment_lot_export = json_encode($payment_lot_export);
+            $opportunity->save(true);
+            $app->enableAccessControl();
+        }
 
         // Pega o tipo de lote a ser exportado
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
-
 
         /** 
          * Instancia o CANB
@@ -445,18 +486,32 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
 
 
-        // Pega os ID's das inscrições
-        $registration_ids = $this->getRegistrationsIds($opportunity);
 
         foreach($registration_ids as $key => $id){
             $app = App::i();
-
+           
             // Pega a inscrição pelo ID
             $registration = $app->repo("Registration")->find(['id' => $id]);
 
             // Pega o pagamento
             $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['registration' => $registration->id]);
 
+            if($identifier != "lote-9999"){
+                $paymentInfo = [];
+                if(!$payment->metadata){
+                    $paymentInfo['identifier'][] = $identifier;
+                    $payment->metadata = json_encode($paymentInfo);
+                }else{
+                    $paymentInfo = json_decode($payment->metadata, true);
+                    $paymentInfo['identifier'][] = $identifier;
+                    $payment->metadata = json_encode($paymentInfo);
+                
+                }
+            
+                $payment->status = Payment::STATUS_EXPORTED;
+                $payment->save(true);
+            }
+                        
             // Insere 1 lote
             $lote->inserirDetalhe(array(
                
@@ -486,9 +541,17 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
             ));
             
+            $app->log->debug("Exportando inscrição {$id} para pagamento");
+            $app->em->clear();
         }
-      
-        $file_name = 'canb240.txt';
+
+  
+        $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$this->data['lotType']]));
+        $file_name = "{$identifier}-{$fileType}-opp-{$opportunity->id}-canb240.txt";
+
+
+        var_dump($file_name);
+        exit;
 
         $dir = BASE_PATH . '/cnab/';
 
@@ -517,7 +580,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      * @param mixed $opportunity
      * @return \MapasCulturais\Entities\Registration[]
      */
-    public function getRegistrationsIds(Opportunity $opportunity)
+    public function getRegistrationsIds(Opportunity $opportunity, $identifier)
     {
         $this->requireAuthentication();
 
@@ -563,14 +626,18 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
         }
 
-        
+        if($identifier == "lote-9999"){
+            $complement_where .= " AND p.status >= :p_status";
+        }else{
+
+            $complement_where .= " AND p.status = :p_status";        }
+                
         
         $query = "SELECT r.id FROM registration r 
                   JOIN payment p on r.id = p.registration_id {$complement_join}
                   WHERE 
                   r.status > :r_status AND 
-                  r.opportunity_id = :opportunity_id AND 
-                  p.status = :p_status {$complement_where}";
+                  r.opportunity_id = :opportunity_id {$complement_where}";
 
         $params += [
             'opportunity_id' => $opportunity->id,
@@ -578,6 +645,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'p_status' => 0
         ];
 
+       
        
         $registrations_ids = $conn->fetchAll($query, $params);
 

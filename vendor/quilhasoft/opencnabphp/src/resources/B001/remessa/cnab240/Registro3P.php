@@ -129,8 +129,20 @@ class Registro3P extends Generico3
             'tipo' => 'alfa',
             'required' => true
         ),
-        'seu_numero' => array( // 16.3A
-            'tamanho' => 20,
+        'numero_favorecido' => array( // 16.3A
+            'tamanho' => 6,
+            'default' => ' ',
+            'tipo' => 'alfa',
+            'required' => true
+        ),
+        'numero_pagador' => array( // 16.3B
+            'tamanho' => 6,
+            'default' => ' ',
+            'tipo' => 'alfa',
+            'required' => true
+        ),
+        'referencia_pagamento' => array( // 16.3C
+            'tamanho' => 8,
             'default' => ' ',
             'tipo' => 'alfa',
             'required' => true
@@ -162,7 +174,7 @@ class Registro3P extends Generico3
         ),
         'nosso_numero' => array( //21.3A
             'tamanho' => 20,
-            'default' => '0',
+            'default' => ' ',
             'tipo' => 'alfa',
             'required' => true
         ),

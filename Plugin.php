@@ -119,13 +119,15 @@ class Plugin extends \MapasCulturais\Plugin{
         }
 
         // Exibe Botão para exportação CNAB240
-        $app->hook('template(opportunity.<<single|edit>>.sidebar-right):begin', function () use ($plugin) {
+        $app->hook('template(opportunity.<<single|edit>>.sidebar-right):begin', function () use ($plugin, $app) {
 
-            if($plugin->config['cnab240_enabled']){
-                $entity = $this->controller->requestedEntity;
-                $this->part('singles/export-button', ['entity' => $entity]);
+            $entity = $this->controller->requestedEntity;         
+            if($entity->canUser('@control')){
+                if($plugin->config['cnab240_enabled'] && in_array($entity->id, array_keys($plugin->config['opportunitysCnab']))){
+                    $this->part('singles/export-button', ['entity' => $entity]);
+                }
             }
-           
+
         });
 
         // Adiciona tab de Pagamentos na single da Oportunidade

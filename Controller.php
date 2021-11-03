@@ -392,17 +392,17 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         // Pega a instancia do plugin
         $plugin = Plugin::getInstance();
 
-        // Verifica se o usuário é do grupo ADMIN
-        if(!$app->user->is('admin')){
-            echo "Não Autorizado";
-            exit;
-        }
-
+       
    
         // Pega a oportunidade
         $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
         $this->registerRegistrationMetadata($opportunity);
 
+        // Verifica se o usuário te controle da oportunidade para executar a exportação
+        if(!$opportunity->canUser('@control')){
+            echo "Não Autorizado";
+            exit;
+        }
 
          // Pega o identificador
          $identifier = "lote-". str_pad($this->data['identifier'] , 4 , '0' , STR_PAD_LEFT);

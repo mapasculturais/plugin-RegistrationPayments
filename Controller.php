@@ -408,6 +408,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             exit;
         }
 
+        // Veirfica existe identificaçõ do lote
+        if(!$test && empty($this->data['identifier'])){
+            echo "Informe o número de identificação do lote Ex.: 001";
+            exit;
+        }
+
          // Pega o identificador
          $identifier = "lote-". str_pad($this->data['identifier'] , 4 , '0' , STR_PAD_LEFT);
          
@@ -421,15 +427,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             echo "Nao foram encontrado inscrições";
             exit;
         }
-
-         // Veirfica existe identificaçõ do lote
-         if(!isset($this->data['identifier'])){
-            echo "Informe o número de identificaçõ do lote Ex.: 001";
-            exit;
-        }
-
-       
-
+   
         // Verifica se o CNAB esta ativo
         if(!$plugin->config['cnab240_enabled']){
             echo "Habilite o CANB240 nas configurações";
@@ -472,8 +470,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         // Veirfica a data de pagamento 
         if(!($paymentDate = $this->data['paymentDate'])){
-            echo "Informe a data de pagamento";
-            exit;
+           $paymentDate = null;
         }
 
        
@@ -543,8 +540,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'cep_residencia_favorecido' => $this->processValues('zipcode', $registration),
                 'estado_residencia_favorecido' => 'PE',
                 'data_emissao' => (new DateTime('now'))->format("Y-m-d"), 
-                // 'data_vencimento' => '2016-04-09',
-                // 'data_real' => '2021-10-29',
 
 
                 //Dados para pagamento
@@ -553,16 +548,16 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'agencia_favorecido_dv' => $this->processValues('branch_dv', $registration),
                 'conta_favorecido' => $this->processValues('account', $registration),
                 'conta_favorecido_dv' => $this->processValues('account_dv', $registration),
-                'data_pagamento' => $paymentDate,
+                'data_pagamento' => $paymentDate ?? $payment->paymentDate->format("Y-m-d"),
                 'valor_pagamento' => $payment->amount, 
                 'tipo_inscricao' => $this->processValues('social_type', $registration), 
                 'numero_inscricao' => $this->processValues('proponent_document', $registration),
                 'referencia_pagamento' => $registration->id
 
-
             ));
             
-            $app->log->debug("Exportando inscrição {$id} para pagamento");
+            $complementDebugInfo = $test ? "para teste" : "para pagamento";
+            $app->log->debug("#{$key} - CNAB240 Exportando inscrição {$id} {$complementDebugInfo}");
             $app->em->clear();
         }
 

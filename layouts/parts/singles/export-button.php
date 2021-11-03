@@ -37,6 +37,7 @@ $url = $app->createUrl('payment', 'generateCnab');
                 Exportar lote de teste
             </label> <br>
 
+            <small>OBS.: Caso a data de pagamento nao for informada, sera inserido a data que está cadastrada junto aos dados de pagamento</small>
         </form>
     </edit-box>
 </div>

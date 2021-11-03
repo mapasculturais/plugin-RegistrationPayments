@@ -182,7 +182,7 @@ class Registro3P extends Generico3
             'tamanho' => 8,
             'default' => '',
             'tipo' => 'date',
-            'required' => true
+            'required' => false
         ),
         'valor_real' => array( //23.3A
             'tamanho' => 13,

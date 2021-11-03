@@ -25,46 +25,61 @@ class Plugin extends \MapasCulturais\Plugin{
                 3 => 'Outros bancos' // Outros bancos
             ],
             'treatments' => [
-                'social_type' => function($registration, $field_id, $settings, $metadata, $dependence){
-                    return $settings['social_type'][$metadata[$field_id]];
+                'social_type' => function($registration, $field, $settings, $metadata, $dependence){
+                    $field_id = "field_".$field;
+                    $id = isset($metadata[$field_id]) ? $metadata[$field_id] : $field;
+                    return $settings['social_type'][$id];
                 },
-                'proponent_name' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'proponent_name' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'proponent_document' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'proponent_document' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'address' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'address' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'number' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'number' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'complement' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'complement' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'zipcode' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'zipcode' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'city' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'city' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'account_type' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'account_type' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'bank' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'bank' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'branch' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'branch' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'branch_dv' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'branch_dv' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'account' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'account' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'account_dv' => function($registration, $field_id, $settings,$metadata, $dependence){
+                'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 }
             ],

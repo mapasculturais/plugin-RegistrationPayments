@@ -470,6 +470,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             exit;
         }
 
+        // Veirfica a data de pagamento 
+        if(!($paymentDate = $this->data['paymentDate'])){
+            echo "Informe a data de pagamento";
+            exit;
+        }
+
+       
+
         /** 
          * Instancia o CANB
          * @var Remessa  $arquivo
@@ -496,7 +504,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         // Seta o tipo do lote
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
-
 
 
         foreach($registration_ids as $key => $id){
@@ -535,9 +542,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'cidade_residencia_favorecido' => $this->processValues('city', $registration),
                 'cep_residencia_favorecido' => $this->processValues('zipcode', $registration),
                 'estado_residencia_favorecido' => 'PE',
-                'data_emissao' => '2016-04-09', 
-                'data_vencimento' => '2016-04-09',
-                'data_real' => '2021-10-29',
+                'data_emissao' => (new DateTime('now'))->format("Y-m-d"), 
+                // 'data_vencimento' => '2016-04-09',
+                // 'data_real' => '2021-10-29',
 
 
                 //Dados para pagamento
@@ -546,7 +553,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'agencia_favorecido_dv' => $this->processValues('branch_dv', $registration),
                 'conta_favorecido' => $this->processValues('account', $registration),
                 'conta_favorecido_dv' => $this->processValues('account_dv', $registration),
-                'data_pagamento' => '2021-10-29',
+                'data_pagamento' => $paymentDate,
                 'valor_pagamento' => $payment->amount, 
                 'tipo_inscricao' => $this->processValues('social_type', $registration), 
                 'numero_inscricao' => $this->processValues('proponent_document', $registration),

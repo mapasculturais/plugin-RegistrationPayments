@@ -18,6 +18,9 @@ $url = $app->createUrl('payment', 'generateCnab');
             <label for="identifier">Identificação do lote de pagamento</label>
             <input type="number" name="identifier" id="identifier" placeholder="EX.: 001">
 
+            <label for="identifier">Data de pagamento</label>
+            <input type="date" name="paymentDate" id="paymentDate">
+
             
             <label for="lotType">Tipo de exportação</label>
             <select name="lotType" id="lotType">

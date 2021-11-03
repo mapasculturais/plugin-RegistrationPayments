@@ -464,27 +464,35 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         // Pega o tipo de lote a ser exportado
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
 
+        // Pega as configurações da entidade pagadora
+        if(!($company_data = $plugin->config['cnab240_company_data'])){
+            echo "A entidade pagadora nao foi configurada";
+            exit;
+        }
+
         /** 
          * Instancia o CANB
          * @var Remessa  $arquivo
-        */
+        */     
         $arquivo = $plugin->getCanbInstace('001', 'Cnab240', [
-            'nome_empresa' => "Secretaria de cultura PE",
-            'tipo_inscricao' => 2, 
-            'numero_inscricao' => "13.270.478/0001-83",
-            'agencia' => '3234', 
-            'agencia_dv' => '4', 
-            'conta' => '11914', 
-            'conta_dv' => '8', 
+            'nome_empresa' => $company_data['nome_empresa'],
+            'tipo_inscricao' => $company_data['tipo_inscricao'],
+            'numero_inscricao' => $company_data['numero_inscricao'],
+            'agencia' => $company_data['agencia'], 
+            'agencia_dv' => $company_data['agencia_dv'],
+            'conta' => $company_data['conta'], 
+            'conta_dv' => $company_data['conta_dv'], 
             'numero_sequencial_arquivo' => 1, 
-            'convenio' => '264470',
+            'convenio' => $company_data['convenio'],
             'carteira' => '',
             'situacao_arquivo' => $test ? 'TS' : ' ', 
-            'uso_bb1' => '264470', 
+            'uso_bb1' => $company_data['convenio'],
             'operacao' => 'C',
             'tipo_lancamento' => $lot,
 
         ]);
+
+     
 
         // Seta o tipo do lote
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos

@@ -19,6 +19,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $config += [
             'cnab240_enabled' => false,
             'opportunitysCnab' => [],
+            'cnab240_company_data' => [],
             'file_type' => [
                 1 => 'Corrente BB', // Corrente BB
                 2 => 'Poupança BB', // Poupança BB

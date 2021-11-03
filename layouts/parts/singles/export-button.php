@@ -34,8 +34,6 @@ $url = $app->createUrl('payment', 'generateCnab');
                 Exportar lote de teste
             </label> <br>
 
-            <small>OBS.: Para exportar um arquivo de teste, insira o código 9999 no campo de identificação do lote</small> 
-
         </form>
     </edit-box>
 </div>

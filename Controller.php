@@ -392,7 +392,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         // Pega a instancia do plugin
         $plugin = Plugin::getInstance();
 
-       
+       // Varifica se o arquivo é um teste ou se é um arquivo oficial
+       $test = false;
+       if(isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on'){
+           $test = true;
+       }
    
         // Pega a oportunidade
         $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
@@ -443,14 +447,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $payment_lot_export = json_decode($opportunity->payment_lot_export, true);
 
         // Verifica se o lote ja foi exportado anteriormente
-        if(in_array($identifier, $payment_lot_export ?? [])){
+        if(!$test && in_array($identifier, $payment_lot_export ?? [])){
             echo "{$identifier} Já exportado anteriormente";
             exit;
         }
 
         // Salva a refêrencia do lote na oportunidade
         $app->disableAccessControl();
-        if($identifier != "lote-9999"){
+        if(!$test){
             $payment_lot_export[] = $identifier;
             $opportunity->payment_lot_export = json_encode($payment_lot_export);
             $opportunity->save(true);
@@ -475,7 +479,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'numero_sequencial_arquivo' => 1, 
             'convenio' => '264470',
             'carteira' => '',
-            'situacao_arquivo' => (isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on') ? 'TS' : ' ', 
+            'situacao_arquivo' => $test ? 'TS' : ' ', 
             'uso_bb1' => '264470', 
             'operacao' => 'C',
             'tipo_lancamento' => $lot,
@@ -496,7 +500,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             // Pega o pagamento
             $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['registration' => $registration->id]);
 
-            if($identifier != "lote-9999"){
+            if(!$test){
                 $paymentInfo = [];
                 if(!$payment->metadata){
                     $paymentInfo['identifier'][] = $identifier;
@@ -538,6 +542,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'valor_pagamento' => $payment->amount, 
                 'tipo_inscricao' => $this->processValues('social_type', $registration), 
                 'numero_inscricao' => $this->processValues('proponent_document', $registration),
+                'referencia_pagamento' => $registration->id
+
 
             ));
             
@@ -664,7 +670,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      */
     public function processValues($value, \MapasCulturais\Entities\Registration $registration)
     {
-       
+        if(!$value){
+            return "";
+        }
+
         $plugin = Plugin::getInstance();
 
         $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'];
@@ -682,7 +691,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $field_id = $field_id[$dependence];            
         }
         
-        return $tratament ? $tratament($registration, "field_" . $field_id, $settings, $metadata, $dependence) : $value;
+        return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;
     }
     
 

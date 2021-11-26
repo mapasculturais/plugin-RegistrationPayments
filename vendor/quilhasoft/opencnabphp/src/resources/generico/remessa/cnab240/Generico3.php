@@ -107,6 +107,15 @@ class Generico3 extends RegistroRemAbstract
         $this->data['identificacao_contrato'] = $value != ' ' ? $value : $this->data['nosso_numero'];
     }
 
+    protected function set_codigo_banco_favorecido($value)
+    {
+        $this->data['camara_centralizadora'] = ($value == 001) ? "000" : "018";
+
+        if($value == 001){
+            $this->data['filler2'] = " ";
+        }
+    }
+
     protected function set_especie_titulo($value)
     {
         if (is_int($value)) {

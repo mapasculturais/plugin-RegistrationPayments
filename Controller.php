@@ -565,7 +565,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
   
         $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$this->data['lotType']]));
-        $file_name = "{$identifier}-{$fileType}-opp-{$opportunity->id}-canb240.txt";
+        $file_name = "{$identifier}-opp-{$opportunity->id}-{$fileType}-canb240.txt";
 
 
         $dir = BASE_PATH . '/cnab/';

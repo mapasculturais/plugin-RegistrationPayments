@@ -4,12 +4,27 @@ Plugin que agrega funcionalidade de gerenciamento dos pagamentos
 ## Configuração CNAB 240
 
 ```
-     'RegistrationPayments' => [
+      'RegistrationPayments' => [
             'namespace' => 'RegistrationPayments',
             'config' => [
                 'cnab240_enabled' => true, // Habilita ou Desabilita exportação do CNAB240
+                'cnab240_company_data' => [
+                    'nome_empresa' => 'NOME DA EMPRESA', // Nome da fonte pagadora
+                    'tipo_inscricao' => '2', // 1 CPF OU 2 CNPJ
+                    'numero_inscricao' => '00.000.000/000-00', // CPF OU CNPJ
+                    'agencia' => '0000', // Agência bancarioa
+                    'agencia_dv' => '0', // DV da Agência bancária
+                    'conta' => '00000', // Conta corrente bancária
+                    'conta_dv' => '0', // DV da conta bancária
+                    'numero_sequencial_arquivo' => 1, // Sequencial do arquivo. Deixar por default 1
+                    'convenio' => '000000000', // Número do convênia junto ao banco do Brasil
+                    'carteira' => '', // Deixar em branco
+                    'situacao_arquivo' => " ", // Colocar a sigla TS pata testes ou Branco para envio oficial
+                    'uso_bb1' => '000000000', // Repetir número do conênio
+                    'operacao' => 'C', // Deixar por default C
+                ],
                 'opportunitysCnab' => [ // Configurações de oportunidades
-                    '820' => [
+                    '820' => [                        
                         'settings' => [ // Configurações padrões
                             'social_type' => [ // Tipo de proponente (Pessoa Fisica ou Pessoa Jurídica) Pessoa Fisica = 1 Pessoa Jurídica = 2
                                 'PF (Pessoa Física)' => '1',
@@ -20,7 +35,7 @@ Plugin que agrega funcionalidade de gerenciamento dos pagamentos
                                 1 => '01', // Corrente BB
                                 2 => '05', // Poupança BB
                                 3 => '03' // Outros bancos
-                            ]
+                            ],
 
                         ],
                         'social_type' => 17169, // ID campo que define o tipo de ptoponente, (Pessoa Fisica ou Pessoa Jurídica)

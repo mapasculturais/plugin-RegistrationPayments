@@ -492,6 +492,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'carteira' => '',
             'situacao_arquivo' => $test ? 'TS' : ' ', 
             'uso_bb1' => $company_data['convenio'],
+            'uso_bb2' => '0126',
+            'uso_bb4' => $test ? 'TS' : ' ',
             'operacao' => 'C',
             'tipo_lancamento' => $lot,
 

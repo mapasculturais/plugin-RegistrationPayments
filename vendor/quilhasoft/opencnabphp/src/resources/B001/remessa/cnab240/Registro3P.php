@@ -82,7 +82,7 @@ class Registro3P extends Generico3
         ),
         'camara_centralizadora' => array( // 08.3A
             'tamanho' => 3,
-            'default' => '018',
+            'default' => '000',
             'tipo' => 'int',
             'required' => true
         ),
@@ -119,7 +119,7 @@ class Registro3P extends Generico3
         ),
         'filler2' => array( // 14.3A => campo se chama {Dígito Verificador Agência/Conta} no Particularidades V7 2019
             'tamanho' => 1,
-            'default' => '0',
+            'default' => ' ',
             'tipo' => 'alfa',
             'required' => true
         ),

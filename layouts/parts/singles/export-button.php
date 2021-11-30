@@ -29,6 +29,9 @@ $url = $app->createUrl('payment', 'generateCnab');
                 <option value="3">Outros Bancos</option>
             </select>
 
+            <label for="registrationFilter">Filtrar somenta as inscrições</label>
+            <textarea name="registrationFilter" id="registrationFilter" cols="30" rows="3" placeholder="Insira aqui a lista de inscrições que deseja exportar"></textarea>
+
             <input type="hidden" name="opportunity_id" value="<?=$entity->id?>">
             <button class="btn btn-primary download" type="submit">Exportar</button><br>
 

@@ -609,8 +609,31 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $complement_join = "";
         $complement_where = "";
         $conn = $app->em->getConnection();
-
+        
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
+
+        if($this->data['registrationFilter']){
+
+            $registrationFilter = $this->data['registrationFilter'];
+
+            if(count(explode(",", $registrationFilter)) >1){
+                $delimiter = ",";
+            }else if(count(explode("\n", $registrationFilter)) >1){
+                $delimiter = "\n"; 
+            }
+            
+            $ids = explode($delimiter, $registrationFilter);
+
+            $result = array_map(function($id){
+                return preg_replace('/[^0-9]/i', '', $id);
+            },$ids);
+
+            array_filter($result);
+            
+            $list = implode(",", $result);
+            $complement_where.= "AND r.id IN ({$list})";
+
+        }
 
         if($lot == '01' || $lot == '05'){
             if($lot == '01'){
@@ -653,6 +676,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                   WHERE 
                   r.status > :r_status AND 
                   r.opportunity_id = :opportunity_id {$complement_where}";
+
+
 
         $params += [
             'opportunity_id' => $opportunity->id,

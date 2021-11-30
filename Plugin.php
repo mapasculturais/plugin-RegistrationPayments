@@ -18,7 +18,7 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $config += [
             'cnab240_enabled' => false,
-            'opportunitys_canb_active' => [],
+            'opportunitys_canab_active' => [],
             'opportunitysCnab' => [],
             'cnab240_company_data' => [],
             'file_type' => [

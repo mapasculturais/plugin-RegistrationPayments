@@ -145,7 +145,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
             $entity = $this->controller->requestedEntity;         
             if($entity->canUser('@control')){
-                if($plugin->config['cnab240_enabled'] && in_array($entity->id, $plugin->config['opportunitys_canb_active'])){
+                if($plugin->config['cnab240_enabled'] && in_array($entity->id, $plugin->config['opportunitys_cnab_active'])){
                     $this->part('singles/export-button', ['entity' => $entity]);
                 }
             }

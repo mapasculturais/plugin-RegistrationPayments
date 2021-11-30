@@ -554,7 +554,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'valor_pagamento' => $payment->amount, 
                 'tipo_inscricao' => $this->processValues('social_type', $registration), 
                 'numero_inscricao' => $this->processValues('proponent_document', $registration),
-                'referencia_pagamento' => $registration->id
+                'referencia_pagamento' => base_convert($registration->id, 10, 36)
 
             ));
             
@@ -698,9 +698,16 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $dependence = null;
         if(is_array($field_id) && isset($field_id['dependence'])){
-            $id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
-            $dependence = $settings[$field_id['dependence']][$metadata['field_'.$id]]; 
-            $field_id = $field_id[$dependence];            
+
+            
+            if($field_id['dependence'] == "category"){
+                $field_id = $field_id['dependence']; 
+            }else{
+                $id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
+                $dependence = $settings[$field_id['dependence']][$metadata['field_'.$id]]; 
+                $field_id = $field_id[$dependence];  
+            }
+                      
         }
         
         return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;

@@ -38,10 +38,22 @@ class Plugin extends \MapasCulturais\Plugin{
                     return $settings['social_type'][$id];
                 },
                 'proponent_name' => function($registration, $field, $settings,$metadata, $dependence){
+                    if($field =="category"){
+                        $id = $registration->$field;  
+                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
+                        return $metadata[$field_id] ?? null;
+                    }
+                    
                     $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
                 'proponent_document' => function($registration, $field, $settings,$metadata, $dependence){
+                    if($field =="category"){                      
+                        $id = $registration->$field;                          
+                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_document'][$settings['social_type'][$id]];
+                        return $metadata[$field_id] ?? null;
+                    }
+
                     $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },

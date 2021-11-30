@@ -27,6 +27,11 @@ class Plugin extends \MapasCulturais\Plugin{
             ],
             'treatments' => [
                 'social_type' => function($registration, $field, $settings, $metadata, $dependence){
+                    if($field =="category"){
+                        $id = $registration->$field;                        
+                        return $settings['social_type'][$id];
+                    }
+
                     $field_id = "field_".$field;
                     $id = isset($metadata[$field_id]) ? $metadata[$field_id] : $field;
                     return $settings['social_type'][$id];

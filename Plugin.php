@@ -18,6 +18,7 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $config += [
             'cnab240_enabled' => false,
+            'opportunitys_canb_active' => [],
             'opportunitysCnab' => [],
             'cnab240_company_data' => [],
             'file_type' => [
@@ -144,7 +145,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
             $entity = $this->controller->requestedEntity;         
             if($entity->canUser('@control')){
-                if($plugin->config['cnab240_enabled'] && in_array($entity->id, array_keys($plugin->config['opportunitysCnab']))){
+                if($plugin->config['cnab240_enabled'] && in_array($entity->id, $plugin->config['opportunitys_canb_active'])){
                     $this->part('singles/export-button', ['entity' => $entity]);
                 }
             }

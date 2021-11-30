@@ -520,7 +520,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     $paymentInfo['identifier'][] = $identifier;
                     $payment->metadata = json_encode($paymentInfo);
                 }else{
-                    $paymentInfo = json_decode($payment->metadata ?? "", true);
+                    $paymentInfo = (array)$payment->metadata ?? [];
                     $paymentInfo['identifier'][] = $identifier;
                     $payment->metadata = json_encode($paymentInfo);
                 

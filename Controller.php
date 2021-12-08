@@ -451,8 +451,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         ];
 
         // Verifica se o lote ja foi exportado anteriormente
-        if(!$test && in_array($identifier, $payment_lot_export ?? [])){
-            echo "{$identifier} Já exportado anteriormente";
+        if(!$test && in_array($this->data['lotType'], $payment_lot_export[$identifier] ?? [])){
+            echo "{$identifier} para o arquivo {$typeLot[$this->data['lotType']]} Já exportado anteriormente. Caso queira fazer uma confêrencia selecione a caixa Exportar lote de teste.";
             exit;
         }
 

@@ -444,6 +444,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         // Pega todos os lotes ja exportados
         $payment_lot_export = json_decode($opportunity->payment_lot_export, true);
 
+        $typeLot = [
+            1 => "Corrente BB",
+            2 => "Poupança BB",
+            3 => "Outros Bancos"
+        ];
+
         // Verifica se o lote ja foi exportado anteriormente
         if(!$test && in_array($identifier, $payment_lot_export ?? [])){
             echo "{$identifier} Já exportado anteriormente";

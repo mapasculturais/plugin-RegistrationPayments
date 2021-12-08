@@ -456,14 +456,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             exit;
         }
 
-        // Salva a refêrencia do lote na oportunidade
-        $app->disableAccessControl();
-        if(!$test){
-            $payment_lot_export[] = $identifier;
-            $opportunity->payment_lot_export = json_encode($payment_lot_export);
-            $opportunity->save(true);
-            $app->enableAccessControl();
-        }
+        
 
         // Pega o tipo de lote a ser exportado
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
@@ -567,6 +560,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $complementDebugInfo = $test ? "para teste" : "para pagamento";
             $app->log->debug("#{$key} - CNAB240 Exportando inscrição {$id} {$complementDebugInfo}");
             $app->em->clear();
+        }
+
+        // Salva a refêrencia do lote na oportunidade
+        if(!$test){
+            $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
+            $payment_lot_export[$identifier][] = $this->data['lotType'];
+            $opportunity->payment_lot_export = json_encode($payment_lot_export);
+            $opportunity->save(true);
         }
 
   

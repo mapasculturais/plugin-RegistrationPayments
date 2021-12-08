@@ -675,13 +675,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
         }
 
-        $payment_lot_export = json_decode($opportunity->payment_lot_export, true) ?? [];
-
-        if($test || !array_diff(["1","2","3"], $payment_lot_export[$identifier] ?? [])){
-            $complement_where .= " AND p.status >= :p_status";
-        }else{
-            $complement_where .= " AND p.status = :p_status";  
-        }
+        $complement_where .= " AND p.status >= :p_status";
        
         $query = "SELECT r.id FROM registration r 
                   JOIN payment p on r.id = p.registration_id {$complement_join}

@@ -592,7 +592,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
 
         header('Content-Type: application/txt');
-        header('Content-Disposition: attachment; filename=' . $file_name);
+        header("Content-Disposition: attachment; filename=\"$file_name\"");
         header('Pragma: no-cache');
         readfile($patch);
     }

@@ -639,11 +639,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
             $result = array_map(function($id){
                 return preg_replace('/[^0-9]/i', '', $id);
-            },$ids);
-
-            array_filter($result);
+            },$ids);         
             
-            $list = implode(",", $result);
+            $list = implode(",", array_filter($result));
             $complement_where.= "AND r.id IN ({$list})";
 
         }

@@ -136,7 +136,11 @@ class Plugin extends \MapasCulturais\Plugin{
                     $data = $metadata[$field_id] ?? 0;
                     
                     if(!is_int($data) && (strlen($data) > 2)){
-                        $data = 0;
+                        if(preg_match("/x/", mb_strtolower($data))){
+                            $data = "X";
+                        }else{
+                            $data = 0;
+                        }
                     }
                     
                     $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];

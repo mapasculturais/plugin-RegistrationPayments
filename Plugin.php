@@ -21,6 +21,19 @@ class Plugin extends \MapasCulturais\Plugin{
             'opportunitys_cnab_active' => [],
             'opportunitysCnab' => [],
             'cnab240_company_data' => [],
+            'fromToDvBranch' => [
+                '0' => '3',
+                '1' => '4',
+                '2' => '5',
+                '3' => '6',
+                '4' => '7',
+                '5' => '8',
+                '6' => '9',
+                '7' => 'X',
+                '8' => '0',
+                '9' => '1',
+                'X' => '2',
+            ],
             'file_type' => [
                 1 => 'Corrente BB', // Corrente BB
                 2 => 'Poupança BB', // Poupança BB
@@ -94,12 +107,50 @@ class Plugin extends \MapasCulturais\Plugin{
                     return $metadata[$field_id] ?? null;
                 },
                 'account' => function($registration, $field, $settings,$metadata, $dependence){
+
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    $data = $metadata[$field_id] ?? null;
+
+                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
+                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
+                    $search = "banco do brasil";
+                    
+                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id])) && substr($data, 0, 2) != "51"){
+                       
+                        $account_temp = "51" . $data;
+
+                        if(strlen($account_temp) < 9){
+                            $result = "51".str_pad($data, 7, 0, STR_PAD_LEFT);
+                        }else{
+                            $result = "51" . $data;
+                        }
+
+                    }else{
+                        $result = $data;
+                    }
+
+                   return $result;
                 },
                 'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    $data = $metadata[$field_id] ?? 0;
+                    
+                    if(!is_int($data) && (strlen($data) > 2)){
+                        $data = 0;
+                    }
+                    
+                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
+                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
+                    $search = "banco do brasil";
+
+                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id]))){
+                        return $this->config['fromToDvBranch'][$data];
+                    }else{
+                        $result =  $data;
+                    }
+
+                    return $result;
+
                 }
             ],
         ];

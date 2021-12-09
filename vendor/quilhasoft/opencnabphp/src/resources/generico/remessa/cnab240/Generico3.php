@@ -109,6 +109,7 @@ class Generico3 extends RegistroRemAbstract
 
     protected function set_codigo_banco_favorecido($value)
     {
+        $this->data['codigo_banco_favorecido'] = $value;
         $this->data['camara_centralizadora'] = ($value == 001) ? "000" : "018";
 
         if($value == 001){

@@ -547,7 +547,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'codigo_banco_favorecido' => substr(preg_replace('/[^0-9]/', '', $this->processValues('bank', $registration)), 0, 3),
                 'agencia_favorecido' => $this->processValues('branch', $registration),
                 'agencia_favorecido_dv' => $this->processValues('branch_dv', $registration),
-                'conta_favorecido' => $this->processValues('account', $registration),
+                'conta_favorecido' => preg_replace('/[^0-9]/', '', $this->processValues('account', $registration)),
                 'conta_favorecido_dv' => $this->processValues('account_dv', $registration),
                 'data_pagamento' => $paymentDate ?? $payment->paymentDate->format("Y-m-d"),
                 'valor_pagamento' => $payment->amount, 

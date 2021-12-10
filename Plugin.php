@@ -33,6 +33,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 '8' => '0',
                 '9' => '1',
                 'X' => '2',
+                'x' => '2',
             ],
             'file_type' => [
                 1 => 'Corrente BB', // Corrente BB

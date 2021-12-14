@@ -123,7 +123,7 @@ use MapasCulturais\i;
                         <span ng-if="data.apiMetadata.count > 0">
                             <i><?php i::_e("de"); ?> {{ data.apiMetadata.count }}</i>
                         </span>
-                        <?php i::_e("Pagamentos"); ?>
+                        <?php i::_e("Pagamentos - Valor total de pagamentos "); ?> <b>{{data.sumAmount}}</b>
                     </span>
                 </td>
             </tr>

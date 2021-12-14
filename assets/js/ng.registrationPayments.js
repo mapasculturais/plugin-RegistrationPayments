@@ -114,7 +114,8 @@
             }, 1500);
         }
 
-        $scope.loadMore = function(){            
+        $scope.loadMore = function(){
+            return;            
             var search = $scope.data.search;
             var page = $scope.data.apiMetadata.page ? parseInt($scope.data.apiMetadata.page) +1 : 1;           
             var status = $scope.data.status ? $scope.data.status : null;

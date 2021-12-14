@@ -41,11 +41,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $conn = $app->em->getConnection();
 
-        $limit = isset($data['@limit']) ? $data['@limit'] : 50;
+        // $limit = isset($data['@limit']) ? $data['@limit'] : 50;
         $page = isset($data['@page']) ? (int) $data['@page'] : 1;
         $search = isset($data['search']) ? $data['search'] : "";
         $status = isset($data['status']) ? $data['status'] : null;
-        $offset = ($page - 1) * $limit;
+        // $offset = ($page - 1) * $limit;
 
         //Parametros basicos de pesquisa
         $params = [
@@ -53,8 +53,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             "search" => "%" . $search . "%",
             "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
             "documento" => '%"documento":"' . $search . '%',
-            "limit" => $limit,
-            'offset' => $offset,
+            // "limit" => $limit,
+            // 'offset' => $offset,
         ];
 
         //incrementa parametros caso exista um filtro por status
@@ -80,8 +80,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
-        (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}
-        LIMIT :limit OFFSET :offset";
+        (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
 
         $payments = $conn->fetchAll($query, $params);
 

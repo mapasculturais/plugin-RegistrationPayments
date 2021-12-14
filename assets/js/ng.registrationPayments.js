@@ -410,9 +410,9 @@
     module.factory('RegistrationPaymentsService', ['$http', '$rootScope', 'UrlService', function ($http, $rootScope, UrlService) {  
         return {
             find: function (data) { 
-                if(!data['@limit']){
-                    data['@limit'] = 50;
-                }
+                // if(!data['@limit']){
+                //     data['@limit'] = 50;
+                // }
 
                 var url = MapasCulturais.createUrl('payment', 'findPayments', {opportunity:MapasCulturais.entity.id});
                 

@@ -46,7 +46,8 @@
             historyPayment: false,
             revisions: [],
             dataRevision: [],
-            dataRevsionShow: false
+            dataRevsionShow: false,
+            sumAmount: 0.00
         };
         
         RegistrationPaymentsService.find({opportunity_id:MapasCulturais.entity.id, search:"", page:1}).success(function (data, status, headers){
@@ -58,6 +59,15 @@
             }else{
                 $scope.data.payments = $scope.data.payments.concat(data);
             }
+
+            var sum = 0.00;
+            $scope.data.payments.map(function(item){
+                sum+= item.amount;
+            });
+
+            
+            $scope.data.sumAmount = $scope.getAmountPaymentString(sum)
+         
         });
 
         $scope.$watch('data.statusFilter[value]', function(new_val, old_val) {

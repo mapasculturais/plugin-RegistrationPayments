@@ -5,10 +5,11 @@ namespace RegistrationPayments;
 use DateTime;
 use League\Csv\Writer;
 use MapasCulturais\App;
-use MapasCulturais\Entities\Opportunity;
 use MapasCulturais\Traits;
-use RegistrationPayments\Payment;
+use CnabPHP\RemessaAbstract;
 use RegistrationPayments\Plugin;
+use RegistrationPayments\Payment;
+use MapasCulturais\Entities\Opportunity;
 
 /**
  * Payment Controller
@@ -572,7 +573,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
   
         $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$this->data['lotType']]));
         $name = mb_strtolower(str_replace(" ", "-", mb_substr($opportunity->name, 0, 20)));
-        $file_name = "pagamento-{$identifier}-{$name}--opp-{$opportunity->id}-{$fileType}-canb240.txt";
+        $amount_file = preg_replace('/[^0-9]/i', '', RemessaAbstract::$sumValoesTrailer);
+        $file_name = "pagamento-{$amount_file}---{$identifier}-{$name}--opp-{$opportunity->id}-{$fileType}-canb240.txt";
 
 
         $dir = BASE_PATH . '/cnab/';

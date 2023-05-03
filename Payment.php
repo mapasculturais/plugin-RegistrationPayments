@@ -174,7 +174,7 @@ class Payment extends \MapasCulturais\Entity {
         return $can;
     }
 
-    public function getControllerId()
+    public static function getControllerId()
     {
         return "payment";
     }

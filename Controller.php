@@ -400,7 +400,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
    
         // Pega a oportunidade
         $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
-        $this->registerRegistrationMetadata($opportunity);
+        $opportunity->registerRegistrationMetadata($opportunity);
 
         // Verifica se o usuário te controle da oportunidade para executar a exportação
         if(!$opportunity->canUser('@control')){

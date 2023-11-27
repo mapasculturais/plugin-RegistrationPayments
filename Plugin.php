@@ -2,6 +2,7 @@
 
 namespace RegistrationPayments;
 
+use Normalizer;
 use CnabPHP\Remessa;
 use MapasCulturais\i;
 use MapasCulturais\App;
@@ -16,6 +17,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
     function __construct(array $config = [])
     {
+        $self = $this;
         $config += [
             'cnab240_enabled' => false,
             'opportunitys_cnab_active' => [],
@@ -51,15 +53,22 @@ class Plugin extends \MapasCulturais\Plugin{
                     $id = isset($metadata[$field_id]) ? $metadata[$field_id] : $field;
                     return $settings['social_type'][$id];
                 },
-                'proponent_name' => function($registration, $field, $settings,$metadata, $dependence){
+                'proponent_name' => function($registration, $field, $settings,$metadata, $dependence) use ($self){
                     if($field =="category"){
                         $id = $registration->$field;  
                         $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
-                        return $metadata[$field_id] ?? null;
+                        $_value = $metadata[$field_id] ?? null;
+                    } else {
+                        $field_id = "field_".$field;
+                        $_value = $metadata[$field_id] ?? null;
                     }
                     
-                    $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    if($self->isJson($_value)){
+                        return $self->normalizeString(json_decode($_value));
+                    }else{
+                        return $self->normalizeString($_value);
+                    }
+                   
                 },
                 'proponent_document' => function($registration, $field, $settings,$metadata, $dependence){
                     if($field =="category"){                      
@@ -488,6 +497,33 @@ class Plugin extends \MapasCulturais\Plugin{
     public function getCanbInstace($bank, $layout, array $params)
     {
         return new Remessa($bank, $layout, $params);
+    }
+
+     /**
+     * Normaliza uma string
+     *
+     * @param string $valor
+     * @return string
+     */
+    private function normalizeString($valor): string
+    {
+        $valor = Normalizer::normalize($valor, Normalizer::FORM_D);
+        return preg_replace('/[^A-Za-z0-9 ]/i', '', $valor);
+    }
+
+    /**
+     * @param string $string
+     * @return boolean
+     */
+    function isJson($string) {
+        $decoded = json_decode($string);
+    
+
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            return false;
+        }
+    
+        return true;
     }
     
 }

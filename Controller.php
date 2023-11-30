@@ -666,14 +666,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $complement_where .= " AND bank.key = :field_bank";
             $complement_where .= " AND bank.value = :bank_name";
             $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
+            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
             
         }else if($lot == '03'){
             $complement_join .= " join registration_meta bank on r.id = bank.object_id";
             $complement_where .= " AND bank.key = :field_bank";
             $complement_where .= " AND bank.value <> :bank_name";
             $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = '1 Banco Do Brasil S.A (BB)';
+            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
         }
 
         $complement_where .= " AND p.status >= :p_status";

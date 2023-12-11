@@ -277,6 +277,10 @@ class Plugin extends \MapasCulturais\Plugin{
             $values['Payment'] = Payment::class;
         });
 
+        $app->hook('template(opportunity.edit.opportunity-data-collection-config):afeter',function(){
+                $this->part('payments/payments-config');
+        });
+
     }
 
     function enqueueScriptsAndStyles() {
@@ -345,7 +349,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'paymentsTabEnabled',
             [
                 'label' => 'Habilitar aba de pagamentos',
-                'type' => 'select',
+                'type' => 'radio',
                 'options' => (object)[
                     "0" => i::__('Desabilitar'),
                     "1" => i::__('Habilitar'),

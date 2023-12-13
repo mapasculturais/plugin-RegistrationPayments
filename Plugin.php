@@ -217,62 +217,6 @@ class Plugin extends \MapasCulturais\Plugin{
             $conn->commit();
         }
 
-        // Exibe Botão para exportação CNAB240
-        $app->hook('template(opportunity.<<single|edit>>.sidebar-right):begin', function () use ($plugin, $app) {
-
-            $entity = $this->controller->requestedEntity;         
-            if($entity->canUser('@control')){
-                if($plugin->config['cnab240_enabled'] && in_array($entity->id, $plugin->config['opportunitys_cnab_active'])){
-                    $this->part('singles/export-button', ['entity' => $entity]);
-                }
-            }
-
-        });
-
-        // Adiciona tab de Pagamentos na single da Oportunidade
-        $app->hook('template(opportunity.single.tabs):end', function () use ($app) {
-
-            if (!$app->user->is('admin')) {
-                return;
-            }
-
-            $entity = $this->controller->requestedEntity;
-            $paymentsTabEnabled = $entity->paymentsTabEnabled ?? null;
-
-            if ($paymentsTabEnabled) {
-                $this->part('singles/opportunity-payments--tab', ['entity' => $entity]);
-            }
-
-        });
-
-        // Adiciona o conteúdo da aba Pagamentos na single da Oportunidade
-        $app->hook('template(opportunity.single.tabs-content):end', function () use ($app) {
-
-            if (!$app->user->is('admin')) {
-                return;
-            }
-
-            $entity = $this->controller->requestedEntity;
-            $paymentsTabEnabled = $entity->paymentsTabEnabled ?? null;
-
-            if ($paymentsTabEnabled) {
-                $this->part('singles/opportunity-payments', ['entity' => $entity]);
-            }
-
-        });
-
-        // Adiciona campo para selecionar se a oportunidade usará ou não a aba de pagamentos nas oportunidades
-        $app->hook('template(opportunity.edit.tab-about):end', function () use ($app) {
-
-            if (!$app->user->is('admin')) {
-                return;
-            }
-
-            $entity = $this->controller->requestedEntity;
-            $this->part('singles/opportunity-payments-config', ['entity' => $entity]);
-
-        });
-
         $app->hook('doctrine.emum(object_type).values', function(&$values) {
             $values['Payment'] = Payment::class;
         });

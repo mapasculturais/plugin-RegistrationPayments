@@ -6,6 +6,7 @@ app.component('opportunity-payments-config', {
             this.entity.paymentsTabEnabled = "0";
         }
     },
+    
     props: {
         entity:{
             type: Entity,

@@ -225,7 +225,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 $this->part('payments/payments-config');
         });
 
-        $app->hook("template(opportunity.single.tabs):end", function() use ($app) {
+        $app->hook("template(opportunity.edit.tabs):end", function() use ($app) {
             $entity = $this->controller->requestedEntity;
             if($entity->paymentsTabEnabled == "1") {
                 $this->part("payments/opportunity-payments-tab");

@@ -227,7 +227,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             if ($errors = $payment->getValidationErrors()) {
                 $this->errorJson($errors, 400);
             }
-            $payment->save();
+            $payment->save(true);
         }
 
         $app->em->flush();

@@ -218,8 +218,18 @@ class Plugin extends \MapasCulturais\Plugin{
             $conn->commit();
         }
 
-        $app->hook('mapas.printJsObject:before', function () use ($plugin) {            
-            $plugin->addToJs();
+        $app->hook('mapas.printJsObject:before', function () {            
+            $status = [
+                ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
+                ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
+                ['value' => Payment::STATUS_FAILED, 'label' => i::__("Falha")],
+                ['value' => Payment::STATUS_EXPORTED, 'label' => i::__("Exportado")],
+                ['value' => Payment::STATUS_AVAILABLE, 'label' => i::__("Disponível")],
+                ['value' => Payment::STATUS_PAID, 'label' => i::__("Pago")],
+            ];
+    
+            $this->jsObject['config']['payment']['statusDic'] = $status;
+            $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
         });
 
         $app->hook('doctrine.emum(object_type).values', function(&$values) {
@@ -512,26 +522,6 @@ class Plugin extends \MapasCulturais\Plugin{
         }
 
         return $errors;
-    }
-
-    /**
-     * Adiciona dados no javascript
-     * @return void
-     */
-    public function addToJs(): void
-    {
-        $status = [
-            ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
-            ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
-            ['value' => Payment::STATUS_FAILED, 'label' => i::__("Falha")],
-            ['value' => Payment::STATUS_EXPORTED, 'label' => i::__("Exportado")],
-            ['value' => Payment::STATUS_AVAILABLE, 'label' => i::__("Disponível")],
-            ['value' => Payment::STATUS_PAID, 'label' => i::__("Pago")],
-        ];
-
-        $this->jsObject['config']['payment']['statusDic'] = $status;
-        $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
-
     }
     
 }

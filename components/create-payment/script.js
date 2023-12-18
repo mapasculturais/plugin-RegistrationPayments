@@ -42,7 +42,7 @@ app.component('create-payment', {
         },
         save(modal) {
             const messages = useMessages();
-            this.payment.amount = parseFloat(this.payment.amount);
+            this.payment.amount = this.payment.amount.replace(/\s/g, '').replace(',', '.');
             const api = new API('payment');
             let url = Utils.createUrl('payment', 'createMultiple', { opportunity: this.entity.id });
             api.POST(url, this.payment).then(res => res.json()).then(data => {

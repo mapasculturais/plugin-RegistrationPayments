@@ -3,6 +3,7 @@
 namespace RegistrationPayments;
 
 use DateTime;
+use MapasCulturais\i;
 use League\Csv\Writer;
 use MapasCulturais\App;
 use MapasCulturais\Traits;
@@ -196,7 +197,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $user = $app->getUser();
 
+        $plugin = Plugin::getInstance();
+
         $data = $this->data;
+
+        if($errors = $plugin->errorsRequest($data)) {
+            $this->errorJson($errors, 400);
+        }
+
         $ids = explode(",", $data['registration_id']);
 
         $ids = array_map(function ($id) {
@@ -209,11 +217,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $registrations = $app->repo('Registration')->findBy(['id' => $ids]);
 
+        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+
         if (!$registrations) {
+            $errors[] = i::__("As iscrições informadas não foram encontradas na oportunidade {$opportunity->name}");
             $this->errorJson($errors, 400);
         }
-
-        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
 
         foreach ($registrations as $registration) {
             $payment = new Payment();

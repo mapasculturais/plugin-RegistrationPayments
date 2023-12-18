@@ -484,5 +484,28 @@ class Plugin extends \MapasCulturais\Plugin{
     
         return true;
     }
-    
+
+    /**
+     * Validações de erros dos dados recebidos do request
+     *
+     * @param array $data
+     * @return array
+     */
+    public function errorsRequest(array $data): array
+    {
+        $errors = [];
+        if(!in_array('registration_id', array_keys($data)) || !$data['registration_id']) {
+            $errors[] = i::__('O campo Inscrições é um campo obrigatório');
+        }
+
+        if(!in_array('payment_date', array_keys($data)) || !$data['payment_date']) {
+            $errors[] = i::__('O campo Previsão de pagamento é um campo obrigatório');
+        }
+
+        if(!in_array('amount', array_keys($data)) || !$data['amount']) {
+            $errors[] = i::__('O campo Valor é um campo obrigatório');
+        }
+
+        return $errors;
+    }
 }

@@ -87,7 +87,7 @@ class Payment extends \MapasCulturais\Entity {
     /**
      * @var object
      *
-     * @ORM\Column(name="metadata", type="json_array", nullable=false)
+     * @ORM\Column(name="metadata", type="json", nullable=false)
      */
     protected $metadata;
 

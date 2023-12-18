@@ -6,6 +6,7 @@ use Normalizer;
 use CnabPHP\Remessa;
 use MapasCulturais\i;
 use MapasCulturais\App;
+use RegistrationPayments\Payment;
 use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
@@ -216,6 +217,10 @@ class Plugin extends \MapasCulturais\Plugin{
             $app->enableAccessControl();
             $conn->commit();
         }
+
+        $app->hook('mapas.printJsObject:before', function () use ($plugin) {            
+            $plugin->addToJs();
+        });
 
         $app->hook('doctrine.emum(object_type).values', function(&$values) {
             $values['Payment'] = Payment::class;
@@ -508,4 +513,25 @@ class Plugin extends \MapasCulturais\Plugin{
 
         return $errors;
     }
+
+    /**
+     * Adiciona dados no javascript
+     * @return void
+     */
+    public function addToJs(): void
+    {
+        $status = [
+            ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
+            ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
+            ['value' => Payment::STATUS_FAILED, 'label' => i::__("Falha")],
+            ['value' => Payment::STATUS_EXPORTED, 'label' => i::__("Exportado")],
+            ['value' => Payment::STATUS_AVAILABLE, 'label' => i::__("Disponível")],
+            ['value' => Payment::STATUS_PAID, 'label' => i::__("Pago")],
+        ];
+
+        $this->jsObject['config']['payment']['statusDic'] = $status;
+        $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
+
+    }
+    
 }

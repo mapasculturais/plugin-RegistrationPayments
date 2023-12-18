@@ -177,7 +177,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
     function _init() {
         $app = App::i();
-
+        $app->view->enqueueStyle('app-v2', 'registrationpayments-v2', 'css/plugin-RegistrationPayments.css');
         $driver = $app->em->getConfiguration()->getMetadataDriverImpl();
         $driver->addPaths([__DIR__]);
 

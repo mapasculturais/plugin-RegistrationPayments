@@ -13,8 +13,9 @@ $this->import('
     opportunity-payment-table
 ');
 ?>
-
-<mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">
-    <create-payment :entity="entity"></create-payment>
-    <opportunity-payment-table :entity="entity"></opportunity-payment-table>
-</mc-tab>
+<div class="payment-tab__container">
+    <mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">
+        <create-payment :entity="entity"></create-payment>
+        <opportunity-payment-table :entity="entity"></opportunity-payment-table>
+    </mc-tab>
+</div>

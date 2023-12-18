@@ -46,12 +46,13 @@ app.component('create-payment', {
             const api = new API('payment');
             let url = Utils.createUrl('payment', 'createMultiple', { opportunity: this.entity.id });
             api.POST(url, this.payment).then(res => res.json()).then(data => {
-                if (data.error) {
+                if (data?.error) {
                     messages.error(this.text('createPaymentsError'));
                     this.response = data
                 } else {
                     messages.success(this.text('createPaymentsSuccess'));
                     this.payment = this.skeleton();
+                    this.response = {}
                     modal.close()
                 }
             });

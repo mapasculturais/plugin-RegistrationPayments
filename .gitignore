@@ -1,0 +1,5 @@
+.idea
+assets-src/node_modules
+assets/css/plugin-RegistrationPayments.css
+mix-manifest.json
+node_modules/

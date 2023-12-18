@@ -10,7 +10,7 @@ app.component('create-payment', {
 
     computed: {
         status() {
-            return $MAPAS.config.createPayment.statusDic;
+            return $MAPAS.config.payment.statusDic;
         },
     },
 

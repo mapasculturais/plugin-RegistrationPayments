@@ -20,7 +20,13 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $self = $this;
         $config += [
-            'cnab240_enabled' => false,
+            'cnab240_enabled' => function($entity) use($self){
+                if(in_array($entity->id, $self->config['opportunitys_cnab_active']) || $entity->paymentCnabEnabled == '1'){
+                    return true;
+                }
+
+                return false;
+            },
             'opportunitys_cnab_active' => [],
             'opportunitysCnab' => [],
             'cnab240_company_data' => [],
@@ -243,7 +249,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("template(opportunity.edit.tabs):end", function() use ($app) {
             $entity = $this->controller->requestedEntity;
             if($entity->paymentsTabEnabled == "1") {
-                $this->part("payments/opportunity-payments-tab");
+                $this->part("payments/opportunity-payments-tab", ['entity' => $entity]);
             }
         });
 
@@ -321,6 +327,18 @@ class Plugin extends \MapasCulturais\Plugin{
                     "1" => i::__('Habilitar'),
                 ],
                 'default_value' => (string) "0",
+            ]
+        );
+
+        $this->registerMetadata('MapasCulturais\Entities\Opportunity',
+            'paymentCnabEnabled',
+                [
+                'label' => 'Habilita extração do arquivo CNAB240',
+                'type' => 'radio',
+                'options' => (object)[
+                    "0" => i::__('Desabilitar'),
+                    "1" => i::__('Habilitar'),
+                ],
             ]
         );
     }

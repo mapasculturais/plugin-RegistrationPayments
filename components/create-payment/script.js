@@ -53,10 +53,11 @@ app.component('create-payment', {
                     messages.error(this.text('createPaymentsError'));
                     this.response = data
                 } else {
+                    modal.close()
                     messages.success(this.text('createPaymentsSuccess'));
                     this.payment = this.skeleton();
                     this.response = {}
-                    modal.close()
+                    this.entities.refresh();
                 }
             });
         },

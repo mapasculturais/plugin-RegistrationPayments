@@ -38,7 +38,7 @@ app.component('opportunity-payment-table', {
 
     methods: {
         amountToString(amount) {
-            return parseFloat(amount).toLocaleString('pt-BR', { style: 'currency', currency: __('currency', 'entity-occurrence-list')  });
+            return parseFloat(amount).toLocaleString($MAPAS.config.locale, { style: 'currency', currency: __('currency', 'opportunity-payment-table')  });
         },
         statusTostring(status) {
             let result = null;

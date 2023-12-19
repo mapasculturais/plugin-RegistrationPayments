@@ -5,6 +5,9 @@ app.component('create-payment', {
         entity: {
             type: Entity,
             required: true,
+        },
+        entities: {
+            type: Array,
         }
     },
 

@@ -11,8 +11,8 @@ $this->import('
     mc-modal
 ');
 ?>
-<div class="complaint-sugestion__complaint">
-    <mc-modal title="<?= i::__('Criar pagamentos:') ?>" classes="complaint-sugestion__modal">
+<div>
+    <mc-modal title="<?= i::__('Criar pagamentos:') ?>">
         <span v-if="hasErrors">
             <template v-for="item in response?.data">
                 <p class="field__error">* {{item}}</p>

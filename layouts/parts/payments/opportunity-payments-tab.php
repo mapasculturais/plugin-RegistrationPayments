@@ -9,6 +9,8 @@ use MapasCulturais\i;
 use RegistrationPayments\Plugin;
 
 $this->import('
+    create-payment
+    extraction-cnab
     mc-tab
     opportunity-payment-table
 ');
@@ -20,7 +22,7 @@ $cnab_enabled = $plugin->config['cnab240_enabled'];
 <div class="payment-tab__container">
     <mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">
         <?php  if($cnab_enabled($entity)):  ?>
-            <!-- Componente do botão CNAB -->
+            <extraction-cnab :entity="entity"></extraction-cnab>
         <?php endif ?>
         <opportunity-payment-table :entity="entity"></opportunity-payment-table>
     </mc-tab>

@@ -2,7 +2,7 @@ app.component('opportunity-payment-table', {
     template: $TEMPLATES['opportunity-payment-table'],
 
     props: {
-        entity: {
+        opportunity: {
             type: Entity,
             required: true,
         }

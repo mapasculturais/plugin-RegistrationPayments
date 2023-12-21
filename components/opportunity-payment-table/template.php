@@ -15,7 +15,7 @@ $this->import('
 
 <entity-table type="payment" :select="select" :query="query" :headers= "headers" endpint  required="registration" visible="registration,paymentDate,amount,status">
     <template #actions-table="{entities}" >
-            <create-payment :entity="entity" :entities="entities"></create-payment>
+            <create-payment :opportunity="entity" :entities="entities"></create-payment>
     </template>
 
    <template #status="entity">

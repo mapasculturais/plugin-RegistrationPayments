@@ -24,6 +24,6 @@ $cnab_enabled = $plugin->config['cnab240_enabled'];
         <?php  if($cnab_enabled($entity)):  ?>
             <extraction-cnab :entity="entity"></extraction-cnab>
         <?php endif ?>
-        <opportunity-payment-table :entity="entity"></opportunity-payment-table>
+        <opportunity-payment-table :opportunity="entity"></opportunity-payment-table>
     </mc-tab>
 </div>

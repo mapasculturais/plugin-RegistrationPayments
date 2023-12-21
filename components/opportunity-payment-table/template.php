@@ -30,8 +30,10 @@ $this->import('
             {{statusTostring(entity.status).label}}
     </template>
 
-    <template #amount="entity" >
-            {{amountToString(entity.amount)}}
+    <template #options="entity">
+        <mc-icon name="edit"></mc-icon>
+        <mc-icon name="delete"></mc-icon>
+        <mc-icon name="history"></mc-icon>
     </template>
    
 </entity-table>

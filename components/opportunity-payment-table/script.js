@@ -28,6 +28,7 @@ app.component('opportunity-payment-table', {
                 { text: "Previsão de pagamento", value: "paymentDate"},
                 { text: "Valor", value: "amount"},
                 { text: "Status", value: "status"},
+                { text: "Opções", value: "options"},
             ]
         }
     },

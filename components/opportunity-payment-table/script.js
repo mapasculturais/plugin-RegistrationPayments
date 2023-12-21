@@ -14,7 +14,7 @@ app.component('opportunity-payment-table', {
         },
         query() {
             const args = {
-                opportunity: `EQ(${this.entity.id})`,
+                opportunity: `EQ(${this.opportunity.id})`,
                 status: 'GTE(0)',
             }
             return args

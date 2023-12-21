@@ -17,9 +17,13 @@ $this->import('
     <template #actions-table="{entities}" >
             <create-payment :entity="entity" :entities="entities"></create-payment>
     </template>
-    
-    <template #paymentDate="entity" >
-            {{entity.paymentDate.date('numeric year')}}
+
+   <template #status="entity">
+        <select v-model="entity.status" @change="setStatus(entity)">
+            <template v-for="item in statusList">
+                <option :value="item.value">{{item.label}}</option>
+            </template>
+        </select>
     </template>
 
     <template #status="entity" >

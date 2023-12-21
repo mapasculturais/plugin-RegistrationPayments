@@ -32,11 +32,31 @@ app.component('opportunity-payment-table', {
         }
     },
 
+    setup() {
+        // os textos estão localizados no arquivo texts.php deste componente 
+        const messages = useMessages();
+        const text = Utils.getTexts('opportunity-payment-table')
+        return { text, messages }
+    },
+
     data() {
-        return {}
+        const api = new API();
+        return {
+            api
+        }
     },
 
     methods: {
+        setStatus(payment) {
+            let url = Utils.createUrl('payment', 'single', {id: payment._id});
+            this.api.PATCH(url, {status:payment.status}).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    this.messages.error(this.text('setStatusError'));
+                } else {
+                    this.messages.success(this.text('setStatusSuccess'));
+                }
+            });
+        },
         amountToString(amount) {
             return parseFloat(amount).toLocaleString($MAPAS.config.locale, { style: 'currency', currency: __('currency', 'opportunity-payment-table')  });
         },

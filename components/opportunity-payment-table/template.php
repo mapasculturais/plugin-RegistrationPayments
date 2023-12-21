@@ -10,12 +10,13 @@ use MapasCulturais\i;
 $this->import('
     create-payment
     entity-table
+    mc-icon
 ');
 ?>
 
-<entity-table type="payment" :select="select" :query="query" :headers= "headers" endpint  required="registration" visible="registration,paymentDate,amount,status">
-    <template #actions-table="{entities}" >
-            <create-payment :opportunity="entity" :entities="entities"></create-payment>
+<entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options,name" visible="registration,paymentDate,amount,status,options">
+    <template #actions-table="{entities}">
+        <create-payment :entity="opportunity" :entities="entities"></create-payment>
     </template>
 
    <template #status="entity">
@@ -26,8 +27,8 @@ $this->import('
         </select>
     </template>
 
-    <template #status="entity" >
-            {{statusTostring(entity.status).label}}
+    <template #amount="entity">
+        {{amountToString(entity.amount)}}
     </template>
 
     <template #options="entity">
@@ -35,5 +36,5 @@ $this->import('
         <mc-icon name="delete"></mc-icon>
         <mc-icon name="history"></mc-icon>
     </template>
-   
+
 </entity-table>

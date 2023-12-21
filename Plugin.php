@@ -3,6 +3,7 @@
 namespace RegistrationPayments;
 
 use Normalizer;
+use  MapasCulturais\Definitions;
 use CnabPHP\Remessa;
 use MapasCulturais\i;
 use MapasCulturais\App;
@@ -287,6 +288,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'label' => i::__('Lotes exportados'),
             'type' => 'json',
             'private' => true,
+            'dafault' => '[]',
         ]);
 
         $this->registerAgentMetadata('payment_bank_account_type', [
@@ -340,6 +342,15 @@ class Plugin extends \MapasCulturais\Plugin{
                     "1" => i::__('Habilitar'),
                 ],
             ]
+        );
+        
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
+                'export-cnab-files',
+                ['text/plain'],
+                'O arquivo não e valido'
+            )
         );
     }
 

@@ -450,8 +450,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
              
-        // Pega todos os lotes ja exportados
-        $payment_lot_export = json_decode($opportunity->payment_lot_export, true);
+        $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
 
         $typeLot = [
             1 => "Corrente BB",
@@ -599,12 +598,19 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         fwrite($stream, $arquivo->getText());
 
         fclose($stream);
-
-
-        header('Content-Type: application/txt');
-        header("Content-Disposition: attachment; filename=\"$file_name\"");
-        header('Pragma: no-cache');
-        readfile($patch);
+        
+        $class_name = $opportunity->fileClassName;
+        $file = new $class_name([
+            'name' => $file_name,
+            'type' => mime_content_type($patch),
+            'tmp_name' => $patch,
+            'error' => 0,
+            'size' => filesize ($patch)
+        ]);
+        $file->group = 'export-cnab-files';
+        $file->description = 'arquivo-caab';   
+        $file->owner = $opportunity;
+        $file->save(true);
     }
 
     /**
@@ -638,10 +644,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         if($this->data['registrationFilter']){
 
             $registrationFilter = $this->data['registrationFilter'];
+            $delimiter = "\n";
 
             if(count(explode(",", $registrationFilter)) >1){
-                $delimiter = ",";
-            }else if(count(explode("\n", $registrationFilter)) >1){
                 $delimiter = "\n"; 
             }
             

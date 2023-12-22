@@ -6,16 +6,26 @@
  */
 
 use MapasCulturais\i;
+use RegistrationPayments\Plugin;
 
 $this->import('
     create-payment
     entity-table
+    extraction-cnab
     mc-icon
 ');
+
+$plugin = Plugin::getInstance();
+$cnab_enabled = $plugin->config['cnab240_enabled'];
+$entity = $this->controller->requestedEntity;
 ?>
 
 <entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options,name" visible="registration,paymentDate,amount,status,options">
     <template #actions-table="{entities}">
+        <?php  if($cnab_enabled($entity)):  ?>
+            <extraction-cnab :entity="entity"></extraction-cnab>
+        <?php endif ?>
+
         <create-payment :entity="opportunity" :entities="entities"></create-payment>
     </template>
 

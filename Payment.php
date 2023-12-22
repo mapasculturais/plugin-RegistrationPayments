@@ -25,7 +25,7 @@ use MapasCulturais\Traits;
  * 
  * @ORM\Table(name="payment")
  * @ORM\Entity
- * @ORM\entity(repositoryClass="MapasCulturais\Repository")
+ * @ORM\entity(repositoryClass="RegistrationPayments\Repositories\Payment")
  */
 class Payment extends \MapasCulturais\Entity {
 

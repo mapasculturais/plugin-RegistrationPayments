@@ -254,6 +254,17 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        $app->hook('repo(RegistrationPayments.Payment).getIdsByKeywordDQL.join', function (&$joins, $keyword) {
+            $joins .= " LEFT JOIN e.registration reg ";
+            $joins .= " LEFT JOIN reg.owner owner ";
+        });
+
+        $app->hook('repo(RegistrationPayments.Payment).getIdsByKeywordDQL.where', function (&$where, $keyword) {
+            $or = trim($where) ? "OR" : "";
+            $where .= " {$or} reg.number LIKE lower(:keyword) ";
+            $where .= " OR unaccent(lower(owner.name)) LIKE unaccent(lower(:keyword)) ";
+        });
+
     }
 
     function enqueueScriptsAndStyles() {

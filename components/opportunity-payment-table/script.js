@@ -26,11 +26,11 @@ app.component('opportunity-payment-table', {
             return [
                 { text: "Inscrição", value: "registration.number", slug:"registration" },
                 { text: "Categoria", value: "registration.category", slug:"category" },
+                { text: "Agente", value: "registration.owner.name", slug: "agent"},
+                { text: "Documento", value: "registration.owner.documento", slug: "documento"},
                 { text: "Previsão de pagamento", value: "paymentDate"},
                 { text: "Valor", value: "amount"},
                 { text: "Status", value: "status"},
-                { text: "Agente", value: "registration.owner.name", slug: "agent"},
-                { text: "Documento", value: "registration.owner.documento", slug: "documento"},
                 { text: "Opções", value: "options"},
             ]
         }

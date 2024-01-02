@@ -21,12 +21,21 @@ $entity = $this->controller->requestedEntity;
 ?>
 
 <entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options,agent" visible="registration,paymentDate,amount,status,options">
-    <template #actions-table="{entities}">
-        <?php  if($cnab_enabled($entity)):  ?>
+    <template #actions-primary="{entities}">
+        <create-payment :entity="opportunity" :entities="entities"></create-payment>
+    </template>
+
+    <template #actions-secondary="{entities}">
+        <button class="button button--primary button--icon"><?= i::__('Criar pagamento via planilha') ?> <mc-icon name="external"></mc-icon></button>
+        <?php if($cnab_enabled($entity)):  ?>
             <extraction-cnab :entity="opportunity"></extraction-cnab>
         <?php endif ?>
+    </template>
 
-        <create-payment :entity="opportunity" :entities="entities"></create-payment>
+    <template #table-filters="{entities}">
+        <div class="opportunity-payment-table__filters">
+            <h4 class="bold"><?= i::__('Filtrar:') ?></h4>
+        </div>
     </template>
 
    <template #status="entity">
@@ -44,7 +53,6 @@ $entity = $this->controller->requestedEntity;
     <template #options="entity">
         <mc-icon name="edit"></mc-icon>
         <mc-icon name="delete"></mc-icon>
-        <mc-icon name="history"></mc-icon>
     </template>
 
 </entity-table>

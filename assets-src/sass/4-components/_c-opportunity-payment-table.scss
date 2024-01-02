@@ -1,0 +1,11 @@
+.opportunity-payment-table {
+    &__filters {
+        height: 67px;
+        border-radius: var(--mc-border-radius-xs);
+        border: var(--mc-border-hairline) var(--mc-gray-500);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}

@@ -13,6 +13,7 @@ $this->import('
     entity-table
     extraction-cnab
     mc-icon
+    mc-modal
 ');
 
 $plugin = Plugin::getInstance();
@@ -20,7 +21,7 @@ $cnab_enabled = $plugin->config['cnab240_enabled'];
 $entity = $this->controller->requestedEntity;
 ?>
 
-<entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options,agent" visible="registration,paymentDate,amount,status,options">
+<entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options" visible="registration,paymentDate,amount,status,options">
     <template #actions-primary="{entities}">
         <create-payment :entity="opportunity" :entities="entities"></create-payment>
     </template>
@@ -51,7 +52,35 @@ $entity = $this->controller->requestedEntity;
     </template>
 
     <template #options="entity">
-        <mc-icon name="edit"></mc-icon>
+        <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
+            <div>
+                <label><?= i::__('Inscrições') ?></label>
+                <textarea v-model="entity.registration_id" name="" id="" cols="30" rows="10"></textarea>
+            </div>
+
+            <div>
+                <label><?= i::__('Previsão de pagamento') ?></label>
+                <input v-model="entity.paymentDate" type="date">
+            </div>
+
+            <div>
+                <label><?= i::__('Valor') ?></label>
+                R$<input v-model="entity.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
+            </div>
+            <div>
+                <label><?= i::__('Observações') ?></label>
+                <textarea v-model="entity.metadata.csv_line.OBSERVACOES" name="" id="" cols="30" rows="10"></textarea>
+            </div>
+
+            <template #button={open}>
+                <mc-icon name="edit" @click="open()"></mc-icon>
+            </template>
+
+            <template #actions="modal">
+                <button @click="doSomething(modal)"><?= i::__('Salvar') ?></button>
+                <button @click="modal.close()"><?= i::__('Cancelar') ?></button>
+            </template>
+        </mc-modal>
         <mc-icon name="delete"></mc-icon>
     </template>
 

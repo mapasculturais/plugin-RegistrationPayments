@@ -26,7 +26,6 @@ use MapasCulturais\Traits;
  * @ORM\Table(name="payment")
  * @ORM\Entity
  * @ORM\entity(repositoryClass="RegistrationPayments\Repositories\Payment")
- * @ORM\HasLifecycleCallbacks
  */
 class Payment extends \MapasCulturais\Entity {
 
@@ -183,24 +182,4 @@ class Payment extends \MapasCulturais\Entity {
         return "payment";
     }
 
-    //============================================================= //
-    // The following lines ara used by MapasCulturais hook system.
-    // Please do not change them.
-    // ============================================================ //
-
-    /** @ORM\PrePersist */
-    public function prePersist($args = null){ parent::prePersist($args); }
-    /** @ORM\PostPersist */
-    public function postPersist($args = null){ parent::postPersist($args); }
-
-    /** @ORM\PreRemove */
-    public function preRemove($args = null){ parent::preRemove($args); }
-    /** @ORM\PostRemove */
-    public function postRemove($args = null){ parent::postRemove($args); }
-
-    /** @ORM\PreUpdate */
-    public function preUpdate($args = null){ parent::preUpdate($args); }
-    /** @ORM\PostUpdate */
-    public function postUpdate($args = null){ parent::postUpdate($args); }
-    
 }

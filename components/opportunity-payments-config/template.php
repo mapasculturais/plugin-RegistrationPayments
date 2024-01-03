@@ -12,9 +12,5 @@ $this->import('
     mc-card
 ');
 ?>
-<div class="col-12">
-    <div class="grid-12">
-        <entity-field classes="col-6 sm:col-12" :entity="entity" prop="paymentsTabEnabled"></entity-field>
-        <entity-field v-if="entity.paymentsTabEnabled == '1'" classes="col-6 sm:col-12" :entity="entity" prop="paymentCnabEnabled"></entity-field>
-    </div>
-</div>
+<entity-field classes="col-3 sm:col-12" :entity="entity" prop="paymentsTabEnabled"></entity-field>
+<entity-field v-if="entity.paymentsTabEnabled == '1'" classes="col-3 sm:col-12" :entity="entity" prop="paymentCnabEnabled"></entity-field>

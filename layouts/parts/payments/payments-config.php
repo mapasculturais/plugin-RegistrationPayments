@@ -8,4 +8,4 @@
 $this->import("opportunity-payments-config");
 ?>
 
-<opportunity-payments-config :entity="phase"></opportunity-payments-config>
+<opportunity-payments-config :entity="entity"></opportunity-payments-config>

@@ -243,7 +243,7 @@ class Plugin extends \MapasCulturais\Plugin{
             $values['Payment'] = Payment::class;
         });
 
-        $app->hook('template(opportunity.edit.opportunity-data-collection-config):afeter',function(){
+        $app->hook('template(opportunity.edit.opportunity-basic-info):afeter ',function(){
                 $this->part('payments/payments-config');
         });
 

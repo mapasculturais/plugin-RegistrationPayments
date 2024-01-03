@@ -14,7 +14,6 @@ $this->import('
     extraction-cnab
     mc-icon
     mc-modal
-    payment-spreadsheet
 ');
 
 $plugin = Plugin::getInstance();

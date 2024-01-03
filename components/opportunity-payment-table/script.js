@@ -51,6 +51,9 @@ app.component('opportunity-payment-table', {
     },
 
     methods: {
+        formatDateInput(date) {
+            return new Date(date);
+        },
         setStatus(payment) {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});
             this.api.PATCH(url, {status:payment.status}).then(res => res.json()).then(data => {

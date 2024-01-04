@@ -41,7 +41,6 @@ $entity = $this->controller->requestedEntity;
                     <label><?= i::__('Data inicial')?></label>
                     <input v-model="filters.paymentFrom" @change="change($event,entities)" type="date">
                 </div>
-                
                 <div class="field col-4">
                     <label><?= i::__('Data final')?></label>
                     <input v-model="filters.paymentTo" @change="change($event,entities)" type="date">

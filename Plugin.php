@@ -21,6 +21,25 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $self = $this;
         $config += [
+            'fields' => [],
+            'fields_tratament' => function ($registration, $field) {
+                if(!$this->config['fields']){return;}
+                $result = [                   
+                    'CPF' => function () use ($registration, $field) {
+                        
+                        $field = $this->prefixFieldId($field);
+                        return preg_replace('/[^0-9]/i', '', $registration->$field);
+                    },
+                    'NOME_COMPLETO' => function () use ($registration, $field) {                        
+                        $field = $this->prefixFieldId($field);
+                        return $registration->$field;
+                    },
+                ];
+
+                $callable = $result[$field] ?? null;
+
+                return $callable ? $callable() : null;
+            },
             'cnab240_enabled' => function($entity) use($self){
                 if(in_array($entity->id, $self->config['opportunitys_cnab_active']) || $entity->paymentCnabEnabled == '1'){
                     return true;
@@ -363,6 +382,15 @@ class Plugin extends \MapasCulturais\Plugin{
                 'O arquivo não e valido'
             )
         );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
+                'export-financial-validator-files',
+                ['^text/csv$'],
+                'O arquivo não e valido'
+            )
+        );
     }
 
     /**
@@ -563,5 +591,21 @@ class Plugin extends \MapasCulturais\Plugin{
 
         return $errors;
     }
-    
+
+    /**
+     * Retorna o usuário autenticado
+     *
+     */
+    public static function getUser()
+    {
+        $app = App::i();
+
+        return $app->repo('User')->find($app->user->id);
+    }
+
+    public function prefixFieldId($value)
+    {
+        $fields_id = $this->config['fields'];
+        return $fields_id[$value] ? "field_".$fields_id[$value] : null;
+    }
 }

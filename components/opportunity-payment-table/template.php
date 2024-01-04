@@ -36,6 +36,26 @@ $entity = $this->controller->requestedEntity;
     <template #table-filters="{entities}">
         <div class="opportunity-payment-table__filters">
             <h4 class="bold"><?= i::__('Filtrar:') ?></h4>
+            <div class="grid-12">
+                <div class="field col-4">
+                    <label><?= i::__('Data inicial')?></label>
+                    <input v-model="filters.paymentFrom" @change="change($event,entities)" type="date">
+                </div>
+                
+                <div class="field col-4">
+                    <label><?= i::__('Data final')?></label>
+                    <input v-model="filters.paymentTo" @change="change($event,entities)" type="date">
+                </div>
+                <div class="field col-3">
+                    <label><?= i::__('Status')?></label>
+                    <select v-model="filters.status" @change="change($event,entities)">
+                        <option value=""><?= i::__('Selecione')?></option>
+                        <template v-for="status in statusList">
+                            <option :value="status.value">{{status.label}}</option>
+                        </template>
+                    </select>
+                </div>
+            </div>
         </div>
     </template>
 

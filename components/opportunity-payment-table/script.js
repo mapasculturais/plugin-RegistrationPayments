@@ -12,13 +12,6 @@ app.component('opportunity-payment-table', {
         statusList() {
             return $MAPAS.config.payment.statusDic;
         },
-        query() {
-            const args = {
-                opportunity: `EQ(${this.opportunity.id})`,
-                status: 'GTE(0)',
-            }
-            return args
-        },
         select() {
             return "id,registration.{id,number,category,owner.{id,name,cpf,cnpj,documento}},paymentDate,amount,metadata,status"
         },
@@ -46,6 +39,15 @@ app.component('opportunity-payment-table', {
     data() {
         const api = new API();
         return {
+            query: {
+                opportunity: `EQ(${this.opportunity.id})`,
+                status:`GTE(0)`,
+            },
+            filters: {
+                paymentFrom:'',
+                paymentTo: '',
+                status: ''
+            },
             api
         }
     },
@@ -77,5 +79,14 @@ app.component('opportunity-payment-table', {
 
             return result;
         },
+        change(event,entities) {
+            if(this.filters.status){
+                this.query['status'] = `EQ(${event.target.value})`;
+            }
+            if(this.filters.paymentFrom && this.filters.paymentTo){
+                this.query['paymentDate'] = `BET(${this.filters.paymentFrom},${this.filters.paymentTo})`
+            }
+            entities.refresh();
+        }
     },
 });

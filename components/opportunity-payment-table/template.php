@@ -52,36 +52,46 @@ $entity = $this->controller->requestedEntity;
     </template>
 
     <template #options="entity">
-        <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
-            <div>
-                <label><?= i::__('Inscrições') ?></label>
-                <textarea v-model="entity.registration_id" name="" id="" cols="30" rows="10"></textarea>
-            </div>
+        <div class="opportunity-payment-table__table-actions">
+            <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
 
-            <div>
-                <label><?= i::__('Previsão de pagamento') ?></label>
-                <input v-model="entity.paymentDate" type="date">
-            </div>
+                <div class="grid-12">
+                    <div class="field col-12">
+                        <label> <?= i::__('Inscrições') ?></label>
+                        <textarea v-model="entity.registration_id" name="" id="" cols="30" rows="5"></textarea>
+                    </div>
 
-            <div>
-                <label><?= i::__('Valor') ?></label>
-                R$<input v-model="entity.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
-            </div>
-            <div>
-                <label><?= i::__('Observações') ?></label>
-                <textarea v-model="entity.metadata.csv_line.OBSERVACOES" name="" id="" cols="30" rows="10"></textarea>
-            </div>
+                    <div class="field col-12">
+                        <label><?= i::__('Previsão de pagamento') ?></label>
+                        <input v-model="entity.paymentDate" type="date">
+                    </div>
 
-            <template #button={open}>
-                <mc-icon name="edit" @click="open()"></mc-icon>
-            </template>
+                    <div class="field col-12">
+                        <label><?= i::__('Valor') ?></label>
+                        <span class="field__currence">
+                            <span class="field__currence-sign">R$</span>
+                            <input v-model="entity.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
+                        </span> 
+                    </div>
 
-            <template #actions="modal">
-                <button @click="doSomething(modal)"><?= i::__('Salvar') ?></button>
-                <button @click="modal.close()"><?= i::__('Cancelar') ?></button>
-            </template>
-        </mc-modal>
-        <mc-icon name="delete"></mc-icon>
+                    <div class="field col-12">
+                        <label><?= i::__('Observações') ?></label>
+                        <textarea v-model="entity.metadata.csv_line.OBSERVACOES" name="" id="" cols="30" rows="5"></textarea>
+                    </div>
+                </div>
+
+
+                <template #button={open}>
+                    <mc-icon name="edit" @click="open()"></mc-icon>
+                </template>
+
+                <template #actions="modal">
+                    <button class="button button" @click="modal.close()"><?= i::__('Cancelar') ?></button>
+                    <button class="button button--primary" @click="doSomething(modal)"><?= i::__('Salvar') ?></button>
+                </template>
+            </mc-modal>
+            <mc-icon name="trash"></mc-icon>
+        </div>
     </template>
 
 </entity-table>

@@ -349,6 +349,16 @@ class Plugin extends \MapasCulturais\Plugin{
             'available_for_opportunities' => true
         ]);
 
+        $this->registerMetadata(
+            'MapasCulturais\Entities\Opportunity',
+            'paymentFieldsPending',
+            [
+                'label' => 'Campos de dados bancarios pendente de criação',
+                'type' => 'boolean',
+                'default' => false,
+            ]
+        );
+
         $this->registerMetadata('MapasCulturais\Entities\Opportunity',
             'paymentsTabEnabled',
             [

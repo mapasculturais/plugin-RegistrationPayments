@@ -26,7 +26,7 @@ $this->import('
                 </span>
                 <div class="field col-12">
                     <label for="regId"><?= i::__('Inscrições') ?></label>
-                    <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="10"></textarea>
+                    <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5"></textarea>
                 </div>
                 <div class="field col-12">
                     <label for="paymentDate"><?= i::__('Previsão de pagamento') ?></label>
@@ -34,7 +34,10 @@ $this->import('
                 </div>
                 <div class="field col-6">
                     <label for="paymentAmount"><?= i::__('Valor') ?></label>
-                    <input name="paymentAmount" v-model="payment.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
+                    <span class="field__currence">
+                        <span class="field__currence-sign">R$</span>
+                        <input name="paymentAmount" v-model="payment.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
+                    </span>
                 </div>
                 <div class="field col-6">
                     <label for="paymentStatus"><?= i::__('Status') ?></label>
@@ -44,7 +47,7 @@ $this->import('
                 </div>
                 <div class="field col-12">
                     <label for="obs"><?= i::__('Observações') ?></label>
-                    <textarea v-model="payment.metadata.csv_line.OBSERVACOES" name="obs" id="" cols="30" rows="10"></textarea>
+                    <textarea v-model="payment.metadata.csv_line.OBSERVACOES" name="obs" id="" cols="30" rows="5"></textarea>
                 </div>
             </div>
         </template>

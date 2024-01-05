@@ -16,6 +16,12 @@ $this->import('
 ');
 ?>
 
+<template #tabs-alert>
+    <mc-alert type="danger">
+        <?= i::__('Dados bancários ainda não foram configurados.') ?>
+    </mc-alert>
+</template>
+
 <div class="payment-tab__container">
     <mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">
         <opportunity-payment-table :opportunity="entity"></opportunity-payment-table>

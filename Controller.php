@@ -195,29 +195,37 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $app = App::i();
 
+        $errors = [];
+        $data = $this->data;
+        $create_type = trim($data['createType']);
+        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+
         $user = $app->getUser();
 
         $plugin = Plugin::getInstance();
-
-        $data = $this->data;
 
         if($errors = $plugin->errorsRequest($data)) {
             $this->errorJson($errors, 400);
         }
 
-        $ids = explode(",", $data['registration_id']);
+        if($create_type == "category"){
+            $registrations = $app->repo('Registration')->findBy(['category' => $create_type, 'opportunity' => $opportunity]);
+        }
 
-        $ids = array_map(function ($id) {
-            return trim(preg_replace('/[^0-9]/i', '', $id));
-        }, $ids);
+        if($create_type == "registration_id"){
+            $ids = explode(",",$data[$create_type]);
+            $ids = array_map(function ($id) {
+                return trim(preg_replace('/[^0-9]/i', '', $id));
+            }, $ids);
+            
+            $ids = array_filter($ids);
 
-        $ids = array_filter($ids);
+            $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
+        }
 
-        $errors = [];
-
-        $registrations = $app->repo('Registration')->findBy(['id' => $ids]);
-
-        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+        if($create_type == "registrationStatus"){
+            $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
+        }
 
         if (!$registrations) {
             $errors[] = i::__("As iscrições informadas não foram encontradas na oportunidade {$opportunity->name}");

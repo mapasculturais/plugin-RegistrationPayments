@@ -69,7 +69,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $from = isset($request['from']) ? DateTime::createFromFormat('Y-m-d', $request['from']) : null;
         $to = isset($request['to']) ? DateTime::createFromFormat('Y-m-d', $request['to']) : null;
         
-        if (empty($registrations)) {
+        if (!$registrations) {
             $errors[] = i::__("Não foram encontrados registros.");   
         }
 
@@ -81,7 +81,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $errors[] = i::__("Data inicial está maior que a data final");
         }
         
-        return !empty($errors) ? $this->errorJson($errors) : $errors;
+        return $errors;
     }
 
     public function POST_export() {
@@ -95,14 +95,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         $registrations = $this->getRegistrations($opportunity);
         
-        $this->getValidateErrors($opportunity, $registrations, $this->data);
+        if($errors = $this->getValidateErrors($opportunity, $registrations, $this->data)) {
+            $this->errorJson($errors);
+        }
         
-        $filename = $this->generateCSV($registrations, $opportunity);
-
-        /*header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename=' . basename($filename));
-        header('Pragma: no-cache');
-        readfile($filename);*/
+        $this->generateCSV($registrations, $opportunity);
     }
 
     protected function exportInit(Opportunity $opportunity) {
@@ -252,7 +249,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $file->owner = $opportunity;
         $file->save(true);
 
-        return $path;
+        $this->json($file); 
     }
 
     /**

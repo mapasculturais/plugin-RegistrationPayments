@@ -22,11 +22,234 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 {
 
     use Traits\ControllerAPI;
+
+    protected $columns = [
+        'NUMERO',
+        'NOME_COMPLETO',
+        'CPF',
+        'VALIDACAO',
+        'OBSERVACOES',
+        'STATUS',
+        'DATA 1',
+        'VALOR 1',
+        'DATA 2',
+        'VALOR 2',
+        'DATA 3',
+        'VALOR 3',
+        'DATA 4',
+        'VALOR 4',
+        'DATA 5',
+        'VALOR 5',
+        'DATA 6',
+        'VALOR 6',
+        'DATA 7',
+        'VALOR 7',
+        'DATA 8',
+        'VALOR 8',
+        'DATA 9',
+        'VALOR 9',
+        'DATA 10',
+        'VALOR 10',
+        'DATA 11',
+        'VALOR 11',
+        'DATA 12',
+        'VALOR 12'
+    ];
+
     public function __construct()
     {
         parent::__construct();
         $this->entityClassName = 'RegistrationPayments\Payment';
 
+    }
+
+    protected function getValidateErrors($opportunity, $registrations, $request) {
+        $errors = [];
+        
+        $from = isset($request['from']) ? DateTime::createFromFormat('Y-m-d', $request['from']) : null;
+        $to = isset($request['to']) ? DateTime::createFromFormat('Y-m-d', $request['to']) : null;
+        
+        if (!$registrations) {
+            $errors[] = i::__("Não foram encontrados registros.");   
+        }
+
+        if (!$opportunity->canUser('@control')) {
+            $errors[] = i::__("Não autorizado");   
+        }
+
+        if ($to > $from) {
+            $errors[] = i::__("Data inicial está maior que a data final");
+        }
+        
+        return $errors;
+    }
+
+    public function POST_export() {
+        $app = App::i();
+
+        //Oportunidade que a query deve filtrar
+        $opportunity_id = $this->data['opportunity_id'];
+        $opportunity = $app->repo('Opportunity')->find($opportunity_id);
+
+        $this->exportInit($opportunity);
+        
+        $registrations = $this->getRegistrations($opportunity);
+        
+        if($errors = $this->getValidateErrors($opportunity, $registrations, $this->data)) {
+            $this->errorJson($errors);
+        }
+        
+        $this->generateCSV($registrations, $opportunity);
+    }
+
+    protected function exportInit(Opportunity $opportunity) {
+        $this->requireAuthentication();
+
+        $opportunity->registerRegistrationMetadata();
+
+        //Seta o timeout
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '768M');    
+
+    }
+
+    protected function getRegistrations(Opportunity $opportunity){
+        
+        $app = App::i();
+        
+        $dql_params = [ 'opportunity_Id' => $opportunity->id ];
+
+        $from = isset($this->data['from']) ? DateTime::createFromFormat('Y-m-d', $this->data['from']) : null;
+        $to = isset($this->data['to']) ? DateTime::createFromFormat('Y-m-d', $this->data['to']) : null;
+
+        $dql_params['from'] = $from ?: '';
+        $dql_from = $from ? "e.sentTimestamp >= :from AND" : '';
+
+        $dql_params['to'] = $to ?: '';
+        $dql_to = $to ? "e.sentTimestamp >= :to AND" : '';
+
+        $dql = "
+            SELECT
+                e
+            FROM
+                MapasCulturais\Entities\Registration e
+            WHERE
+                $dql_to
+                $dql_from
+                e.status IN (1,10) AND
+                e.opportunity = :opportunity_Id";
+
+        $query = $app->em->createQuery($dql);
+
+        $query->setParameters(array_filter($dql_params));
+
+        return $query->getResult();
+        
+    }
+
+    protected function generateCSV(array $registrations, Opportunity $opportunity):string {
+        /**
+         * Array com header do documento CSV
+         * @var array $headers
+         */
+        $headers = $this->columns;
+
+        $csv_data = [];
+        $plugin = Plugin::getInstance();
+        
+        $tratament = $plugin->config['fields_tratament']; 
+
+        foreach ($registrations as $i => $registration) {  
+            $csv_data[$i] = [
+                'NUMERO' => $registration->number,
+                'NOME_COMPLETO' => $tratament($registration, 'NOME_COMPLETO'),
+                'CPF' => $tratament($registration, 'CPF'),
+                'VALIDACAO' => null,
+                'OBSERVACOES' => null,
+                'DATA 1' => null,
+                'VALOR 1' => null,
+                'DATA 2' => null,
+                'VALOR 2' => null,
+                'DATA 3' => null,
+                'VALOR 3' => null,
+                'DATA 4' => null,
+                'VALOR 4' => null,
+                'DATA 5' => null,
+                'VALOR 5' => null,
+                'DATA 6' => null,
+                'VALOR 6' => null,
+                'DATA 7' => null,
+                'VALOR 7' => null,
+                'DATA 8' => null,
+                'VALOR 8' => null,
+                'DATA 9' => null,
+                'VALOR 9' => null,
+                'DATA 10' => null,
+                'VALOR 10' => null,
+                'DATA 11' => null,
+                'VALOR 11' => null,
+                'DATA 12' => null,
+                'VALOR 12' => null                
+            ];            
+        }        
+        
+        //$validador = $this->plugin->getSlug();
+        $hash = md5(json_encode($csv_data));
+
+        $dir = PRIVATE_FILES_PATH . "financeiro/";
+
+        $file_name = "validador-financeiro-{$hash}.csv";
+        $path =  $dir . $file_name;
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
+
+        $stream = fopen($path, 'w');
+
+        $csv = Writer::createFromStream($stream);
+        $csv->setDelimiter(";");
+
+        // Caso não exista Fields configurados remove os campos de nome e CPF
+        if(!$plugin->config['fields']){
+            $map_headers = [];
+            foreach($headers as $value){
+                if(!in_array($value, ['NOME_COMPLETO', 'CPF'])){
+                    $map_headers[] = $value;
+                }
+            }
+          
+            $map_csv_data = array_map(function($row){                
+                unset($row['NOME_COMPLETO']);
+                unset($row['CPF']);
+
+                return $row;
+            }, $csv_data);
+
+            $csv_data = $map_csv_data;
+            $headers = $map_headers;
+        }
+
+        $csv->insertOne($headers);
+
+        foreach ($csv_data as $csv_line) {
+            $csv->insertOne($csv_line);
+        }
+
+        $class_name = $opportunity->fileClassName;
+        $file = new $class_name([
+            'name' => $file_name,
+            'type' => mime_content_type($path),
+            'tmp_name' => $path,
+            'error' => 0,
+            'size' => filesize ($path)
+        ]);
+        $file->group = 'export-financial-validator-files';
+        $file->description = (new DateTime())->format('dmY'). '-' . $file_name;
+        $file->owner = $opportunity;
+        $file->save(true);
+
+        $this->json($file); 
     }
 
     /**
@@ -35,7 +258,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     public function GET_findPayments($opportunity_id = null)
     {
         $this->requireAuthentication();
-
+        
         $opportunity_id = $this->data['opportunity'];
         $data = $this->data;
         $complement = "";

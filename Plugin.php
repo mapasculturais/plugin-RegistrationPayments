@@ -21,6 +21,25 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $self = $this;
         $config += [
+            'fields' => [],
+            'fields_tratament' => function ($registration, $field) {
+                if(!$this->config['fields']){return;}
+                $result = [                   
+                    'CPF' => function () use ($registration, $field) {
+                        
+                        $field = $this->prefixFieldId($field);
+                        return preg_replace('/[^0-9]/i', '', $registration->$field);
+                    },
+                    'NOME_COMPLETO' => function () use ($registration, $field) {                        
+                        $field = $this->prefixFieldId($field);
+                        return $registration->$field;
+                    },
+                ];
+
+                $callable = $result[$field] ?? null;
+
+                return $callable ? $callable() : null;
+            },
             'cnab240_enabled' => function($entity) use($self){
                 if(in_array($entity->id, $self->config['opportunitys_cnab_active']) || $entity->paymentCnabEnabled == '1'){
                     return true;
@@ -330,6 +349,16 @@ class Plugin extends \MapasCulturais\Plugin{
             'available_for_opportunities' => true
         ]);
 
+        $this->registerMetadata(
+            'MapasCulturais\Entities\Opportunity',
+            'paymentFieldsPending',
+            [
+                'label' => 'Campos de dados bancarios pendente de criação',
+                'type' => 'boolean',
+                'default' => false,
+            ]
+        );
+
         $this->registerMetadata('MapasCulturais\Entities\Opportunity',
             'paymentsTabEnabled',
             [
@@ -340,6 +369,10 @@ class Plugin extends \MapasCulturais\Plugin{
                     "1" => i::__('Habilitar'),
                 ],
                 'default_value' => (string) "0",
+                'serialize' => function($value, $entity) {
+                    $entity->paymentFieldsPending = (!$entity->paymentFieldsPending && $value == 1) ? true : false;
+                    return $value;                    
+                }
             ]
         );
 
@@ -361,6 +394,16 @@ class Plugin extends \MapasCulturais\Plugin{
                 'export-cnab-files',
                 ['text/plain'],
                 'O arquivo não e valido'
+            )
+        );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
+                'export-financial-validator-files',
+                ['^text/csv$'],
+                'O arquivo não e valido',
+                unique:true,
             )
         );
     }
@@ -577,5 +620,21 @@ class Plugin extends \MapasCulturais\Plugin{
 
         return $errors;
     }
-    
+
+    /**
+     * Retorna o usuário autenticado
+     *
+     */
+    public static function getUser()
+    {
+        $app = App::i();
+
+        return $app->repo('User')->find($app->user->id);
+    }
+
+    public function prefixFieldId($value)
+    {
+        $fields_id = $this->config['fields'];
+        return $fields_id[$value] ? "field_".$fields_id[$value] : null;
+    }
 }

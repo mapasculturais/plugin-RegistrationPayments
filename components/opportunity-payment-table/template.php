@@ -11,7 +11,9 @@ use RegistrationPayments\Plugin;
 $this->import('
     create-payment
     entity-table
+    entity-files-list
     extraction-cnab
+    payment-spreadsheet
     mc-icon
     mc-modal
 ');
@@ -19,15 +21,17 @@ $this->import('
 $plugin = Plugin::getInstance();
 $cnab_enabled = $plugin->config['cnab240_enabled'];
 $entity = $this->controller->requestedEntity;
+$url = $app->createUrl('payment', 'export');
 ?>
 
 <entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options" visible="registration,paymentDate,amount,status,options">
     <template #actions-primary="{entities}">
+        <payment-spreadsheet :entity="opportunity"></payment-spreadsheet>
+        <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="" editable></entity-files-list>
         <create-payment :entity="opportunity" :entities="entities"></create-payment>
     </template>
 
     <template #actions-secondary="{entities}">
-        <button class="button button--primary button--icon"><?= i::__('Criar pagamento via planilha') ?> <mc-icon name="external"></mc-icon></button>
         <?php if($cnab_enabled($entity)):  ?>
             <extraction-cnab :entity="opportunity"></extraction-cnab>
         <?php endif ?>

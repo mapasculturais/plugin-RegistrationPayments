@@ -24,9 +24,6 @@ $this->import('
                 <span v-if="hasErrors" class="col-12">
                     <p v-for="item in response?.data" class="field__error">* {{item}}</p>
                 </span>
-                <div class="col-12">
-                    <?= i::__('Agora, defina o título e os dados a serem exibidos no gráfico:') ?>
-                </div>
                 <div class="field col-12">
                     <label for="regId"><?= i::__('Inscrições') ?></label>
                     <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5"></textarea>

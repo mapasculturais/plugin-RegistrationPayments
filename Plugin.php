@@ -369,6 +369,10 @@ class Plugin extends \MapasCulturais\Plugin{
                     "1" => i::__('Habilitar'),
                 ],
                 'default_value' => (string) "0",
+                'serialize' => function($value, $entity) {
+                    $entity->paymentFieldsPending = (!$entity->paymentFieldsPending && $value == 1) ? true : false;
+                    return $value;                    
+                }
             ]
         );
 

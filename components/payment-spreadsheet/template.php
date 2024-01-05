@@ -21,6 +21,9 @@ $this->import('
         </template>
 
         <template #default>
+            <span v-if="hasErrors" class="col-12">
+                <p v-for="item in response?.data" class="field__error">* {{ item }}</p>
+            </span>
             <div>
                 <label><?= i::__('Inscrições com data de envio inicial') ?></label>
                 <input type="date" v-model="dataExport.from">

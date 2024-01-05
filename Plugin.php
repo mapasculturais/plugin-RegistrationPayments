@@ -388,7 +388,8 @@ class Plugin extends \MapasCulturais\Plugin{
             new Definitions\FileGroup(
                 'export-financial-validator-files',
                 ['^text/csv$'],
-                'O arquivo não e valido'
+                'O arquivo não e valido',
+                unique:true,
             )
         );
     }

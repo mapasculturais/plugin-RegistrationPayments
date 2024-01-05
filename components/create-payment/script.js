@@ -33,6 +33,7 @@ app.component('create-payment', {
     methods: {
         skeleton() {
             return {
+                createType: "registration_id",
                 metadata: {
                     csv_line: {
                         OBSERVACOES: ''

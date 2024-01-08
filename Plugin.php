@@ -3,13 +3,14 @@
 namespace RegistrationPayments;
 
 use Normalizer;
-use  MapasCulturais\Definitions;
 use CnabPHP\Remessa;
 use MapasCulturais\i;
 use MapasCulturais\App;
+use  MapasCulturais\Definitions;
 use RegistrationPayments\Payment;
 use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
+use RegistrationPayments\JobTypes\GenerateCnab;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
 
 require_once 'vendor/autoload.php';
@@ -393,7 +394,8 @@ class Plugin extends \MapasCulturais\Plugin{
             new Definitions\FileGroup(
                 'export-cnab-files',
                 ['text/plain'],
-                'O arquivo não e valido'
+                'O arquivo não e valido',
+                private:true
             )
         );
 
@@ -626,6 +628,43 @@ class Plugin extends \MapasCulturais\Plugin{
 
         if(!in_array('amount', array_keys($data)) || !$data['amount']) {
             $errors[] = i::__('O campo Valor é um campo obrigatório');
+        }
+
+        return $errors;
+    }
+
+    public function getCnabValidationErrors($opportunity, $request)
+    {
+        $errors = [];
+        if (!$request['identifier']) {
+            $errors["identifier"] = i::__("Informe o número de identificação do lote Ex.: 001");
+        }
+
+        if (!$request['lotType']) {
+            $errors['lotType'] = i::__("Informe o tipo de lote. Corrente BB, Poupança BB ou Outros Bancos");
+        }
+        
+        if (!$opportunity->canUser('@control')) {
+            $errors[] = i::__("Você nao tem permissão para geração do CNAB240 nesta oportunidade");
+        }
+        
+        $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
+        $cnab240_enabled = $this->config['cnab240_enabled'];
+        if (!in_array('opportunitysCnab', array_keys($this->config)) || !$cnab240_enabled($opportunity)) {
+            $errors[] = i::__("Esta oportunidade não esta configurada, fale com administrador");
+        }
+        
+        $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
+
+        if($request['lotType'] && !$request['ts_lot']) {
+            $lot_type = $this->config['file_type'][$request['lotType']];
+            if(in_array($request['lotType'], $payment_lot_export[$identifier] ?? [])){
+                $errors[] = i::__("{$identifier} para o arquivo {$lot_type} Já usado anteriormente.");
+            }
+        }
+
+        if(!$this->config['cnab240_company_data']){
+            $errors[] = i::__("A entidade pagadora nao foi configurada");
         }
 
         return $errors;

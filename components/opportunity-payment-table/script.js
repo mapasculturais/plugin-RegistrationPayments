@@ -82,11 +82,11 @@ app.component('opportunity-payment-table', {
         statusFilter(event,entities) {            
             this.filters.status?.includes(event.target.value) ? this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1) : this.filters.status.push(event.target.value);
             
-            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` : this.query['status'] = `GTE(0)`;
+            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` :  `GTE(0)`;
             
             entities.refresh();
         },
-        change() {            
+        change(event,entities) {            
             if(this.filters.paymentFrom && this.filters.paymentTo){
                 this.query['paymentDate'] = `BET(${this.filters.paymentFrom},${this.filters.paymentTo})`
             }

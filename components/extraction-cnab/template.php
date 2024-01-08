@@ -16,9 +16,13 @@ $this->import('
 <div class="extraction-cnab">
     <mc-modal title="<?= i::__('Exportar TXT CNAB') ?>">
         <div class="grid-12">
-            <div class="field col-12">
-                <label> <?= i::__('Identificação do lote de pagamento') ?></label>
-                <input v-model="cnabData.identifier" type="text">
+            <span v-if="hasErrors" class="col-12">
+                <p v-for="item in response?.data" class="field__error">* {{item}}</p>
+            </span>
+
+            <div class="field col-12" :class="{'error': fieldError('identifier')}">
+                <label> <?= i::__('Identificação do lote de pagamento') ?> <span class="required">* <?= i::__('Obrigatório') ?></span></label>
+                <input v-model="cnabData.identifier" type="text" >
             </div>
 
             <div class="field col-6">
@@ -26,9 +30,9 @@ $this->import('
                 <input v-model="cnabData.paymentDate" type="date">
             </div>
 
-            <div class="field col-6">
-                <label><?= i::__('Tipo de exportação') ?></label>
-                <select v-model="cnabData.lotType">
+            <div class="field col-6" :class="{'error': fieldError('lotType')}">
+                <label><?= i::__('Tipo de exportação') ?> <span class="required">* <?= i::__('Obrigatório') ?></span></label>
+                <select v-model="cnabData.lotType" class="errors">
                     <option value="1"><?= i::__('Corrente BB') ?></option>
                     <option value="2"><?= i::__('Poupança BB') ?></option>
                     <option value="3"><?= i::__('Outros Bancos') ?></option>

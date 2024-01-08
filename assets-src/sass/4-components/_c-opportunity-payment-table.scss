@@ -9,6 +9,12 @@
         padding: 0 24px;
     }
 
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
     &__table-actions {
         display: flex;
         gap: 12px;

@@ -49,7 +49,7 @@ $url = $app->createUrl('payment', 'export');
     </template>
 
     <template #advanced-actions="{entities}">
-        Opções avançadas vão aqui
+        <entity-files-list :entity="opportunity" group="export-cnab-files" title="" ></entity-files-list>
     </template>
 
     <template #filters="{entities}">

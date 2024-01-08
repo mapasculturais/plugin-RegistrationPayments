@@ -775,7 +775,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'size' => filesize ($patch)
         ]);
         $file->group = 'export-cnab-files';
-        $file->description = 'arquivo-caab';   
+        $file->description = $file_name;   
         $file->owner = $opportunity;
         $file->save(true);
 

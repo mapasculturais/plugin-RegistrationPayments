@@ -35,7 +35,6 @@ $url = $app->createUrl('payment', 'export');
             <h4 class="bold"><?= i::__('Ações:') ?></h4>
 
             <div class="opportunity-payment-table__actions grid-12">
-                <!-- <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="" editable></entity-files-list> -->
 
                 <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
                 

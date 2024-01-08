@@ -418,29 +418,37 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $app = App::i();
 
+        $errors = [];
+        $data = $this->data;
+        $create_type = trim($data['createType']);
+        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+
         $user = $app->getUser();
 
         $plugin = Plugin::getInstance();
-
-        $data = $this->data;
 
         if($errors = $plugin->errorsRequest($data)) {
             $this->errorJson($errors, 400);
         }
 
-        $ids = explode(",", $data['registration_id']);
+        if($create_type == "category"){
+            $registrations = $app->repo('Registration')->findBy(['category' => $create_type, 'opportunity' => $opportunity]);
+        }
 
-        $ids = array_map(function ($id) {
-            return trim(preg_replace('/[^0-9]/i', '', $id));
-        }, $ids);
+        if($create_type == "registration_id"){
+            $ids = explode(",",$data[$create_type]);
+            $ids = array_map(function ($id) {
+                return trim(preg_replace('/[^0-9]/i', '', $id));
+            }, $ids);
+            
+            $ids = array_filter($ids);
 
-        $ids = array_filter($ids);
+            $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
+        }
 
-        $errors = [];
-
-        $registrations = $app->repo('Registration')->findBy(['id' => $ids]);
-
-        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+        if($create_type == "registrationStatus"){
+            $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
+        }
 
         if (!$registrations) {
             $errors[] = i::__("As iscrições informadas não foram encontradas na oportunidade {$opportunity->name}");
@@ -498,10 +506,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $conn = $app->em->getConnection();
         $data = $this->data;
-        $opportunity_id = $this->data["opportunity"];
+        $opportunity_id = $data["opportunity"];
         $search = isset($data["search"]) ? $data["search"] : "";
         $complement = "";
-        $status = isset($data["status"]) ? $data["status"] : null;
+        $status = isset($data["status"]) ? $data["status"] : [];
         $params = [
             "opp" => $opportunity_id,
             "search" => "%" . $search . "%",
@@ -520,11 +528,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             }
         }
         //incrementa parametros caso exista um filtro por status
-        if (is_numeric($status)) {
-            $complement .= " AND p.status = :status";
-            $params["status"] = $status;
+       
+        if ($status) {
+            $complement .= " AND p.status IN (:status)";
+            $params["status"] = explode(',',$status);
         }
+       
         //Busca os ids das inscrições
+       
         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
@@ -570,17 +581,42 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 "status" => $status,
             ];
         }, $dataPayments);
+        
         $app->applyHook("opportunity.payments.reportCSV", [ & $dataPayments, &$header, &$payments]);
-        $csv = Writer::createFromString();
+
+        $dateExport = new DateTime("now");
+        $fileName = "result-filter-payments-opp-" . $data["opportunity"] . md5(json_encode($payments)) . "-" . $dateExport->format("dmY").".csv";
+        $dir = PRIVATE_FILES_PATH . "financeiro/";
+        $path =  $dir . $fileName;
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
+
+        $stream = fopen($path, 'w');
+       
+        $csv = Writer::createFromStream($stream);
         $csv->setDelimiter(";");
         $csv->insertOne($header);
         foreach ($payments as $payment) {
             $csv->insertOne($payment);
         }
-        $dateExport = new DateTime("now");
-        $fileName = "result-filter-payments-opp-" . $data["opportunity"] . md5(json_encode($payments)) . "-" . $dateExport->format("dmY");
-        $csv->output($fileName . ".csv");
-        return;
+        
+        $opportunity = $app->repo("Opportunity")->find($opportunity_id);
+        $class_name = $opportunity->fileClassName;
+        $file = new $class_name([
+            'name' => $fileName,
+            'type' => mime_content_type($path),
+            'tmp_name' => $path,
+            'error' => 0,
+            'size' => filesize ($path)
+        ]);
+        $file->group = 'export-financial-validator-files';
+        $file->description = $fileName;
+        $file->owner = $opportunity;
+        $file->save(true);
+
+        $this->json($file); 
     }
 
     /**

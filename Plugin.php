@@ -402,6 +402,16 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->registerFileGroup(
             'opportunity',
             new Definitions\FileGroup(
+                'export-payments-filters-files',
+                ['^text/csv$'],
+                'O arquivo não e valido',
+                unique:true,
+            )
+        );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
                 'export-financial-validator-files',
                 ['^text/csv$'],
                 'O arquivo não e valido',
@@ -594,8 +604,22 @@ class Plugin extends \MapasCulturais\Plugin{
     public function errorsRequest(array $data): array
     {
         $errors = [];
-        if(!in_array('registration_id', array_keys($data)) || !$data['registration_id']) {
-            $errors[] = i::__('O campo Inscrições é um campo obrigatório');
+        $create_type = $data['createType'];
+
+        switch ($create_type) {
+            case 'registration_id':
+                $type =  i::__('inscrições');
+                break;
+            case 'registrationStatus':
+                $type =  i::__('status');
+                break;
+            case 'category':
+                $type =  i::__('categoria');
+                break;
+        }
+
+        if(!in_array($create_type, array_keys($data)) || !$data[$create_type]) {
+            $errors[] = i::__("O campo {$type} é obrigatório");
         }
 
         if(!in_array('payment_date', array_keys($data)) || !$data['payment_date']) {

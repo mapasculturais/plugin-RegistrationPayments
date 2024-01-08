@@ -41,7 +41,7 @@ $this->import('
                 </div>
                 <div class="field col-6">
                     <label for="paymentStatus"><?= i::__('Status') ?></label>
-                    <select name="paymentStatus">
+                    <select v-model="payment.status" name="paymentStatus">
                         <option v-for="item in status" :value="item.value">{{item.label}}</option>
                     </select>
                 </div>

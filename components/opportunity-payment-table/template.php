@@ -12,6 +12,7 @@ $this->import('
     create-payment
     entity-table
     entity-files-list
+    export-filters-spreadsheet
     extraction-cnab
     payment-spreadsheet
     mc-icon
@@ -130,3 +131,4 @@ $url = $app->createUrl('payment', 'export');
         </div>
     </template>
 </entity-table>
+<export-filters-spreadsheet :entity="opportunity" :filters="filters"></export-filters-spreadsheet>

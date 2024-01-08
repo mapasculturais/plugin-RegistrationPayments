@@ -86,7 +86,7 @@ app.component('opportunity-payment-table', {
             
             entities.refresh();
         },
-        change() {            
+        change(event,entities) {            
             if(this.filters.paymentFrom && this.filters.paymentTo){
                 this.query['paymentDate'] = `BET(${this.filters.paymentFrom},${this.filters.paymentTo})`
             }

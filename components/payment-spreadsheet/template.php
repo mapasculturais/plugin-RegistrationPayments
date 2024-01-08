@@ -37,7 +37,7 @@ $this->import('
         </template>
 
         <template #button="modal">
-            <button class="button button--primary button--icon" @click="modal.open()"><?= i::__('Criar pagamento via planilha') ?> <mc-icon name="external"></mc-icon></button>
+            <button class="button button--primary button--icon" @click="modal.open()"><?= i::__('Pagamento via planilha') ?> <mc-icon name="external"></mc-icon></button>
         </template>
     </mc-modal>
 </div>

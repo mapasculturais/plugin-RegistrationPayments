@@ -58,7 +58,7 @@ $this->import('
         </template>
 
         <template #button="modal">
-            <button type="button" @click="modal.open()" class="button button--primary button--icon"><?= i::__('Extrair CNAB') ?> <mc-icon name="download"></mc-icon></button>
+            <button type="button" @click="modal.open()" class="button button--primary button--icon button--large"><?= i::__('Extrair CNAB') ?> <mc-icon name="download"></mc-icon></button>
         </template>
     </mc-modal>
 </div>

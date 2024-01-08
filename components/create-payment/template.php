@@ -53,7 +53,7 @@ $this->import('
         </template>
 
         <template #button="modal">
-            <button type="button" @click="modal.open()" class="button button--primary button--icon"><mc-icon name="add"></mc-icon><?= i::__('Adicionar pagamento') ?></button>
+            <button type="button" @click="modal.open()" class="button button--primary button--icon button--large"><mc-icon name="add"></mc-icon><?= i::__('Adicionar pagamento') ?></button>
         </template>
     </mc-modal>
 </div>

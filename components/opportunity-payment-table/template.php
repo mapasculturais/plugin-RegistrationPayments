@@ -25,39 +25,53 @@ $url = $app->createUrl('payment', 'export');
 ?>
 
 <entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options" visible="registration,paymentDate,amount,status,options">
-    <template #actions-primary="{entities}">
-        <payment-spreadsheet :entity="opportunity"></payment-spreadsheet>
-        <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="" editable></entity-files-list>
-        <create-payment :entity="opportunity" :entities="entities"></create-payment>
+    
+    <template #title>
+        <h3 class="bold"><?= i::__('Pagamentos') ?></h3>
     </template>
 
-    <template #actions-secondary="{entities}">
-        <?php if($cnab_enabled($entity)):  ?>
-            <extraction-cnab :entity="opportunity"></extraction-cnab>
-        <?php endif ?>
+    <template #actions="{entities}">
+        <div class="opportunity-payment-table__actions">
+            <h4 class="bold"><?= i::__('Ações:') ?></h4>
+
+            <div class="opportunity-payment-table__actions grid-12">
+                <!-- <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="" editable></entity-files-list> -->
+
+                <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
+                
+                <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
+                
+                <?php if($cnab_enabled($entity)):  ?>
+                    <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
+                <?php endif ?>
+            </div>
+        </div>
     </template>
 
-    <template #table-filters="{entities}">
-        <div class="opportunity-payment-table__filters">
-            <h4 class="bold"><?= i::__('Filtrar:') ?></h4>
-            <div class="grid-12">
-                <div class="field col-4">
-                    <label><?= i::__('Data inicial')?></label>
-                    <input v-model="filters.paymentFrom" @change="change($event,entities)" type="date">
-                </div>
-                <div class="field col-4">
-                    <label><?= i::__('Data final')?></label>
-                    <input v-model="filters.paymentTo" @change="change($event,entities)" type="date">
-                </div>
-                <div class="field col-3">
-                    <label><?= i::__('Status')?></label>
-                    <select v-model="filters.status" @change="change($event,entities)">
-                        <option value=""><?= i::__('Selecione')?></option>
-                        <template v-for="status in statusList">
-                            <option :value="status.value">{{status.label}}</option>
-                        </template>
-                    </select>
-                </div>
+    <template #advanced-actions="{entities}">
+        Opções avançadas vão aqui
+    </template>
+
+    <template #filters="{entities}">
+        <div class="grid-12">
+            <div class="field field--horizontal col-6 sm:col-12">
+                <label><?= i::__('Data inicial')?></label>
+                <input v-model="filters.paymentFrom" @change="change($event,entities)" type="date">
+            </div>
+            <div class="field field--horizontal col-6 sm:col-12">
+                <label><?= i::__('Data final')?></label>
+                <input v-model="filters.paymentTo" @change="change($event,entities)" type="date">
+            </div>
+        </div>
+    </template>
+    
+    <template #advanced-filters="{entities}">
+        <div class="field">
+            <label><?= i::__('Status')?></label>
+            <div class="field__group">
+                <label class="field__checkbox" v-for="status in statusList">
+                    <input :checked="filters.status?.includes(status.value)" type="checkbox" :value="status.value" @input="statusFilter($event,entities)"> {{status.label}} 
+                </label>
             </div>
         </div>
     </template>
@@ -77,7 +91,6 @@ $url = $app->createUrl('payment', 'export');
     <template #options="entity">
         <div class="opportunity-payment-table__table-actions">
             <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
-
                 <div class="grid-12">
                     <div class="field col-12">
                         <label> <?= i::__('Inscrições') ?></label>
@@ -103,7 +116,6 @@ $url = $app->createUrl('payment', 'export');
                     </div>
                 </div>
 
-
                 <template #button={open}>
                     <mc-icon name="edit" @click="open()"></mc-icon>
                 </template>
@@ -113,8 +125,8 @@ $url = $app->createUrl('payment', 'export');
                     <button class="button button--primary" @click="doSomething(modal)"><?= i::__('Salvar') ?></button>
                 </template>
             </mc-modal>
+            
             <mc-icon name="trash"></mc-icon>
         </div>
     </template>
-
 </entity-table>

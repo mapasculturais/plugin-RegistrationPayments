@@ -497,10 +497,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
     /**
      *
-     * @apiDefine APIGET
+     * @apiDefine APIPOST
      * @apiDescription Exporta um arquivo CSV com os dados de pagamento filtraos.
      */
-    public function GET_exportFilter()
+    public function POST_exportFilter()
     {
         $this->requireAuthentication();
         $app = App::i();

@@ -28,9 +28,10 @@ app.component('export-filters-spreadsheet', {
         async exportSheet() {
             const api = new API();
             const messages = useMessages();
+            this.filters.opportunity = this.entity.id
 
             let url = Utils.createUrl('payment', 'exportFilter', { opportunity: this.entity.id });
-            api.GET(url, this.filters).then(res => res.json()).then(data => {
+            api.POST(url, this.filters).then(res => res.json()).then(data => {
 
                 messages.success(this.text('exportSuccess'));
                 window.open(data.url, '_blank');

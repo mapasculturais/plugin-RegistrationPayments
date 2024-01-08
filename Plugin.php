@@ -400,6 +400,16 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->registerFileGroup(
             'opportunity',
             new Definitions\FileGroup(
+                'export-payments-filters-files',
+                ['^text/csv$'],
+                'O arquivo não e valido',
+                unique:true,
+            )
+        );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
                 'export-financial-validator-files',
                 ['^text/csv$'],
                 'O arquivo não e valido',

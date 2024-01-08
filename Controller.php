@@ -610,101 +610,46 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $this->apiResponse($return);
     }
-
-    public function ALL_generateCnab()
+    
+    public function POST_generateCnab()
     {
-        $this->requireAuthentication();
+        //Seta o timeout
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '768M');
 
-         //Seta o timeout
-         ini_set('max_execution_time', 0);
-         ini_set('memory_limit', '768M');
+        $this->requireAuthentication();
 
         $app = App::i();
 
-        // Pega a instancia do plugin
         $plugin = Plugin::getInstance();
 
-       // Varifica se o arquivo é um teste ou se é um arquivo oficial
-       $test = false;
-       if(isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on'){
-           $test = true;
-       }
-   
-        // Pega a oportunidade
-        $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
+        $request = $this->data;
+
+        $errors = [];
+        $opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);
         $opportunity->registerRegistrationMetadata($opportunity);
-
-        // Verifica se o usuário te controle da oportunidade para executar a exportação
-        if(!$opportunity->canUser('@control')){
-            echo "Não Autorizado";
-            exit;
-        }
-
-        // Veirfica existe identificaçõ do lote
-        if(!$test && empty($this->data['identifier'])){
-            echo "Informe o número de identificação do lote Ex.: 001";
-            exit;
-        }
-
-         // Pega o identificador
-         $identifier = "lote-". str_pad($this->data['identifier'] , 4 , '0' , STR_PAD_LEFT);
-         
-
-        // Pega os ID's das inscrições
-        $registration_ids = $this->getRegistrationsIds($opportunity,  $identifier);
         
-
-        // Veirfica se o Lote esta informado
-        if(!$registration_ids){
-            echo "Nao foram encontrado inscrições";
-            exit;
-        }
-   
-        // Verifica se o CNAB esta ativo
-        if(!$plugin->config['cnab240_enabled']){
-            echo "Habilite o CANB240 nas configurações";
-            exit;
+        if($errors = $plugin->getCnabValidationErrors($opportunity, $request)) {
+            $this->errorJson($errors); 
         }
 
-        // Veirfica se o Lote esta informado
-        if(!isset($this->data['lotType'])){
-            echo "Informe o tipo de lote <br> 1 Corrente BB<br> 2 Poupança BB<br> 3 Outros bancos";
-            exit;
+        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
+        if (!$registration_ids = $this->getRegistrationsIds($opportunity,  $identifier)) {
+            $errors[] = i::__("Nao foram encontrado inscrições");
         }
 
-             
+        if($errors) {
+            $this->errorJson($errors); 
+        }
+
+        $test = isset( $request['ts_lot']) &&  $request['ts_lot'] ? true : false;
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
+        $company_data = $plugin->config['cnab240_company_data'];
 
-        $typeLot = [
-            1 => "Corrente BB",
-            2 => "Poupança BB",
-            3 => "Outros Bancos"
-        ];
+        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][ $request['lotType']];
 
-        // Verifica se o lote ja foi exportado anteriormente
-        if(!$test && in_array($this->data['lotType'], $payment_lot_export[$identifier] ?? [])){
-            echo "{$identifier} para o arquivo {$typeLot[$this->data['lotType']]} Já exportado anteriormente. Caso queira fazer uma confêrencia selecione a caixa Exportar lote de teste.";
-            exit;
-        }
-
-        
-
-        // Pega o tipo de lote a ser exportado
-        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
-
-        // Pega as configurações da entidade pagadora
-        if(!($company_data = $plugin->config['cnab240_company_data'])){
-            echo "A entidade pagadora nao foi configurada";
-            exit;
-        }
-
-        // Veirfica a data de pagamento 
-        if(!($paymentDate = $this->data['paymentDate'])){
-           $paymentDate = null;
-        }
-
-       
-
+        $paymentDate =  $request['paymentDate'] ?? null;
+     
         /** 
          * Instancia o CANB
          * @var Remessa  $arquivo
@@ -787,22 +732,21 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'referencia_pagamento' => base_convert($registration->id, 10, 36)
 
             ));
-            
+
             $complementDebugInfo = $test ? "para teste" : "para pagamento";
             $app->log->debug("#{$key} - CNAB240 Exportando inscrição {$id} {$complementDebugInfo}");
             $app->em->clear();
         }
 
         // Salva a refêrencia do lote na oportunidade
-        if(!$test){
-            $opportunity = $app->repo("Opportunity")->find(['id' => $this->data['opportunity_id']]);
-            $payment_lot_export[$identifier][] = $this->data['lotType'];
+        if (!$test) {
+            $opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);
+            $payment_lot_export[$identifier][] = $request['lotType'];
             $opportunity->payment_lot_export = json_encode($payment_lot_export);
             $opportunity->save(true);
         }
 
-  
-        $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$this->data['lotType']]));
+        $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$request['lotType']]));
         $name = mb_strtolower(str_replace(" ", "-", mb_substr($opportunity->name, 0, 20)));
         $amount_file = preg_replace('/[^0-9]/i', '', RemessaAbstract::$sumValoesTrailer);
         $file_name = "pagamento-{$amount_file}---{$identifier}-{$name}--opp-{$opportunity->id}-{$fileType}-canb240.txt";
@@ -834,6 +778,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $file->description = 'arquivo-caab';   
         $file->owner = $opportunity;
         $file->save(true);
+
+        $this->json($file);
     }
 
     /**
@@ -842,7 +788,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
      * @param mixed $opportunity
      * @return \MapasCulturais\Entities\Registration[]
      */
-    public function getRegistrationsIds(Opportunity $opportunity, $identifier)
+    public function getRegistrationsIds(Opportunity $opportunity)
     {
         $this->requireAuthentication();
 
@@ -886,9 +832,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         if($lot == '01' || $lot == '05'){
             if($lot == '01'){
-                $acount = 'Conta corrente';
+                $acount = 'conta corrente';
             }else if($lot == '05'){
-                $acount = 'Conta poupança';
+                $acount = 'conta poupança';
             }
 
             $complement_join .= " join registration_meta account on r.id = account.object_id";

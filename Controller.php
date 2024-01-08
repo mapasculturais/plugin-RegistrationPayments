@@ -506,7 +506,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $conn = $app->em->getConnection();
         $data = $this->data;
-        $opportunity_id = $this->data["opportunity"];
+        $opportunity_id = $data["opportunity"];
         $search = isset($data["search"]) ? $data["search"] : "";
         $complement = "";
         $status = isset($data["status"]) ? $data["status"] : null;

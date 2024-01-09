@@ -49,12 +49,42 @@ app.component('opportunity-payment-table', {
                 status: []
             },
             api,
+            revisions: {}
         }
     },
 
     methods: {
         formatDateInput(date) {
             return new Date(date);
+        },
+        updatePayment(payment) {
+            let url = Utils.createUrl('payment', 'single', {id: payment._id});
+            let args = {
+                amount: payment.amount,
+                paymentDate: payment.__originalValues.paymentDate,
+                metadata: {
+                    csv_line: {
+                        OBSERVACOES: payment.metadata.csv_line.OBSERVACOES
+                    }
+                },
+            };
+            this.api.PATCH(url, args).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    this.messages.error(this.text('editPaymentError'));
+                } else {
+                    this.messages.success(this.text('editPaymentSuccess'));
+                }
+            });
+        },
+        delPayment(payment) {
+            let url = Utils.createUrl('payment', 'single', {id: payment._id});
+            this.api.DELETE(url).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    this.messages.error(this.text('setStatusError'));
+                } else {
+                    this.messages.success(this.text('setStatusSuccess'));
+                }
+            });
         },
         setStatus(payment) {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});

@@ -9,12 +9,14 @@ use MapasCulturais\i;
 use RegistrationPayments\Plugin;
 
 $this->import('
+    change-history
     create-payment
     entity-table
     entity-files-list
     export-filters-spreadsheet
     extraction-cnab
     payment-spreadsheet
+    mc-confirm-button
     mc-icon
     mc-modal
 ');
@@ -90,16 +92,13 @@ $url = $app->createUrl('payment', 'export');
 
     <template #options="entity">
         <div class="opportunity-payment-table__table-actions">
+            <change-history :entity="entity"></change-history>
+
             <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
                 <div class="grid-12">
                     <div class="field col-12">
-                        <label> <?= i::__('Inscrições') ?></label>
-                        <textarea v-model="entity.registration_id" name="" id="" cols="30" rows="5"></textarea>
-                    </div>
-
-                    <div class="field col-12">
                         <label><?= i::__('Previsão de pagamento') ?></label>
-                        <input v-model="entity.paymentDate" type="date">
+                        <input v-model="entity.__originalValues.paymentDate" type="date">
                     </div>
 
                     <div class="field col-12">
@@ -122,11 +121,18 @@ $url = $app->createUrl('payment', 'export');
 
                 <template #actions="modal">
                     <button class="button button" @click="modal.close()"><?= i::__('Cancelar') ?></button>
-                    <button class="button button--primary" @click="doSomething(modal)"><?= i::__('Salvar') ?></button>
+                    <button class="button button--primary" @click="updatePayment(entity)"><?= i::__('Salvar') ?></button>
                 </template>
             </mc-modal>
-            
-            <mc-icon name="trash"></mc-icon>
+
+            <mc-confirm-button @confirm="delPayment(entity)">
+                <template #button="{open}">
+                    <mc-icon name="trash" @click="open()"></mc-icon>
+                </template> 
+                <template #message="message">
+                    <?php i::_e('Deseja deletar o pagamento?') ?>
+                </template> 
+            </mc-confirm-button>
         </div>
     </template>
 </entity-table>

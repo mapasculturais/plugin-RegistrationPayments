@@ -92,7 +92,7 @@ $url = $app->createUrl('payment', 'export');
 
     <template #options="entity">
         <div class="opportunity-payment-table__table-actions">
-            <change-history :entity="entity"></change-history>
+            <change-history :entity="opportunity"></change-history>
 
             <mc-modal button-label="abrir" :title="'<?= i::__('Editar pagamento da inscrição') ?> ' + entity.registration.number">
                 <div class="grid-12">

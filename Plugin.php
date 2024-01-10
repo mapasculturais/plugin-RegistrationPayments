@@ -263,15 +263,9 @@ class Plugin extends \MapasCulturais\Plugin{
             $values['Payment'] = Payment::class;
         });
 
-        $app->hook('template(opportunity.edit.opportunity-basic-info):afeter ',function(){
-                $this->part('payments/payments-config');
-        });
-
         $app->hook("template(opportunity.edit.tabs):end", function() use ($app) {
             $entity = $this->controller->requestedEntity;
-            if($entity->paymentsTabEnabled == "1") {
-                $this->part("payments/opportunity-payments-tab", ['entity' => $entity]);
-            }
+            $this->part("payments/opportunity-payments-tab", ['entity' => $entity]);
         });
 
         $app->hook('repo(RegistrationPayments.Payment).getIdsByKeywordDQL.join', function (&$joins, $keyword) {
@@ -329,35 +323,6 @@ class Plugin extends \MapasCulturais\Plugin{
                 'label' => 'Campos de dados bancarios pendente de criação',
                 'type' => 'boolean',
                 'default' => false,
-            ]
-        );
-
-        $this->registerMetadata('MapasCulturais\Entities\Opportunity',
-            'paymentsTabEnabled',
-            [
-                'label' => 'Habilitar aba de pagamentos',
-                'type' => 'radio',
-                'options' => (object)[
-                    "0" => i::__('Desabilitar'),
-                    "1" => i::__('Habilitar'),
-                ],
-                'default_value' => (string) "0",
-                'serialize' => function($value, $entity) {
-                    $entity->paymentFieldsPending = (!$entity->paymentFieldsPending && $value == 1) ? true : false;
-                    return $value;                    
-                }
-            ]
-        );
-
-        $this->registerMetadata('MapasCulturais\Entities\Opportunity',
-            'paymentCnabEnabled',
-                [
-                'label' => 'Habilita extração do arquivo CNAB240',
-                'type' => 'radio',
-                'options' => (object)[
-                    "0" => i::__('Desabilitar'),
-                    "1" => i::__('Habilitar'),
-                ],
             ]
         );
         

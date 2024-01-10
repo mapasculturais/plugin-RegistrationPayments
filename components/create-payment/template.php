@@ -44,7 +44,7 @@ $this->import('
                         </div>
                     </div>
                 </div>
-                
+
                 <div v-if="payment.createType == 'registration_id'" class="field col-12">
                     <label for="regId"><?= i::__('Inscrições') ?></label>
                     <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5"></textarea>
@@ -65,7 +65,7 @@ $this->import('
 
                 <div v-if="payment.createType == 'registrationStatus'" class="field col-6">
                     <label for="paymentStatus"><?= i::__('Status') ?></label>
-                    <select v-model="payment.status" name="paymentStatus">
+                    <select v-model="payment.registrationStatus" name="paymentStatus">
                         <option v-for="item in status" :value="item.value">{{item.label}}</option>
                     </select>
                 </div>

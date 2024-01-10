@@ -24,4 +24,10 @@
             font-size: 18px;
         }
     }
+
+    &__download-btn {
+        display: flex;
+        padding: 24px 38px 0;
+        justify-content: flex-end;
+    }
 }

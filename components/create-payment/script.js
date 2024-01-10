@@ -15,6 +15,9 @@ app.component('create-payment', {
         status() {
             return $MAPAS.config.payment.statusDic;
         },
+        categories() {
+            return this.entity.registrationCategories;
+        }
     },
 
     setup() {
@@ -33,12 +36,12 @@ app.component('create-payment', {
     methods: {
         skeleton() {
             return {
-                createType: "registration_id",
                 metadata: {
                     csv_line: {
                         OBSERVACOES: ''
                     }
-                }
+                },
+                createType: 'registration_id',
             }
         },
         hasErrors() {
@@ -46,10 +49,12 @@ app.component('create-payment', {
         },
         save(modal) {
             const messages = useMessages();
-            this.payment.amount = this.payment.amount.replace(/\s/g, '').replace(',', '.');
+            this.payment.amount = this.payment.amount?.replace(/\s/g, '').replace(',', '.');
             const api = new API('payment');
             let url = Utils.createUrl('payment', 'createMultiple', { opportunity: this.entity.id });
-            api.POST(url, this.payment).then(res => res.json()).then(data => {
+
+            console.log(this.payment);
+            /* api.POST(url, this.payment).then(res => res.json()).then(data => {
                 if (data?.error) {
                     messages.error(this.text('createPaymentsError'));
                     this.response = data
@@ -60,7 +65,7 @@ app.component('create-payment', {
                     this.response = {}
                     this.entities.refresh();
                 }
-            });
+            }); */
         },
 
     },

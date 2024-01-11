@@ -60,7 +60,7 @@ app.component('opportunity-payment-table', {
         updatePayment(payment) {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});
             let args = {
-                amount: payment.amount,
+                amount: payment.amount?.replace(/\s/g, '').replace(',', '.'),
                 paymentDate: payment.__originalValues.paymentDate,
                 metadata: {
                     csv_line: {

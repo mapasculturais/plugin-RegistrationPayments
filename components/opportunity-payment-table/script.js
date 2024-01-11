@@ -80,10 +80,10 @@ app.component('opportunity-payment-table', {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});
             this.api.DELETE(url).then(res => res.json()).then(data => {
                 if (data?.error) {
-                    this.messages.error(this.text('setStatusError'));
+                    this.messages.error(this.text('deletePaymentError'));
                 } else {
                     refresh();
-                    this.messages.success(this.text('setStatusSuccess'));
+                    this.messages.success(this.text('deletePaymentSuccess'));
                 }
             });
         },

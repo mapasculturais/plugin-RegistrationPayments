@@ -52,7 +52,7 @@ $url = $app->createUrl('payment', 'export');
     <template #advanced-actions="{entities}">
         <div class="grid-12">
             <div class="col-6">
-                <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="Validador Financeiro"></entity-files-list>
+                <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="<?= i::__('Validador Financeiro') ?>"></entity-files-list>
             </div>
         </div>
     </template>
@@ -81,7 +81,7 @@ $url = $app->createUrl('payment', 'export');
         </div>
     </template>
 
-   <template #status="entity">
+    <template #status="{entity}">
         <select v-model="entity.status" @change="setStatus(entity)">
             <template v-for="item in statusList">
                 <option :value="item.value">{{item.label}}</option>
@@ -89,11 +89,12 @@ $url = $app->createUrl('payment', 'export');
         </select>
     </template>
 
-    <template #amount="entity">
+    <template #amount="{entity}">
         {{amountToString(entity.amount)}}
     </template>
 
-    <template #options="entity">
+    <template #options="{entity, refresh}">
+        
         <div class="opportunity-payment-table__table-actions">
             <change-history :entity="opportunity"></change-history>
 
@@ -128,7 +129,7 @@ $url = $app->createUrl('payment', 'export');
                 </template>
             </mc-modal>
 
-            <mc-confirm-button @confirm="delPayment(entity)">
+            <mc-confirm-button @confirm="delPayment(entity, refresh)">
                 <template #button="{open}">
                     <mc-icon name="trash" @click="open()"></mc-icon>
                 </template> 

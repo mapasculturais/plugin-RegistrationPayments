@@ -136,6 +136,24 @@ class Payment extends \MapasCulturais\Entity {
     }
 
     /**
+     * Retorna array com os nomes dos status
+     * 
+     * @return array
+     */
+    public static function getStatusById($id) {
+        $status = [
+            self::STATUS_PENDING => i::__('Pendente'),
+            self::STATUS_PROCESSING => i::__('Processando'),
+            self::STATUS_FAILED => i::__('Falha'),
+            self::STATUS_EXPORTED => i::__('Exportado'),
+            self::STATUS_AVAILABLE => i::__('Disponível'),
+            self::STATUS_PAID => i::__('Pago'),
+        ];
+        
+        return $status[$id] ?? null;
+    }
+
+    /**
      * @param DateTime|string $date Se string enviar no formato YYYY-MM-DD
      * @return void 
      */

@@ -21,19 +21,23 @@ $this->import('
         </template>
 
         <template #default>
-            <span v-if="hasErrors" class="col-12">
-                <p v-for="item in response?.data" class="field__error">* {{ item }}</p>
-            </span>
-            <div>
-                <label><?= i::__('Inscrições com data de envio inicial') ?></label>
-                <input type="date" v-model="dataExport.from">
-            </div>
+            <div class="grid-12">
+                <span v-if="hasErrors" class="col-12">
+                    <p v-for="item in response?.data" class="field__error">* {{ item }}</p>
+                </span>
+                
+                <div class="field col-12">
+                    <label><?= i::__('Inscrições com data de envio inicial') ?></label>
+                    <input type="date" v-model="dataExport.from">
+                </div>
 
-            <div>
-                <label><?= i::__('Inscrições com data de envio Final') ?></label>
-                <input type="date" v-model="dataExport.to">
+                <div class="field col-12">
+                    <label><?= i::__('Inscrições com data de envio Final') ?></label>
+                    <input type="date" v-model="dataExport.to">
+                </div>
+
+                <small class="col-12"><?= i::__("# Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
             </div>
-            <small><?= i::__("# Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
         </template>
 
         <template #button="modal">

@@ -38,7 +38,6 @@ $url = $app->createUrl('payment', 'export');
             <h4 class="bold"><?= i::__('Ações:') ?></h4>
 
             <div class="opportunity-payment-table__actions grid-12">
-
                 <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
                 
                 <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
@@ -51,7 +50,11 @@ $url = $app->createUrl('payment', 'export');
     </template>
 
     <template #advanced-actions="{entities}">
-        <entity-files-list :entity="opportunity" group="export-cnab-files" title="" ></entity-files-list>
+        <div class="grid-12">
+            <div class="col-6">
+                <entity-files-list :entity="opportunity" group="export-financial-validator-files" title="Validador Financeiro"></entity-files-list>
+            </div>
+        </div>
     </template>
 
     <template #filters="{entities}">
@@ -136,4 +139,7 @@ $url = $app->createUrl('payment', 'export');
         </div>
     </template>
 </entity-table>
-<export-filters-spreadsheet :entity="opportunity" :filters="filters"></export-filters-spreadsheet>
+
+<div class="opportunity-payment-table__download-btn">
+    <export-filters-spreadsheet :entity="opportunity" :filters="filters"></export-filters-spreadsheet>
+</div>

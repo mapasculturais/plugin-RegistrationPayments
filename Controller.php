@@ -432,7 +432,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "category"){
-            $registrations = $app->repo('Registration')->findBy(['category' => $create_type, 'opportunity' => $opportunity]);
+            $registrations = $app->repo('Registration')->findBy(['category' => $data[$create_type], 'opportunity' => $opportunity]);
+
+            if (!$registrations) {
+                $errors[] = i::__("Não foram encontradas inscrições na categoria {$data[$create_type]}");
+                $this->errorJson($errors, 400);
+            }
         }
 
         if($create_type == "registration_id"){
@@ -444,15 +449,21 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $ids = array_filter($ids);
 
             $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
+
+            if (!$registrations) {
+                $errors[] = i::__("As inscrições informadas não foram encontradas na oportunidade {$opportunity->name}");
+                $this->errorJson($errors, 400);
+            }
         }
 
         if($create_type == "registrationStatus"){
             $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
-        }
 
-        if (!$registrations) {
-            $errors[] = i::__("As iscrições informadas não foram encontradas na oportunidade {$opportunity->name}");
-            $this->errorJson($errors, 400);
+            if (!$registrations) {
+                $status_description = Payment::getStatusById($data[$create_type]);
+                $errors[] = i::__("Não foram encontradas inscrições com o status {$status_description}");
+                $this->errorJson($errors, 400);
+            }
         }
 
         foreach ($registrations as $registration) {
@@ -473,26 +484,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app->em->flush();
 
         $this->finish($payment);
-    }
-
-    /**
-     * 
-     * @apiDefine APIPATCH
-     * @apiDescription Atualiza as configurações de exibição dos pagamentos.
-     * @apiParam {Array} [data] Array com valores para atualizar os atributos da entidade. Use o método describe para descobrir os atributos. 
-     */
-    function PATCH_savePaymentConfig() {
-
-        $this->requireAuthentication();
-
-        $app = App::i();
-        $data = $this->data;
-
-        $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
-        $opportunity->paymentsTabEnabled = $data['value'];
-        $opportunity->save(true);
-
-        $this->_finishRequest($opportunity, true);
     }
 
     /**

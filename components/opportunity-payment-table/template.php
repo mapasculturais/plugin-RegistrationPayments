@@ -94,7 +94,6 @@ $url = $app->createUrl('payment', 'export');
     </template>
 
     <template #options="{entity, refresh}">
-        
         <div class="opportunity-payment-table__table-actions">
             <change-history :entity="opportunity"></change-history>
 
@@ -109,7 +108,7 @@ $url = $app->createUrl('payment', 'export');
                         <label><?= i::__('Valor') ?></label>
                         <span class="field__currence">
                             <span class="field__currence-sign">R$</span>
-                            <input v-model="entity.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
+                            <input v-model="amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
                         </span> 
                     </div>
 
@@ -120,12 +119,12 @@ $url = $app->createUrl('payment', 'export');
                 </div>
 
                 <template #button={open}>
-                    <mc-icon name="edit" @click="open()"></mc-icon>
+                    <mc-icon name="edit" @click="editPayment(open, entity)"></mc-icon>
                 </template>
 
                 <template #actions="modal">
                     <button class="button button" @click="modal.close()"><?= i::__('Cancelar') ?></button>
-                    <button class="button button--primary" @click="updatePayment(entity)"><?= i::__('Salvar') ?></button>
+                    <button class="button button--primary" @click="updatePayment(entity, refresh)"><?= i::__('Salvar') ?></button>
                 </template>
             </mc-modal>
 

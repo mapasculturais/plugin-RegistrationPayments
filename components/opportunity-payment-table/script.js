@@ -49,7 +49,8 @@ app.component('opportunity-payment-table', {
                 status: []
             },
             api,
-            revisions: {}
+            revisions: {},
+            amount: 0.00
         }
     },
 
@@ -57,10 +58,10 @@ app.component('opportunity-payment-table', {
         formatDateInput(date) {
             return new Date(date);
         },
-        updatePayment(payment) {
+        updatePayment(payment, refresh) {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});
             let args = {
-                amount: payment.amount?.replace(/\s/g, '').replace(',', '.'),
+                amount: this.amount?.replace(/\s/g, '').replace(',', '.'),
                 paymentDate: payment.__originalValues.paymentDate,
                 metadata: {
                     csv_line: {
@@ -72,9 +73,14 @@ app.component('opportunity-payment-table', {
                 if (data?.error) {
                     this.messages.error(this.text('editPaymentError'));
                 } else {
+                    refresh();
                     this.messages.success(this.text('editPaymentSuccess'));
                 }
             });
+        },
+        editPayment(open, entity) {
+            this.amount = this.amountToString(entity.amount);
+            open();
         },
         delPayment(payment, refresh) {
             let url = Utils.createUrl('payment', 'single', {id: payment._id});

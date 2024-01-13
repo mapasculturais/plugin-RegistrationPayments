@@ -81,12 +81,10 @@ $url = $app->createUrl('payment', 'export');
         </div>
     </template>
 
-    <template #status="{entity}">
-        <select v-model="entity.status" @change="setStatus(entity)">
-            <template v-for="item in statusList">
-                <option :value="item.value">{{item.label}}</option>
-            </template>
-        </select>
+   <template #status="entity">
+        <mc-select :default-value="entity.status" @change-option="setStatus($event, {entity})">
+            <option v-for="item in statusList" :value="item.value">{{item.label}}</option>
+        </mc-select>
     </template>
 
     <template #amount="{entity}">

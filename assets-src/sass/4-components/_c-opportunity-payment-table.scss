@@ -30,4 +30,20 @@
         padding: 24px 38px 0;
         justify-content: flex-end;
     }
+
+    /* estilização específica de componentes internos */
+    .mc-select {
+        &__selected-option {
+            padding-block: size(3);
+
+            &::after {
+                top: size(12);
+                right: size(20);
+            }
+        }
+
+        &__option {
+            padding-block: size(3);
+        }
+    }
 }

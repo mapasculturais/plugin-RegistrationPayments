@@ -93,9 +93,10 @@ app.component('opportunity-payment-table', {
                 }
             });
         },
-        setStatus(payment) {
-            let url = Utils.createUrl('payment', 'single', {id: payment._id});
-            this.api.PATCH(url, {status:payment.status}).then(res => res.json()).then(data => {
+
+        setStatus(selected, {entity}) {
+            let url = Utils.createUrl('payment', 'single', {id: entity._id});
+            this.api.PATCH(url, {status:selected.value}).then(res => res.json()).then(data => {
                 if (data?.error) {
                     this.messages.error(this.text('setStatusError'));
                 } else {
@@ -103,9 +104,11 @@ app.component('opportunity-payment-table', {
                 }
             });
         },
+
         amountToString(amount) {
             return parseFloat(amount).toLocaleString($MAPAS.config.locale, { style: 'currency', currency: __('currency', 'opportunity-payment-table')  });
         },
+
         statusTostring(status) {
             let result = null;
             Object.values(this.statusList).forEach((item) => {
@@ -116,13 +119,13 @@ app.component('opportunity-payment-table', {
 
             return result;
         },
+
         statusFilter(event,entities) {            
             this.filters.status?.includes(event.target.value) ? this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1) : this.filters.status.push(event.target.value);
-            
             this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` :  `GTE(0)`;
-            
             entities.refresh();
         },
+
         change(event,entities) {            
             if(this.filters.paymentFrom && this.filters.paymentTo){
                 this.query['paymentDate'] = `BET(${this.filters.paymentFrom},${this.filters.paymentTo})`

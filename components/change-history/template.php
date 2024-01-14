@@ -17,32 +17,36 @@ $this->import('
         <div class="grid-12">
             <div class="field col-6">
                 <h3><?= i::__('Revisões') ?></h3>
-                <div v-for="(revision, id) in revisions.revisions" :key="id">
+                <div v-for="(revision, id) in revisions.revisions" :key="id" @click="getDataRevision(revision.id, revision.user.profile.name)">
                     <span><b>{{ formatMessage(revision) }} <?= i::__('em') ?> {{ formatDate(revision.createTimestamp.date) }}</b></span>
                     <br/>
-                    <span><?= i::__('Por') ?>: {{ revision.user.profile.name }} </span>
+                    <span><?= i::__('Por') ?>: {{ revision.user.profile.name }}</span>
                 </div>
             </div>
 
             <div class="field col-6">
                 <h3><?= i::__('Detalhes') ?></h3>
-                <div v-for="(dataRevision, id) in revisions.dataRevisions" :key="id" :class="id">
-                    <span><b><?= i::__('Data') ?>:</b> {{ formatDate(dataRevision.paymentDate.value.date) }} </span>
-                    <br/>
-                    <span><b><?= i::__('Valor') ?>:</b> {{ amountToString(dataRevision.amount.value) }} </span>
-                    <br/>
-                    <span><b><?= i::__('Status') ?>:</b> {{ showStatus(dataRevision.status.value) }} </span>
+                <div v-if="dataRevision && dataRevision.amount">
+                    <div>
+                        <div><?= i::__('Por') ?>: {{dataRevision.agent}}</div>
+                        <div><?= i::__('Data') ?>: {{formatDate(dataRevision.date)}}</div>
+                        <div><?= i::__('Valor') ?>: {{amountToString(dataRevision.amount)}}</div>
+                        <div><?= i::__('Status') ?>: {{showStatus(dataRevision.status)}}</div>
+                        <div><?= i::__('Observação') ?>: {{dataRevision.observation}}</div>
+                    </div>
                 </div>
-
+                <div v-else>
+                    <?= i::__('Selecione uma revisão para visualizar os detalhes.') ?>
+                </div>
             </div>
         </div>
 
         <template #button={open}>
-            <mc-icon name="history" @click="getRevisions(entity, open)"></mc-icon>
+            <mc-icon name="history" @click="getRevisions(open)"></mc-icon>
         </template>
 
-        <template #actions="modal">
-            <button class="button button" @click="modal.close()"><?= i::__('Cancelar') ?></button>
+        <template #actions="{close}">
+            <button class="button button" @click="closeModal(close)"><?= i::__('Cancelar') ?></button>
         </template>
     </mc-modal>
 </div>

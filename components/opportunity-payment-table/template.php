@@ -39,17 +39,15 @@ $url = $app->createUrl('payment', 'export');
             <div class="opportunity-payment-table__actions">
                 <h4 class="bold"><?= i::__('Ações:') ?></h4>
 
-                <div class="opportunity-payment-table__actions grid-12">
-                    <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
-                    
-                    <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
-                    
-                    <?php if($cnab_enabled($entity)):  ?>
-                        <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
-                    <?php endif ?>
-                </div>
+            <div class="opportunity-payment-table__actions grid-12">
+                <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
+                
+                <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
+                
+                <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
             </div>
-        </template>
+        </div>
+    </template>
 
         <template #advanced-actions="{entities}">
             <div class="grid-12">

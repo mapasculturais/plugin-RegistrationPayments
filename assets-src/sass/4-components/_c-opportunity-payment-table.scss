@@ -34,16 +34,16 @@
     /* estilização específica de componentes internos */
     .mc-select {
         &__selected-option {
-            padding-block: size(3);
+            padding-block: 3px;
 
             &::after {
-                top: size(12);
-                right: size(20);
+                top: 12px;
+                right: 20px;
             }
         }
 
         &__option {
-            padding-block: size(3);
+            padding-block: 3px;
         }
     }
 }

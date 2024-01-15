@@ -77,10 +77,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $errors[] = i::__("Não autorizado");   
         }
 
-        if ($to > $from) {
+        if ($from > $to) {
             $errors[] = i::__("Data inicial está maior que a data final");
         }
-        
+
         return $errors;
     }
 
@@ -126,7 +126,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $dql_from = $from ? "e.sentTimestamp >= :from AND" : '';
 
         $dql_params['to'] = $to ?: '';
-        $dql_to = $to ? "e.sentTimestamp >= :to AND" : '';
+        $dql_to = $to ? "e.sentTimestamp <= :to AND" : '';
 
         $dql = "
             SELECT

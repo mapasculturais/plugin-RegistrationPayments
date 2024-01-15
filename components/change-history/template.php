@@ -29,7 +29,7 @@ $this->import('
                 <div v-if="dataRevision && dataRevision.amount">
                     <div>
                         <div><?= i::__('Por') ?>: {{dataRevision.agent}}</div>
-                        <div><?= i::__('Data') ?>: {{formatDate(dataRevision.date)}}</div>
+                        <div><?= i::__('Data') ?>: {{dataRevision.date.date('numeric year')}} {{dataRevision.date.time('numeric')}}</div>
                         <div><?= i::__('Valor') ?>: {{amountToString(dataRevision.amount)}}</div>
                         <div><?= i::__('Status') ?>: {{showStatus(dataRevision.status)}}</div>
                         <div><?= i::__('Observação') ?>: {{dataRevision.observation}}</div>

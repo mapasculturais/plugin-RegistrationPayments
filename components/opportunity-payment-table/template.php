@@ -42,9 +42,7 @@ $url = $app->createUrl('payment', 'export');
                 
                 <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
                 
-                <?php if($cnab_enabled($entity)):  ?>
-                    <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
-                <?php endif ?>
+                <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
             </div>
         </div>
     </template>

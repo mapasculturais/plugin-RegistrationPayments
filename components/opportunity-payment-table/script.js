@@ -94,7 +94,7 @@ app.component('opportunity-payment-table', {
             });
         },
 
-        setStatus(selected, {entity}) {
+        setStatus(selected, entity) {
             let url = Utils.createUrl('payment', 'single', {id: entity._id});
             this.api.PATCH(url, {status:selected.value}).then(res => res.json()).then(data => {
                 if (data?.error) {

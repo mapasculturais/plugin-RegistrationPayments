@@ -2,4 +2,28 @@
     .field textarea {
         max-height: 96px;
     }
+
+    &__modal-content {
+        max-width: 470px;
+        width: 100%;
+    }
+    
+    &__filters {
+        display: grid;
+        gap: 4px;
+        margin: 26px 0 42px;
+        min-width: 470px;
+    }
+    
+    &__filter-field {
+        justify-content: space-between;
+
+        input {
+            max-width: 200px;
+        }
+    }
+
+    &__note {
+        margin-top: 5px;
+    }
 }

@@ -11,32 +11,39 @@ $this->import('
     entity-file
     mc-icon
     mc-modal
+    mc-file
 ');
 ?>
 <div class="create-payment">
-    <mc-modal title="<?= i::__('Criar pagamentos via planilha:') ?>">
+    <mc-modal title="<?= i::__('Criar pagamentos via planilha') ?>">
         <template #actions="modal">
-            <button class="button button--primary" @click="exportValidator(modal)"><?= i::__('Baixar validador') ?></button>
+            <button class="button button--primary button--icon" @click="exportValidator(modal)">
+                <?= i::__('Baixar validador') ?> <mc-icon name="download"></mc-icon>
+            </button>
             <entity-file :entity="entity" groupName="payment-financial-validador" editable disableName></entity-file>
         </template>
 
         <template #default>
-            <div class="grid-12">
-                <span v-if="hasErrors" class="col-12">
-                    <p v-for="item in response?.data" class="field__error">* {{ item }}</p>
-                </span>
-                
-                <div class="field col-12">
-                    <label><?= i::__('Inscrições com data de envio inicial') ?></label>
-                    <input type="date" v-model="dataExport.from">
+            <div class="create-payment__modal-content grid-12">
+                <div class="create-payment__filters col-12">
+                    <div class="create-payment__filter-field field field--horizontal">
+                        <label><?= i::__('Inscrições com data de envio inicial') ?></label>
+                        <input type="date" name="envioInicial" v-model="dataExport.from">
+                    </div>
+    
+                    <div class="create-payment__filter-field field field--horizontal">
+                        <label><?= i::__('Inscrições com data de envio Final') ?></label>
+                        <input type="date" name="envioFinal" v-model="dataExport.to">
+                    </div>
+
+                    <small class="create-payment__note"><?= i::__("*Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
+
+                    <span v-if="hasErrors" class="field">
+                        <small v-for="item in response?.data" class="field__error">* {{ item }}</small>
+                    </span>
                 </div>
 
-                <div class="field col-12">
-                    <label><?= i::__('Inscrições com data de envio Final') ?></label>
-                    <input type="date" v-model="dataExport.to">
-                </div>
-
-                <small class="col-12"><?= i::__("# Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
+                <mc-file class="col-12"></mc-file>
             </div>
         </template>
 

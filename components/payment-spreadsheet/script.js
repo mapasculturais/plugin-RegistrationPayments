@@ -45,6 +45,17 @@ app.component('payment-spreadsheet', {
                     window.open(data.url, '_blank');
                 }
             });
-        }
+        },
+
+        upload(modal) {
+            let data = {
+                description: this.newFile.name,
+                group: 'payment-financial-validador',
+            };
+            this.entity.upload(this.newFile, data).then((response) => {
+                modal.close();
+                return true;
+            });;
+        },
     },
 });

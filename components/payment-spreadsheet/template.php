@@ -20,7 +20,11 @@ $this->import('
             <button class="button button--primary button--icon" @click="exportValidator(modal)">
                 <?= i::__('Baixar validador') ?> <mc-icon name="download"></mc-icon>
             </button>
-            <entity-file :entity="entity" groupName="payment-financial-validador" editable disableName></entity-file>
+
+            <button class="button button--primary--button button--icon" @click="upload(modal)">
+                <?= i::__('Enviar') ?> <mc-icon name="upload"></mc-icon>
+            </button>
+            <!-- <entity-file :entity="entity" groupName="payment-financial-validador" editable disableName></entity-file> -->
         </template>
 
         <template #default>

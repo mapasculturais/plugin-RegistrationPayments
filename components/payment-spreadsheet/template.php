@@ -47,7 +47,7 @@ $this->import('
                     </span>
                 </div>
 
-                <mc-file class="col-12"></mc-file>
+                <mc-file @file-selected="setFile" class="col-12"></mc-file>
             </div>
         </template>
 

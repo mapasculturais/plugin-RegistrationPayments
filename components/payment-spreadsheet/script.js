@@ -24,7 +24,8 @@ app.component('payment-spreadsheet', {
     data() {
         return {
             response: {},
-            dataExport: {}
+            dataExport: {},
+            newFile: null,
         }
     },
 
@@ -47,15 +48,20 @@ app.component('payment-spreadsheet', {
             });
         },
 
+        setFile(file) {
+            this.newFile = file;
+        },
+
         upload(modal) {
             let data = {
                 description: this.newFile.name,
                 group: 'payment-financial-validador',
             };
+            
             this.entity.upload(this.newFile, data).then((response) => {
                 modal.close();
                 return true;
-            });;
+            });
         },
     },
 });

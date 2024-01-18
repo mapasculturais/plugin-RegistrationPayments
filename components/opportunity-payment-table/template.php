@@ -54,7 +54,7 @@ $url = $app->createUrl('payment', 'export');
                 <div v-if="paymentProcessed" class="col-6">
                     <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
 
-                    <div v-for="file in paymentProcessed">
+                    <div v-if="paymentProcessed" v-for="file in paymentProcessed">
                         <div @click="downloadFile(file.url)">
                             <mc-icon name="download"></mc-icon>
                             {{file.name}}

@@ -8,6 +8,7 @@ use MapasCulturais\i;
 use MapasCulturais\App;
 use  MapasCulturais\Definitions;
 use RegistrationPayments\Payment;
+use MapasCulturais\Entities\Registration;
 use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
 use RegistrationPayments\JobTypes\GenerateCnab;
@@ -254,7 +255,16 @@ class Plugin extends \MapasCulturais\Plugin{
                 ['value' => Payment::STATUS_AVAILABLE, 'label' => i::__("Disponível")],
                 ['value' => Payment::STATUS_PAID, 'label' => i::__("Pago")],
             ];
+
+            $registrations = Registration::getStatusesNames();
+
+            foreach($registrations as $status => $status_name){
+                if(in_array($status,[0,1,2,3,8,10])){
+                    $registrationStatus[] = ["label" => $status_name, "value" => $status];
+                }
+            }
     
+            $this->jsObject['config']['payment']['registrationStatus'] = $registrationStatus;
             $this->jsObject['config']['payment']['statusDic'] = $status;
             $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
         });

@@ -4,15 +4,16 @@ namespace RegistrationPayments;
 
 use DateTime;
 use MapasCulturais\i;
-use League\Csv\Writer;
 use League\Csv\Reader;
-use League\Csv\Statement;
+use League\Csv\Writer;
 use MapasCulturais\App;
+use League\Csv\Statement;
 use MapasCulturais\Traits;
 use CnabPHP\RemessaAbstract;
 use RegistrationPayments\Plugin;
 use RegistrationPayments\Payment;
 use MapasCulturais\Entities\Opportunity;
+use MapasCulturais\Entities\Registration;
 
 /**
  * Payment Controller
@@ -462,7 +463,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
 
             if (!$registrations) {
-                $status_description = Payment::getStatusById($data[$create_type]);
+                $status_description = Registration::getStatusNameById($data[$create_type]); 
                 $errors[] = i::__("Não foram encontradas inscrições com o status {$status_description}");
                 $this->errorJson($errors, 400);
             }

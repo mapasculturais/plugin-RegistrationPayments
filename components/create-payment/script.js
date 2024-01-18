@@ -12,6 +12,9 @@ app.component('create-payment', {
     },
 
     computed: {
+        registrationStatus() {
+            return $MAPAS.config.payment.registrationStatus;
+        },
         status() {
             return $MAPAS.config.payment.statusDic;
         },

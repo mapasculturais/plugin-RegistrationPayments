@@ -303,6 +303,13 @@ class Plugin extends \MapasCulturais\Plugin{
             $self->enqueueScriptsAndStyles();
         });
 
+        $this->registerOpportunityMetadata('payment_processed_files', [
+            'label' => 'Arquivos do Validador Financeiro Processados',
+            'type' => 'json',
+            'private' => true,
+            'default_value' => '{}'
+        ]);
+
         $this->registerMetadata('RegistrationPayments\\Payment','payment_identifier', [
             'label' => i::__('Identificação do pagamento'),
             'type' => 'string',
@@ -353,6 +360,15 @@ class Plugin extends \MapasCulturais\Plugin{
                 ['^text/csv$'],
                 'O arquivo não e valido',
                 unique:true,
+            )
+        );
+
+        $app->registerFileGroup(
+            'opportunity',
+            new Definitions\FileGroup(
+                'import-financial-validator-files',
+                ['^text/csv$'],
+                'O arquivo não e valido',
             )
         );
     }

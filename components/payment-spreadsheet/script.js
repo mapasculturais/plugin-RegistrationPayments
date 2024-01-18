@@ -26,6 +26,9 @@ app.component('payment-spreadsheet', {
             response: {},
             dataExport: {},
             newFile: null,
+            process: {
+                active: false
+            }
         }
     },
 
@@ -47,21 +50,37 @@ app.component('payment-spreadsheet', {
                 }
             });
         },
-
         setFile(file) {
             this.newFile = file;
         },
-
-        upload(modal) {
+        upload() {
             let data = {
                 description: this.newFile.name,
-                group: 'payment-financial-validador',
+                group: 'import-financial-validator-files',   
             };
             
             this.entity.upload(this.newFile, data).then((response) => {
-                modal.close();
-                return true;
+                this.process.id = response.id;
+                this.process.active = true;
             });
         },
+        processFile() {
+            const messages = useMessages();
+            const api = new API();
+            let args = {
+                opportunity_id: this.entity.id,
+                file_id: this.process.id
+            };
+            let url = Utils.createUrl('payment', 'import', args);
+            
+            api.POST(url).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    messages.error(this.text('importError'));
+                    this.response = data
+                } else {
+                    messages.success(this.text('importSuccess'));
+                }
+            });
+        }
     },
 });

@@ -5,6 +5,8 @@ namespace RegistrationPayments;
 use DateTime;
 use MapasCulturais\i;
 use League\Csv\Writer;
+use League\Csv\Reader;
+use League\Csv\Statement;
 use MapasCulturais\App;
 use MapasCulturais\Traits;
 use CnabPHP\RemessaAbstract;
@@ -954,7 +956,269 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;
     }
-    
 
+    public function getImportValidateErros($file) {
+        $errors = [];
+        $filename = $file->getPath();
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+        if (!file_exists($filename)) {
+            $errors[] = i::__("Erro ao processar o arquivo. Arquivo inexistente");
+        }
+        
+        if ($ext != "csv") {
+            $errors[] = i::__("Arquivo não permitido.");
+        }
+
+        return $errors;
+    }
     
+    public function POST_import() {
+        $this->requireAuthentication();
+        
+        $app = App::i();
+        $file = $app->repo('File')->find($this->data['file_id']);
+        $opportunity = $file->owner;
+
+        $opportunity->checkPermission('@control');
+
+        if($errors = $this->getImportValidateErros($file)) {
+            $this->errorJson($errors);
+        }
+
+        $this->import($opportunity, $file->getPath());
+    }
+
+    /**
+     * Importador para o inciso 1
+     *
+     * http://localhost:8080/{slug}/import/
+     *
+     */
+    public function import(Opportunity $opportunity, string $filename)
+    {
+
+        /**
+         * Seta o timeout e limite de memoria
+         */
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '768M');
+
+        $app = App::i();
+        
+        //Abre o arquivo em modo de leitura
+        $stream = fopen($filename, "r");
+
+        //Faz a leitura do arquivo
+        $csv = Reader::createFromStream($stream);
+
+        //Define o limitador do arqivo (, ou ;)
+        $csv->setDelimiter(";");
+
+        //Seta em que linha deve se iniciar a leitura
+        $header_temp = $csv->setHeaderOffset(0);
+        
+        //Faz o processamento dos dados
+        $stmt = (new Statement());
+        $results = $stmt->process($csv);
+
+        $header_file = [];
+        foreach ($header_temp as $key => $value) {
+            $header_file[] = $value;
+            break;
+        }
+        $required_columns = ['NUMERO', 'VALIDACAO', 'OBSERVACOES', 'DATA 1', 'VALOR 1'];
+
+        $columns = '"' . implode('", "', $required_columns) . '"';
+        foreach ($required_columns as $column) {
+            if (!isset($header_file[0][$column])) {
+                die("As colunas {$columns} são obrigatórias");
+            }
+        }
+       
+        $slug = (new DateTime())->format('dmY'). '-' . $filename;
+        $name = 'plugin_de_pagamento';
+        
+        $app->disableAccessControl();
+        $count = 0;
+        foreach ($results as $i => $line) {
+            $num = $line['NUMERO'];
+            $obs = $line['OBSERVACOES'];
+            $eval = $line['VALIDACAO'];
+            $column_status = (isset($line['STATUS']) && !empty($line['STATUS'])) ? $line['STATUS'] : null;
+            $status = $this->getStatus($column_status);
+            
+            switch(strtolower($eval)){
+                case 'aprovado':
+                case 'aprovada':
+                case 'selecionado':
+                case 'selecionada':
+                    $result = '10';
+                break;
+
+                case 'negada':
+                case 'negado':
+                case 'invalido':
+                case 'inválido':
+                case 'invalida':
+                case 'inválida':
+                    $result = '2';
+                break;
+
+                case 'não selecionado':
+                case 'nao selecionado':
+                case 'não selecionada':
+                case 'nao selecionada':
+                    $result = '3';
+                break;
+                
+                case 'suplente':
+                    $result = '8';
+                break;
+                
+                default:
+                    die("O valor da coluna VALIDACAO da linha $i está incorreto ($eval). Os valores possíveis são 'selecionada' ou 'aprovada', 'invalida', 'nao selecionada' ou 'suplente'");
+                
+            }
+            
+            if ($result == '10') {              
+                
+                for ($i = 1; $i <= 12; $i++) {
+                    $data = $line["DATA {$i}"] ?? null;
+                    $valor = $line["VALOR {$i}"] ?? null;
+                    if ($data && $valor) {
+                        $data = (new \DateTime($data))->format('d/m/Y');
+                        $valor = number_format($valor, 2);
+                        if(empty($obs)){
+                            $obs = "Inscrição Aprovada\n------------------";                                               
+                        }
+                                                
+                        $obs .= "\nR$ $valor a serem pagos em {$data}";    
+                    }
+                }
+            }
+            
+            $registration = $app->repo('Registration')->findOneBy(['number' => $num, 'opportunity' => $opportunity]);
+
+            if(!$registration){
+                $app->log->debug($num. " Não encontrada");
+                continue;
+            }
+
+            $registration->__skipQueuingPCacheRecreation = true;
+
+            $raw_data = $registration->{$slug . '_raw'};
+            $filesnames = $registration->{$slug . '_filename'};
+            
+            /* @TODO: implementar atualização de status?? */
+            /*if (in_array($filename, $filesnames)) {
+                $app->log->info("$name #{$count} {$registration} $eval - JÁ PROCESSADA");
+                continue;
+            }*/
+            
+            $mess = $column_status ?? $eval;
+
+            $app->log->info("$name #{$count} {$registration} $mess");
+
+            $raw_data[] = $line;
+            $filesnames[] = $filename;
+
+            $registration->{$slug . '_raw'} = $raw_data;
+            $registration->{$slug . '_filename'} = $filesnames;
+
+            $registration->save(true);
+
+            $plugin = Plugin::getInstance();
+            
+            for ($i = 1; $i <= 5; $i++) {
+                $data = $line["DATA {$i}"] ?? null;
+                $valor = $line["VALOR {$i}"] ?? null;
+                if ($data && $valor) {
+                    $payment = new Payment;
+                    $payment->createdByUser = $plugin->getUser();
+                    $payment->paymentDate = $data;
+                    $payment->amount = str_replace(',','.',$valor);
+                    $payment->registration = $registration;
+                    $payment->metadata->csv_line = $line;
+                    $payment->metadata->csv_filename = $filename;
+                    $payment->status = $status;
+
+                    $payment->save(true);
+                }
+            }
+
+            $app->em->clear();
+        }
+
+        $app->enableAccessControl();
+        
+        // por causa do $app->em->clear(); não é possível mais utilizar a entidade para salvar
+        $opportunity = $app->repo('Opportunity')->find($opportunity->id);
+
+        $slug = 'import-financial-validator-files';
+        //$slug = $this->plugin->getSlug();
+
+        $opportunity->refresh();
+        $opportunity->name = $opportunity->name . ' ';
+        $files = $opportunity->payment_processed_files;
+        $files->{basename($filename)} = date('d/m/Y \à\s H:i');
+        $opportunity->payment_processed_files = $files;
+        $opportunity->save(true);
+        $this->finish('ok');
+    }
+
+    public function getStatus($value) {
+        switch ($value) {
+            case 'pago':
+            case 'Pago':
+            case 'PAGO':
+            case 'paga':
+            case 'Paga':
+            case 'PAGA':
+                $status = Payment::STATUS_PAID;
+            break;
+
+            case 'pendente':
+            case 'Pendente':
+            case 'PENDENTE':          
+                $status = Payment::STATUS_PENDING;
+            break;
+
+            case 'PROCESSADO':
+            case 'processado':
+            case 'Processado':
+            case 'processada':
+            case 'Processada':
+            case 'PROCESSADA':                     
+                $status = Payment::STATUS_PROCESSING;
+            break;
+
+            case 'falha':
+            case 'Falha':
+                $status = Payment::STATUS_FAILED;
+            break;
+            
+            case 'EXPORTADO':
+            case 'EXPORTADA':
+            case 'exportado':
+            case 'Exportada':          
+                $status = Payment::STATUS_EXPORTED;
+            break;
+
+            case 'DISPONIVEL':
+            case 'Disponivel':
+            case 'DISPONÍVEL':
+            case 'Disponível':
+            case 'disponível':
+            case 'disponível':          
+                $status = Payment::STATUS_AVAILABLE;
+            break;
+            
+            default:
+                $status = Payment::STATUS_PROCESSING;
+                break;
+        }
+        
+        return $status;
+    }
 }

@@ -21,8 +21,12 @@ $this->import('
                 <?= i::__('Baixar validador') ?> <mc-icon name="download"></mc-icon>
             </button>
 
-            <button class="button button--primary--button button--icon" @click="upload(modal)">
+            <button class="button button--primary--button button--icon" @click="upload()">
                 <?= i::__('Enviar') ?> <mc-icon name="upload"></mc-icon>
+            </button>
+
+            <button v-if="process.active" class="button button--primary--button button--icon" @click="processFile()">
+                <?= i::__('Processar') ?> <mc-icon name="upload"></mc-icon>
             </button>
             <!-- <entity-file :entity="entity" groupName="payment-financial-validador" editable disableName></entity-file> -->
         </template>

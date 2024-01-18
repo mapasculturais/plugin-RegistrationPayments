@@ -15,7 +15,7 @@ $this->import('
 
 <div class="extraction-cnab">
     <mc-modal title="<?= i::__('Exportar TXT CNAB') ?>">
-        <div class="grid-12">
+        <div class="grid-12 extraction-cnab__content">
             <span v-if="hasErrors" class="col-12">
                 <p v-for="item in response?.data" class="field__error">* {{item}}</p>
             </span>
@@ -32,11 +32,11 @@ $this->import('
 
             <div class="field col-6" :class="{'error': fieldError('lotType')}">
                 <label><?= i::__('Tipo de exportação') ?> <span class="required">* <?= i::__('Obrigatório') ?></span></label>
-                <select v-model="cnabData.lotType" class="errors">
+                <mc-select :default-value="cnabData.lotType" @change-option="setCnabType" class="col-6" :class="{'error': fieldError('lotType')}">
                     <option value="1"><?= i::__('Corrente BB') ?></option>
                     <option value="2"><?= i::__('Poupança BB') ?></option>
                     <option value="3"><?= i::__('Outros Bancos') ?></option>
-                </select>
+                </mc-select>
             </div>
 
             <div class="field col-12">

@@ -32,18 +32,20 @@
     }
 
     /* estilização específica de componentes internos */
-    .mc-select {
-        &__selected-option {
-            padding-block: 3px;
+    .entity-table__table {
+        .mc-select {
+            &__selected-option {
+                padding-block: 3px;
 
-            &::after {
-                top: 12px;
-                right: 20px;
+                &::after {
+                    top: 12px;
+                    right: 20px;
+                }
             }
-        }
 
-        &__option {
-            padding-block: 3px;
+            &__option {
+                padding-block: 3px;
+            }
         }
     }
 }

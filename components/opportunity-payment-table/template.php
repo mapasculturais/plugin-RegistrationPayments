@@ -51,7 +51,7 @@ $url = $app->createUrl('payment', 'export');
 
         <template #advanced-actions="{entities}">
             <div class="grid-12">
-                <div class="col-6">
+                <div v-if="paymentProcessed" class="col-6">
                     <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
 
                     <div v-for="file in paymentProcessed">
@@ -61,7 +61,6 @@ $url = $app->createUrl('payment', 'export');
                         </div>
                         <div><?= i::__('Processado em') ?> {{file.dateTime}}</div>
                     </div>
-                    <!--<entity-files-list :entity="opportunity" group="import-financial-validator-files" title="<?= i::__('Validador Financeiro') ?>" editable></entity-files-list>-->
                 </div>
             </div>
         </template>

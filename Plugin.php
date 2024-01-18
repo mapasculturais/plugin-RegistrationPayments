@@ -247,7 +247,7 @@ class Plugin extends \MapasCulturais\Plugin{
         }
 
         $app->hook('mapas.printJsObject:before', function () {            
-            $status = [
+            $statusDic = [
                 ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
                 ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
                 ['value' => Payment::STATUS_FAILED, 'label' => i::__("Falha")],
@@ -265,7 +265,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
     
             $this->jsObject['config']['payment']['registrationStatus'] = $registrationStatus;
-            $this->jsObject['config']['payment']['statusDic'] = $status;
+            $this->jsObject['config']['payment']['statusDic'] = $statusDic;
             $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
         });
 

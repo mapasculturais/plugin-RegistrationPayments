@@ -28,10 +28,11 @@ app.component('opportunity-payment-table', {
             ]
         },
         paymentProcessed() {
-            let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
-            let dateTimeData = $MAPAS.requestedEntity.payment_processed_files;
-
-            if (opportunityFiles) {            
+            
+            if(this.opportunity?.files && this.opportunity.files['import-financial-validator-files']){
+                let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
+                let dateTimeData = $MAPAS.requestedEntity.payment_processed_files;
+                
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);
                     let file = opportunityFiles[index];

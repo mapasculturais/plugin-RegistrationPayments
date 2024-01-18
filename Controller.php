@@ -475,7 +475,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $payment->registration = $registration;
             $payment->paymentDate = new DateTime($data['payment_date']);
             $payment->amount = (float) $data['amount'];
-            $payment->status = $data['status'] ?? 1;
+            $payment->status = $data['status'] ?? 0;
             $payment->metadata = $data['metadata'] ?? (object) [];
             if ($errors = $payment->getValidationErrors()) {
                 $this->errorJson($errors, 400);

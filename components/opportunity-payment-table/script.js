@@ -30,25 +30,29 @@ app.component('opportunity-payment-table', {
         paymentProcessed() {
             let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
             let dateTimeData = $MAPAS.requestedEntity.payment_processed_files;
-            
-            Object.keys(opportunityFiles).forEach(key => {
-                let index = parseInt(key);
-                let file = opportunityFiles[index];
-                let name = file.name;  
-                let url = file.url;
-            
-                this.importedFiles[name] = { name, url };
-            });
-            
-            Object.keys(dateTimeData).forEach(name => {
-                let dateTime = dateTimeData[name];
-            
-                if (this.importedFiles[name]) {
-                    this.importedFiles[name].dateTime = dateTime;
-                }
-            });
-            
-            return this.importedFiles;
+
+            if (opportunityFiles) {            
+                Object.keys(opportunityFiles).forEach(key => {
+                    let index = parseInt(key);
+                    let file = opportunityFiles[index];
+                    let name = file.name;  
+                    let url = file.url;
+                
+                    this.importedFiles[name] = { name, url };
+                });
+                
+                Object.keys(dateTimeData).forEach(name => {
+                    let dateTime = dateTimeData[name];
+                
+                    if (this.importedFiles[name]) {
+                        this.importedFiles[name].dateTime = dateTime;
+                    }
+                });
+                
+                return this.importedFiles;
+            } else {
+                return null;
+            }
         }
     },
 

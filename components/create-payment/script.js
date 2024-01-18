@@ -11,11 +11,16 @@ app.component('create-payment', {
         }
     },
 
+    created() {
+        this.payment.registrationStatus = "";
+        this.payment.category = "";
+    },
+
     computed: {
         registrationStatus() {
             return $MAPAS.config.payment.registrationStatus;
         },
-        status() {
+        statusList() {
             return $MAPAS.config.payment.statusDic;
         },
         categories() {

@@ -155,13 +155,17 @@ app.component('opportunity-payment-table', {
         },
 
         showAllStatus(entities) {
-            for (let status of this.statusList) {
-                if (!this.filters.status?.includes(status.value)) {
-                    this.filters.status.push(status.value);
+            if (!this.$refs.allStatus.checked) {
+                this.clearFilters(entities);
+            } else {
+                for (let status of this.statusList) {
+                    if (!this.filters.status?.includes(status.value)) {
+                        this.filters.status.push(status.value);
+                    }
                 }
+                this.query['status'] = `IN(${this.filters.status})`;
             }
-
-            this.query['status'] = `IN(${this.filters.status})`;
+            
             entities.refresh();
         },
 

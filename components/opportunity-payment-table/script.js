@@ -155,12 +155,31 @@ app.component('opportunity-payment-table', {
             entities.refresh();
         },
 
+        showAllStatus(entities) {
+            for (let status of this.statusList) {
+                if (!this.filters.status?.includes(status.value)) {
+                    this.filters.status.push(status.value);
+                }
+            }
+
+            this.query['status'] = `IN(${this.filters.status})`;
+            entities.refresh();
+        },
+
+        clearFilters(entities) {
+            this.$refs.allStatus.checked = false;
+            this.filters.status = [];
+            this.query['status'] = `GTE(0)`;
+            entities.refresh();
+        },
+
         change(event,entities) {            
             if(this.filters.paymentFrom && this.filters.paymentTo){
                 this.query['paymentDate'] = `BET(${this.filters.paymentFrom},${this.filters.paymentTo})`
             }
             entities.refresh();
         },
+
         downloadFile(url) {
             window.open(url, '_blank');
         }

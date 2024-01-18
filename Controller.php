@@ -444,13 +444,20 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "registration_id"){
-            $ids = explode(",",$data[$create_type]);
+            
+            if (strpos($data[$create_type], "\n") !== false) {
+                $delimiter = "\n";
+            } elseif (strpos($data[$create_type], ",") !== false) {
+                $delimiter = ",";
+            } 
+
+            $_ids = explode($delimiter,$data[$create_type]);
+
             $ids = array_map(function ($id) {
                 return trim(preg_replace('/[^0-9]/i', '', $id));
-            }, $ids);
+            }, $_ids);
             
             $ids = array_filter($ids);
-
             $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
 
             if (!$registrations) {

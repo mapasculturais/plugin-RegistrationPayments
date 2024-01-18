@@ -61,7 +61,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     public function __construct()
     {
         parent::__construct();
-        $this->entityClassName = 'RegistrationPayments\Payment';
+        $this->entityClassName = '\RegistrationPayments\Payment';
 
     }
 

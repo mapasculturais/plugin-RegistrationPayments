@@ -612,9 +612,8 @@ class Plugin extends \MapasCulturais\Plugin{
         }
         
         $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
-        $cnab240_enabled = $this->config['cnab240_enabled'];
-        if (!in_array('opportunitysCnab', array_keys($this->config))) {
-            $errors[] = i::__("Esta oportunidade não esta configurada, fale com administrador");
+        if (!in_array('opportunitysCnab', array_keys($this->config)) || !in_array($opportunity->id, array_keys($this->config['opportunitysCnab']))) {
+            $errors[] = i::__("Os campos para coletar os dados para o CNAB240 não estão configurados nesta oportunidade. Fale com o administrador.");
         }
         
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);

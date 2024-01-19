@@ -63,6 +63,28 @@ app.component('opportunity-payment-table', {
                 return null;
             }
         },
+        cnabProcessed() {
+            if(this.opportunity?.files && this.opportunity.files['export-cnab-files']){
+                let opportunityFiles = this.opportunity.files['export-cnab-files'];
+                let importedFiles = {};
+                
+                Object.keys(opportunityFiles).forEach(key => {
+                    let index = parseInt(key);
+                    let file = opportunityFiles[index];
+                    let name = file.name;  
+                    let url = file.url;
+                    let id = file.id;
+                    let processed = false;
+                    let dateTime = file.createTimestamp
+                
+                    importedFiles[name] = {id, name, url,processed,dateTime };
+                });
+
+                return importedFiles;
+            } else {
+                return null;
+            }
+        },
     },
 
     setup() {

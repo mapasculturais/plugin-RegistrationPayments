@@ -65,6 +65,17 @@ $url = $app->createUrl('payment', 'export');
                         <div v-if="file.processed">- <?= i::__('Processado em') ?> {{file.dateTime}}</div>
                     </div>
                 </div>
+
+                <div class="col-6">
+                    <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
+                    <div v-for="file in cnabProcessed">
+                        <div @click="downloadFile(file.url)">
+                            <mc-icon name="download"></mc-icon>
+                            {{file.name}} 
+                        </div>
+                        <div>- <?= i::__('Extraido em') ?> {{file.dateTime.date('numeric year')}} <?= i::__('às') ?> {{file.dateTime.time('numeric')}}</div>
+                    </div>
+                </div>
             </div>
         </template>
 

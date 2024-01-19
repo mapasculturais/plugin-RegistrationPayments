@@ -6,6 +6,9 @@ app.component('payment-spreadsheet', {
             type: Entity,
             required: true,
         },
+        entities: {
+            type: Array,
+        }
 
     },
 
@@ -65,7 +68,7 @@ app.component('payment-spreadsheet', {
                 this.process.active = true;
             });
         },
-        processFile() {
+        processFile(modal) {
             const messages = useMessages();
             const api = new API();
             let args = {
@@ -79,6 +82,9 @@ app.component('payment-spreadsheet', {
                     messages.error(this.text('importError'));
                     this.response = data
                 } else {
+                    modal.close();
+                    this.entities.refresh();
+                    this.process.active = false;
                     messages.success(this.text('importSuccess'));
                 }
             });

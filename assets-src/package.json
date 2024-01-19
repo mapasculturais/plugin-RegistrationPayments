@@ -7,7 +7,6 @@
     "build": "mix --mix-config=node_modules/@mapas/scripts/webpack.mix.js --production",
     "watch": "mix watch --mix-config=node_modules/@mapas/scripts/webpack.mix.js"
   },
-
   "devDependencies": {
     "laravel-mix": "^5.0.4",
     "sass": "^1.26.10",

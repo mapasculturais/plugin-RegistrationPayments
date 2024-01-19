@@ -60,6 +60,7 @@ app.component('payment-spreadsheet', {
             };
             
             this.entity.upload(this.newFile, data).then((response) => {
+                window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
                 this.process.id = response.id;
                 this.process.active = true;
             });

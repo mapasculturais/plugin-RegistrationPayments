@@ -208,6 +208,7 @@ app.component('opportunity-payment-table', {
                     let date = new McDate(new Date());
                     this.importedFiles[file.name].processed = true;
                     this.importedFiles[file.name].dateTime = date.date('numeric year')+ ' ' + this.text('toThe') + ' ' + date.time('numeric')
+                    window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
                     messages.success(this.text('processSuccess'));
                 }
             });

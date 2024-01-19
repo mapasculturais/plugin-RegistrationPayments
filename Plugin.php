@@ -613,7 +613,7 @@ class Plugin extends \MapasCulturais\Plugin{
         
         $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
         $cnab240_enabled = $this->config['cnab240_enabled'];
-        if (!in_array('opportunitysCnab', array_keys($this->config)) || !$cnab240_enabled($opportunity)) {
+        if (!in_array('opportunitysCnab', array_keys($this->config))) {
             $errors[] = i::__("Esta oportunidade não esta configurada, fale com administrador");
         }
         

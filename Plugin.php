@@ -15,8 +15,7 @@ use RegistrationPayments\JobTypes\GenerateCnab;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
 
 require_once 'vendor/autoload.php';
-class Plugin extends \MapasCulturais\Plugin
-{
+class Plugin extends \MapasCulturais\Plugin{
 
     protected static $instance = null;
 
@@ -26,16 +25,14 @@ class Plugin extends \MapasCulturais\Plugin
         $config += [
             'fields' => [],
             'fields_tratament' => function ($registration, $field) {
-                if (!$this->config['fields']) {
-                    return;
-                }
-                $result = [
+                if(!$this->config['fields']){return;}
+                $result = [                   
                     'CPF' => function () use ($registration, $field) {
-
+                        
                         $field = $this->prefixFieldId($field);
                         return preg_replace('/[^0-9]/i', '', $registration->$field);
                     },
-                    'NOME_COMPLETO' => function () use ($registration, $field) {
+                    'NOME_COMPLETO' => function () use ($registration, $field) {                        
                         $field = $this->prefixFieldId($field);
                         return $registration->$field;
                     },
@@ -45,8 +42,8 @@ class Plugin extends \MapasCulturais\Plugin
 
                 return $callable ? $callable() : null;
             },
-            'cnab240_enabled' => function ($entity) use ($self) {
-                if (in_array($entity->id, $self->config['opportunitys_cnab_active']) || $entity->paymentCnabEnabled == '1') {
+            'cnab240_enabled' => function($entity) use($self){
+                if(in_array($entity->id, $self->config['opportunitys_cnab_active']) || $entity->paymentCnabEnabled == '1'){
                     return true;
                 }
 
@@ -75,125 +72,128 @@ class Plugin extends \MapasCulturais\Plugin
                 3 => 'Outros bancos' // Outros bancos
             ],
             'treatments' => [
-                'social_type' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    if ($field == "category") {
-                        $id = $registration->$field;
+                'social_type' => function($registration, $field, $settings, $metadata, $dependence){
+                    if($field =="category"){
+                        $id = $registration->$field;                        
                         return $settings['social_type'][$id];
                     }
 
-                    $field_id = "field_" . $field;
+                    $field_id = "field_".$field;
                     $id = isset($metadata[$field_id]) ? $metadata[$field_id] : $field;
                     return $settings['social_type'][$id];
                 },
-                'proponent_name' => function ($registration, $field, $settings, $metadata, $dependence) use ($self) {
-                    if ($field == "category") {
-                        $id = $registration->$field;
-                        $field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
+                'proponent_name' => function($registration, $field, $settings,$metadata, $dependence) use ($self){
+                    if($field =="category"){
+                        $id = $registration->$field;  
+                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
                         $_value = $metadata[$field_id] ?? null;
                     } else {
-                        $field_id = "field_" . $field;
+                        $field_id = "field_".$field;
                         $_value = $metadata[$field_id] ?? null;
                     }
-
-                    if ($self->isJson($_value)) {
+                    
+                    if($self->isJson($_value)){
                         return $self->normalizeString(json_decode($_value));
-                    } else {
+                    }else{
                         return $self->normalizeString($_value);
                     }
+                   
                 },
-                'proponent_document' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    if ($field == "category") {
-                        $id = $registration->$field;
-                        $field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_document'][$settings['social_type'][$id]];
+                'proponent_document' => function($registration, $field, $settings,$metadata, $dependence){
+                    if($field =="category"){                      
+                        $id = $registration->$field;                          
+                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_document'][$settings['social_type'][$id]];
                         return $metadata[$field_id] ?? null;
                     }
 
-                    $field_id = "field_" . $field;
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'address' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'address' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'number' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'number' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'complement' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'complement' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'zipcode' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'zipcode' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'city' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'city' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'account_type' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'account_type' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'bank' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'bank' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'branch' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'branch' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'branch_dv' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'branch_dv' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     return $metadata[$field_id] ?? null;
                 },
-                'account' => function ($registration, $field, $settings, $metadata, $dependence) {
+                'account' => function($registration, $field, $settings,$metadata, $dependence){
 
-                    $field_id = "field_" . $field;
+                    $field_id = "field_".$field;
                     $data = $metadata[$field_id] ?? null;
 
-                    $account_type_field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
-                    $bank_field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
+                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
+                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
                     $search = "banco do brasil";
-
-                    if (in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id])) && substr($data, 0, 2) != "51") {
-
+                    
+                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id])) && substr($data, 0, 2) != "51"){
+                       
                         $account_temp = "51" . $data;
 
-                        if (strlen($account_temp) < 9) {
-                            $result = "51" . str_pad($data, 7, 0, STR_PAD_LEFT);
-                        } else {
+                        if(strlen($account_temp) < 9){
+                            $result = "51".str_pad($data, 7, 0, STR_PAD_LEFT);
+                        }else{
                             $result = "51" . $data;
                         }
-                    } else {
+
+                    }else{
                         $result = $data;
                     }
 
-                    return $result;
+                   return $result;
                 },
-                'account_dv' => function ($registration, $field, $settings, $metadata, $dependence) {
-                    $field_id = "field_" . $field;
+                'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
+                    $field_id = "field_".$field;
                     $data = $metadata[$field_id] ?? 0;
-
-                    if (!is_int($data) && (strlen($data) > 2)) {
-                        if (preg_match("/x/", mb_strtolower($data))) {
+                    
+                    if(!is_int($data) && (strlen($data) > 2)){
+                        if(preg_match("/x/", mb_strtolower($data))){
                             $data = "X";
-                        } else {
+                        }else{
                             $data = 0;
                         }
                     }
-
-                    $account_type_field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
-                    $bank_field_id = "field_" . $this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
+                    
+                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
+                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
                     $search = "banco do brasil";
 
-                    if (in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id]))) {
+                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id]))){
                         return $this->config['fromToDvBranch'][$data];
-                    } else {
+                    }else{
                         $result =  $data;
                     }
 
                     return $result;
+
                 }
             ],
         ];
@@ -203,14 +203,14 @@ class Plugin extends \MapasCulturais\Plugin
         self::$instance = $this;
     }
 
-    function _init()
-    {
+    function _init() {
         $app = App::i();
+        $app->view->enqueueStyle('app-v2', 'registrationpayments-v2', 'css/plugin-RegistrationPayments.css');
         $driver = $app->em->getConfiguration()->getMetadataDriverImpl();
         $driver->addPaths([__DIR__]);
 
         $plugin = $this;
-
+        
         // @todo implementar cache para não fazer essa consulta a cada requisição
         if (!$app->repo('DbUpdate')->findBy(['name' => 'create table payment'])) {
             $conn = $app->em->getConnection();
@@ -246,7 +246,7 @@ class Plugin extends \MapasCulturais\Plugin
             $conn->commit();
         }
 
-        $app->hook('mapas.printJsObject:before', function () {
+        $app->hook('mapas.printJsObject:before', function () {            
             $statusDic = [
                 ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
                 ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
@@ -258,22 +258,22 @@ class Plugin extends \MapasCulturais\Plugin
 
             $registrations = Registration::getStatusesNames();
 
-            foreach ($registrations as $status => $status_name) {
-                if (in_array($status, [0, 1, 2, 3, 8, 10])) {
+            foreach($registrations as $status => $status_name){
+                if(in_array($status,[0,1,2,3,8,10])){
                     $registrationStatus[] = ["label" => $status_name, "value" => $status];
                 }
             }
-
+    
             $this->jsObject['config']['payment']['registrationStatus'] = $registrationStatus;
             $this->jsObject['config']['payment']['statusDic'] = $statusDic;
             $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
         });
 
-        $app->hook('doctrine.emum(object_type).values', function (&$values) {
+        $app->hook('doctrine.emum(object_type).values', function(&$values) {
             $values['Payment'] = Payment::class;
         });
 
-        $app->hook("template(opportunity.edit.tabs):end", function () use ($app) {
+        $app->hook("template(opportunity.edit.tabs):end", function() use ($app) {
             $entity = $this->controller->requestedEntity;
             $this->part("payments/opportunity-payments-tab", ['entity' => $entity]);
         });
@@ -288,22 +288,22 @@ class Plugin extends \MapasCulturais\Plugin
             $where .= " {$or} reg.number LIKE lower(:keyword) ";
             $where .= " OR unaccent(lower(owner.name)) LIKE unaccent(lower(:keyword)) ";
         });
+
     }
 
-    function enqueueScriptsAndStyles()
-    {
-
+    function enqueueScriptsAndStyles() {
+        
         $app = App::i();
 
         $app->view->enqueueScript('app', 'regitration-payments', 'js/ng.registrationPayments.js', ['entity.module.opportunity']);
         $app->view->enqueueStyle('app', 'fontawesome', 'https://use.fontawesome.com/releases/v5.8.2/css/all.css');
         $app->view->enqueueStyle('app', 'regitration-payments', 'css/payments.css');
         $app->view->jsObject['angularAppDependencies'][] = 'ng.registrationPayments';
+
     }
 
 
-    function register()
-    {
+    function register () {
 
         $app = App::i();
         $app->registerController('payment', Controller::class);
@@ -320,13 +320,13 @@ class Plugin extends \MapasCulturais\Plugin
             'default_value' => '{}'
         ]);
 
-        $this->registerMetadata('RegistrationPayments\\Payment', 'payment_identifier', [
+        $this->registerMetadata('RegistrationPayments\\Payment','payment_identifier', [
             'label' => i::__('Identificação do pagamento'),
             'type' => 'string',
             'private' => true,
         ]);
 
-        $this->registerMetadata('MapasCulturais\Entities\Opportunity', 'payment_lot_export', [
+        $this->registerMetadata('MapasCulturais\Entities\Opportunity','payment_lot_export', [
             'label' => i::__('Lotes exportados'),
             'type' => 'json',
             'private' => true,
@@ -342,14 +342,14 @@ class Plugin extends \MapasCulturais\Plugin
                 'default' => false,
             ]
         );
-
+        
         $app->registerFileGroup(
             'opportunity',
             new Definitions\FileGroup(
                 'export-cnab-files',
                 ['text/plain'],
                 'O arquivo não e valido',
-                private: true
+                private:true
             )
         );
 
@@ -359,7 +359,7 @@ class Plugin extends \MapasCulturais\Plugin
                 'export-payments-filters-files',
                 ['^text/csv$'],
                 'O arquivo não e valido',
-                unique: true,
+                unique:true,
             )
         );
 
@@ -369,7 +369,7 @@ class Plugin extends \MapasCulturais\Plugin
                 'export-financial-validator-files',
                 ['^text/csv$'],
                 'O arquivo não e valido',
-                unique: true,
+                unique:true,
             )
         );
 
@@ -394,8 +394,7 @@ class Plugin extends \MapasCulturais\Plugin
      * @return void 
      * @throws NotRegistredBankCode 
      */
-    function validateAccount(string $bank_number, string $account_number, string $branch, string $account_verifying_digit = null, string $branch_verifying_digit = null)
-    {
+    function validateAccount(string $bank_number, string $account_number, string $branch, string $account_verifying_digit = null, string $branch_verifying_digit = null) {
         $original = [
             'account_number' => $account_number,
             'branch' => $branch,
@@ -409,16 +408,16 @@ class Plugin extends \MapasCulturais\Plugin
 
         $branch_length = $bank::agency_size;
         $branch = preg_replace("#[^{$valid_chars}]*#i", '', $branch);
-        $branch_verifying_digit = $branch_verifying_digit ?
+        $branch_verifying_digit = $branch_verifying_digit ? 
             preg_replace("#[^{$valid_chars}]*#i", '', $branch_verifying_digit) : $branch_verifying_digit;
 
         $branch_changed = false;
-
-        if ($bank->use_agency_digit() && (empty($branch_verifying_digit) || !BankValidator::validate_agency($bank_number, $branch, $branch_verifying_digit))) {
+        
+        if ($bank->use_agency_digit() && (empty($branch_verifying_digit) || ! BankValidator::validate_agency($bank_number, $branch, $branch_verifying_digit))) {
             $branch_changed = true;
             if ($branch_verifying_digit === '0' && BankValidator::validate_agency($bank_number, $branch, 'X')) {
                 $branch_verifying_digit = 'X';
-            } else if (in_array($branch_verifying_digit, ['X', 'x']) && BankValidator::validate_agency($bank_number, $branch, '0')) {
+            }else if (in_array($branch_verifying_digit, ['X', 'x']) && BankValidator::validate_agency($bank_number, $branch, '0')) {
                 $branch_verifying_digit = '0';
             } else {
                 $_branch = substr($branch, 0, -1);
@@ -428,25 +427,26 @@ class Plugin extends \MapasCulturais\Plugin
                 if (BankValidator::validate_agency($bank_number, $_branch, $_branch_verifying_digit)) {
                     $branch = $_branch;
                     $branch_verifying_digit = $_branch_verifying_digit;
-
+                    
                     // provavelmente a agencia-dv foi informada no campo da agencia antes de existir campo de dv
                     $branch_changed = false;
-                } else if ($_branch_verifying_digit === '0' && BankValidator::validate_agency($bank_number, $_branch, 'X')) {
+
+                } else if($_branch_verifying_digit === '0' && BankValidator::validate_agency($bank_number, $_branch, 'X')) {
                     $branch = $_branch;
                     $branch_verifying_digit = 'X';
                 } else if (strlen($branch) == $branch_length) {
                     $branch_verifying_digit = $bank->calculate_agency($branch);
                 }
             }
-        }
+        } 
 
         $account_length = $bank::account_size;
         $account_number = preg_replace("#[^{$valid_chars}]*#i", '', $account_number);
-        $account_verifying_digit = $account_verifying_digit ?
+        $account_verifying_digit = $account_verifying_digit ? 
             preg_replace("#[^{$valid_chars}]*#i", '', $account_verifying_digit) : $account_verifying_digit;
 
         $account_changed = false;
-
+        
         if ($bank->use_account_digit() && (empty($account_verifying_digit) || !BankValidator::validate_account($bank_number, $branch, $account_number, $account_verifying_digit))) {
             $account_changed = true;
 
@@ -457,13 +457,14 @@ class Plugin extends \MapasCulturais\Plugin
             } else {
                 $_account_number = substr($account_number, 0, -1);
                 $_account_verifying_digit = substr($account_number, -1);
-
+    
                 if (BankValidator::validate_account($bank_number, $branch, $_account_number, $_account_verifying_digit)) {
                     $account_number = $_account_number;
                     $account_verifying_digit = $_account_verifying_digit;
-
+                    
                     // provavelmente a conta-dv foi informada no campo da conta antes de existir campo de dv
                     $account_changed = false;
+
                 } else if ($_account_verifying_digit === '0' && BankValidator::validate_account($bank_number, $branch, $_account_number, 'X')) {
                     $account_number = $_account_number;
                     $account_verifying_digit = 'X';
@@ -478,7 +479,7 @@ class Plugin extends \MapasCulturais\Plugin
 
             'validator' => $bank,
             'bank_number' => $bank_number,
-
+            
             'original' => $original,
 
             'account_full' => false,
@@ -504,7 +505,7 @@ class Plugin extends \MapasCulturais\Plugin
             $result->account_verifying_digit = $account_verifying_digit;
             $result->account_full = $bank->use_account_digit() ? "{$account_number}-{$account_verifying_digit}" : $account_number;
         }
-
+        
         return $result;
     }
 
@@ -516,7 +517,7 @@ class Plugin extends \MapasCulturais\Plugin
     {
         return self::$instance;
     }
-
+    
     /**
      * Devolve a instância do CNAB
      *
@@ -530,7 +531,7 @@ class Plugin extends \MapasCulturais\Plugin
         return new Remessa($bank, $layout, $params);
     }
 
-    /**
+     /**
      * Normaliza uma string
      *
      * @param string $valor
@@ -546,15 +547,14 @@ class Plugin extends \MapasCulturais\Plugin
      * @param string $string
      * @return boolean
      */
-    function isJson($string)
-    {
+    function isJson($string) {
         $decoded = json_decode($string);
-
+    
 
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
             return false;
         }
-
+    
         return true;
     }
 
@@ -581,15 +581,15 @@ class Plugin extends \MapasCulturais\Plugin
                 break;
         }
 
-        if (!in_array($create_type, array_keys($data)) || !$data[$create_type]) {
+        if(!in_array($create_type, array_keys($data)) || !$data[$create_type]) {
             $errors[] = i::__("O campo {$type} é obrigatório");
         }
 
-        if (!in_array('payment_date', array_keys($data)) || !$data['payment_date']) {
+        if(!in_array('payment_date', array_keys($data)) || !$data['payment_date']) {
             $errors[] = i::__('O campo Previsão de pagamento é um campo obrigatório');
         }
 
-        if (!in_array('amount', array_keys($data)) || !$data['amount']) {
+        if(!in_array('amount', array_keys($data)) || !$data['amount']) {
             $errors[] = i::__('O campo Valor é um campo obrigatório');
         }
 
@@ -606,27 +606,27 @@ class Plugin extends \MapasCulturais\Plugin
         if (!$request['lotType']) {
             $errors['lotType'] = i::__("Informe o tipo de lote. Corrente BB, Poupança BB ou Outros Bancos");
         }
-
+        
         if (!$opportunity->canUser('@control')) {
             $errors[] = i::__("Você nao tem permissão para geração do CNAB240 nesta oportunidade");
         }
-
-        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
+        
+        $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
         $cnab240_enabled = $this->config['cnab240_enabled'];
         if (!in_array('opportunitysCnab', array_keys($this->config))) {
             $errors[] = i::__("Esta oportunidade não esta configurada, fale com administrador");
         }
-
+        
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
 
-        if ($request['lotType'] && !$request['ts_lot']) {
+        if($request['lotType'] && !$request['ts_lot']) {
             $lot_type = $this->config['file_type'][$request['lotType']];
-            if (in_array($request['lotType'], $payment_lot_export[$identifier] ?? [])) {
+            if(in_array($request['lotType'], $payment_lot_export[$identifier] ?? [])){
                 $errors[] = i::__("{$identifier} para o arquivo {$lot_type} Já usado anteriormente.");
             }
         }
 
-        if (!$this->config['cnab240_company_data']) {
+        if(!$this->config['cnab240_company_data']){
             $errors[] = i::__("A entidade pagadora nao foi configurada");
         }
 
@@ -647,6 +647,6 @@ class Plugin extends \MapasCulturais\Plugin
     public function prefixFieldId($value)
     {
         $fields_id = $this->config['fields'];
-        return $fields_id[$value] ? "field_" . $fields_id[$value] : null;
+        return $fields_id[$value] ? "field_".$fields_id[$value] : null;
     }
 }

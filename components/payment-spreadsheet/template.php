@@ -26,7 +26,7 @@ $this->import('
             </button>
 
             <button v-if="process.active" class="button button--primary--button button--icon" @click="processFile()">
-                <?= i::__('Processar') ?> <mc-icon name="upload"></mc-icon>
+                <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
             </button>
             <!-- <entity-file :entity="entity" groupName="payment-financial-validador" editable disableName></entity-file> -->
         </template>

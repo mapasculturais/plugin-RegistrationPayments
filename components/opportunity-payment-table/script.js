@@ -27,34 +27,42 @@ app.component('opportunity-payment-table', {
                 { text: "Opções", value: "options"},
             ]
         },
+        paymentProcessedFiles() {
+            return $MAPAS.requestedEntity.payment_processed_files;
+        },
         paymentProcessed() {
             
             if(this.opportunity?.files && this.opportunity.files['import-financial-validator-files']){
                 let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
-                let dateTimeData = $MAPAS.requestedEntity.payment_processed_files;
-                
+
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);
                     let file = opportunityFiles[index];
                     let name = file.name;  
                     let url = file.url;
+                    let id = file.id;
+                    let processed = false;
                 
-                    this.importedFiles[name] = { name, url };
+                    this.importedFiles[name] = {id, name, url,processed };
                 });
                 
-                Object.keys(dateTimeData).forEach(name => {
-                    let dateTime = dateTimeData[name];
-                
-                    if (this.importedFiles[name]) {
-                        this.importedFiles[name].dateTime = dateTime;
-                    }
-                });
+                if(this.paymentProcessedFiles) {
+                    Object.keys(this.paymentProcessedFiles).forEach(name => {
+                        let dateTime = this.paymentProcessedFiles[name];
+                    
+                        if (this.importedFiles[name]) {
+                            this.importedFiles[name].dateTime = dateTime;
+                            this.importedFiles[name].processed = true;
+                        }
+                    });
+                }
+               
                 
                 return this.importedFiles;
             } else {
                 return null;
             }
-        }
+        },
     },
 
     setup() {
@@ -182,6 +190,27 @@ app.component('opportunity-payment-table', {
 
         downloadFile(url) {
             window.open(url, '_blank');
+        },
+        processFile(file) {
+            const messages = useMessages();
+            const api = new API();
+            let args = {
+                opportunity_id: this.opportunity.id,
+                file_id: file.id
+            };
+            let url = Utils.createUrl('payment', 'import', args);
+            
+            api.POST(url).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    messages.error(this.text('processError'));
+                    this.response = data
+                } else {
+                    let date = new McDate(new Date());
+                    this.importedFiles[file.name].processed = true;
+                    this.importedFiles[file.name].dateTime = date.date('numeric year')+ ' ' + this.text('toThe') + ' ' + date.time('numeric')
+                    messages.success(this.text('processSuccess'));
+                }
+            });
         }
     },
 });

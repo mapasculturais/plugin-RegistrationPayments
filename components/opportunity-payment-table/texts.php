@@ -9,4 +9,7 @@ return [
     'editPaymentError' => i::__('Erro ao editar o pagamento'),
     'deletePaymentSuccess' => i::__('Pagamento deletado com sucesso'),
     'deletePaymentError' => i::__('Erro ao deletar o pagamento'),
+    'processSuccess' => i::__('Validador financeiro processado com sucesso'),
+    'processError' => i::__('Validador financeiro processado com sucesso'),
+    'toThe' => i::__('às'),
 ];

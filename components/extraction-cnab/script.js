@@ -26,7 +26,7 @@ app.component('extraction-cnab', {
             return {
                 identifier: "",
                 ts_lot: false,
-                lotType: null,
+                lotType: 1,
                 registrationFilter: "",
             }
         },

@@ -670,8 +670,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $this->errorJson($errors); 
         }
 
-        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
-        if (!$registration_ids = $this->getRegistrationsIds($opportunity,  $identifier)) {
+        if (!$registration_ids = $this->getRegistrationsIds($opportunity)) {
             $errors[] = i::__("Nao foram encontrado inscrições");
         }
 

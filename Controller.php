@@ -576,11 +576,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 $paymentInfo = [];
                 if(!$payment->metadata){
                     $paymentInfo['identifier'][] = $identifier;
-                    $payment->metadata = json_encode($paymentInfo);
+                    $payment->metadata = $paymentInfo;
                 }else{
                     $paymentInfo = (array)$payment->metadata ?? [];
                     $paymentInfo['identifier'][] = $identifier;
-                    $payment->metadata = json_encode($paymentInfo);
+                    $payment->metadata = $paymentInfo;
                 
                 }
             

@@ -180,20 +180,29 @@ app.component('opportunity-payment-table', {
             return result;
         },
 
-        statusFilter(event,entities) {            
-            this.filters.status?.includes(event.target.value) ? this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1) : this.filters.status.push(event.target.value);
-            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` :  `GTE(0)`;
+        statusFilter(event,entities) {  
+            if(event.target.checked) {
+                this.filters.status.push(event.target.value)
+            }else{
+                this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1)
+            }
+
+            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` : `GTE(0)`;
             entities.refresh();
         },
 
         showAllStatus(entities) {
             for (let status of this.statusList) {
-                if (!this.filters.status?.includes(status.value)) {
+                if(this.$refs.allStatus.checked) {
                     this.filters.status.push(status.value);
                 }
             }
 
-            this.query['status'] = `IN(${this.filters.status})`;
+            if(!this.$refs.allStatus.checked) {
+                this.filters.status = [];
+            }
+
+            this.query['status'] = this.$refs.allStatus.checked ? `IN(${this.filters.status})` : `GTE(0)`;
             entities.refresh();
         },
 

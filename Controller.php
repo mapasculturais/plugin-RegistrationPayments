@@ -714,7 +714,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         // Seta o tipo do lote
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
-
+        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
 
         foreach($registration_ids as $key => $id){
             $app = App::i();

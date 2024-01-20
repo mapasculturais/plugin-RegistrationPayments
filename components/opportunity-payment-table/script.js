@@ -100,6 +100,7 @@ app.component('opportunity-payment-table', {
             query: {
                 opportunity: `EQ(${this.opportunity.id})`,
                 status:`GTE(0)`,
+                '@permissions': 'view'
             },
             filters: {
                 paymentFrom:'',

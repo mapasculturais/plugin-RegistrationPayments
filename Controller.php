@@ -125,11 +125,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $from = isset($this->data['from']) ? DateTime::createFromFormat('Y-m-d', $this->data['from']) : null;
         $to = isset($this->data['to']) ? DateTime::createFromFormat('Y-m-d', $this->data['to']) : null;
 
-        $dql_params['from'] = $from->format('Y-m-d') ?: '';
-        $dql_from = $from ? "e.sentTimestamp >= :from AND" : '';
-
-        $dql_params['to'] = $to->format('Y-m-d') ?: '';
-        $dql_to = $to ? "e.sentTimestamp <= :to AND" : '';
+        $dql_to = "";
+        $dql_from = "";
+        if($from && $to) {
+            $dql_params['from'] = $from->format('Y-m-d') ?: '';
+            $dql_from = $from ? " e.sentTimestamp >= :from AND " : '';
+    
+            $dql_params['to'] = $to->format('Y-m-d') ?: '';
+            $dql_to = $to ? " e.sentTimestamp <= :to AND " : '';
+        }
 
         $dql = "
             SELECT
@@ -139,7 +143,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             WHERE
                 $dql_to
                 $dql_from
-                e.status IN (10) AND
                 e.opportunity = :opportunity_Id";
 
         $query = $app->em->createQuery($dql);

@@ -382,7 +382,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
        
         if ($status) {
             $complement .= " AND p.status IN (:status)";
-            $params["status"] = explode(',',$status);
+            $params["status"] = implode(',',$status);
         }
        
         //Busca os ids das inscrições

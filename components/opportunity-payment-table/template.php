@@ -67,7 +67,7 @@ $url = $app->createUrl('payment', 'export');
                 </div>
 
                 <div class="col-6">
-                    <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
+                    <h4 class="bold"><?= i::__('Arquivos CNAB240') ?></h4>
                     <div v-for="file in cnabProcessed">
                         <div @click="downloadFile(file.url)">
                             <mc-icon name="download"></mc-icon>

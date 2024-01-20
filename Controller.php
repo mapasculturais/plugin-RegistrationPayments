@@ -868,12 +868,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($lot == '01' || $lot == '05'){
-            if($lot == '01'){
-                $acount = 'conta corrente';
-            }else if($lot == '05'){
-                $acount = 'conta poupança';
-            }
-
+            $acount = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['default_lot_type'][$lot];
             $complement_join .= " join registration_meta account on r.id = account.object_id";
             $complement_where .= " AND account.key = :field_type_account";
             $complement_where .= " AND account.value = :account";

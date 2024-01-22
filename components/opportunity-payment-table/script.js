@@ -71,7 +71,7 @@ app.component('opportunity-payment-table', {
                 status:`GTE(0)`,
             },
             filters: {
-                paymentFrom:'',
+                paymentFrom: '',
                 paymentTo: '',
                 status: []
             },
@@ -172,7 +172,10 @@ app.component('opportunity-payment-table', {
         clearFilters(entities) {
             this.$refs.allStatus.checked = false;
             this.filters.status = [];
+            this.filters.paymentFrom = '';
+            this.filters.paymentTo = '';
             this.query['status'] = `GTE(0)`;
+            delete this.query['paymentDate'];
             entities.refresh();
         },
 

@@ -19,6 +19,7 @@ $this->import('
     mc-icon
     mc-modal
     mc-select
+    mc-status
     payment-spreadsheet
 ');
 
@@ -94,7 +95,7 @@ $url = $app->createUrl('payment', 'export');
 
         <template #status="{entity}">
             <mc-select :default-value="entity.status" @change-option="setStatus($event, entity)">
-                <option v-for="item in statusList" :value="item.value">{{item.label}}</option>
+                <mc-status v-for="item in statusList" :value="item.value" :status-name="item.label"></mc-status>
             </mc-select>
         </template>
 

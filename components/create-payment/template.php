@@ -47,10 +47,26 @@ $this->import('
 
                 <div v-if="payment.createType == 'registration_id'" class="field col-12">
                     <label for="regId"><?= i::__('Inscrições') ?></label>
-                    <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5"></textarea>
+                    <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5" placeholder="<?= i::__('Informe a lista de ID\'s das inscrições que deseja criar o pagamento, separadas por vírgula, ou um ID em cada linha') ?>"></textarea>
                 </div>
 
-                <div :class="['field', {'col-12' : payment.createType !== 'registration_id'}, {'col-6' : payment.createType == 'registration_id'}]">
+                <div v-if="payment.createType == 'registrationStatus'" class="field col-12">
+                    <label for="paymentStatus"><?= i::__('Status') ?></label>
+                    <select v-model="payment.registrationStatus" name="paymentStatus">
+                        <option value=""><?= i::__('Selecione o status das inscrições que deseja criar o pagamento') ?></option>
+                        <option v-for="item in registrationStatus" :value="item.value">{{item.label}}</option>
+                    </select>
+                </div>
+
+                <div v-if="payment.createType == 'category'" class="field col-12">
+                    <label for="paymentCategory"><?= i::__('Categorias') ?></label>
+                    <select v-model="payment.category" name="paymentCategory">
+                        <option value=""><?= i::__('Selecione a categoria das inscrições que deseja criar o pagamento') ?></option>
+                        <option v-for="category in categories" :value="category">{{category}}</option>
+                    </select>
+                </div>
+
+                <div :class="['field', {'col-12' : payment.createType !== 'registration_id'}, {'col-12' : payment.createType == 'registration_id'}]">
                     <label for="paymentDate"><?= i::__('Previsão de pagamento') ?></label>
                     <input v-model="payment.payment_date" name="paymentDate" type="date">
                 </div>
@@ -62,18 +78,11 @@ $this->import('
                         <input name="paymentAmount" v-model="payment.amount" v-maska data-maska="9 99#,##" data-maska-tokens="9:[0-9]:repeated" data-maska-reversed type="text">
                     </span>
                 </div>
-
-                <div v-if="payment.createType == 'registrationStatus'" class="field col-6">
-                    <label for="paymentStatus"><?= i::__('Status') ?></label>
-                    <select v-model="payment.registrationStatus" name="paymentStatus">
-                        <option v-for="item in status" :value="item.value">{{item.label}}</option>
-                    </select>
-                </div>
-
-                <div v-if="payment.createType == 'category'" class="field col-6">
-                    <label for="paymentCategory"><?= i::__('Categorias') ?></label>
-                    <select v-model="payment.category" name="paymentCategory">
-                        <option v-for="category in categories" :value="category">{{category}}</option>
+    
+                <div class="field col-6">
+                    <label for="status"><?= i::__('Status') ?></label>
+                    <select v-model="payment.status" name="paymentStatus">
+                        <option v-for="item in statusList" :value="item.value">{{item.label}}</option>
                     </select>
                 </div>
 

@@ -8,6 +8,7 @@ use MapasCulturais\i;
 use MapasCulturais\App;
 use  MapasCulturais\Definitions;
 use RegistrationPayments\Payment;
+use MapasCulturais\Entities\Registration;
 use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
 use RegistrationPayments\JobTypes\GenerateCnab;
@@ -246,7 +247,7 @@ class Plugin extends \MapasCulturais\Plugin{
         }
 
         $app->hook('mapas.printJsObject:before', function () {            
-            $status = [
+            $statusDic = [
                 ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
                 ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
                 ['value' => Payment::STATUS_FAILED, 'label' => i::__("Falha")],
@@ -254,8 +255,17 @@ class Plugin extends \MapasCulturais\Plugin{
                 ['value' => Payment::STATUS_AVAILABLE, 'label' => i::__("Disponível")],
                 ['value' => Payment::STATUS_PAID, 'label' => i::__("Pago")],
             ];
+
+            $registrations = Registration::getStatusesNames();
+
+            foreach($registrations as $status => $status_name){
+                if(in_array($status,[0,1,2,3,8,10])){
+                    $registrationStatus[] = ["label" => $status_name, "value" => $status];
+                }
+            }
     
-            $this->jsObject['config']['payment']['statusDic'] = $status;
+            $this->jsObject['config']['payment']['registrationStatus'] = $registrationStatus;
+            $this->jsObject['config']['payment']['statusDic'] = $statusDic;
             $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
         });
 
@@ -602,9 +612,8 @@ class Plugin extends \MapasCulturais\Plugin{
         }
         
         $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
-        $cnab240_enabled = $this->config['cnab240_enabled'];
-        if (!in_array('opportunitysCnab', array_keys($this->config)) || !$cnab240_enabled($opportunity)) {
-            $errors[] = i::__("Esta oportunidade não esta configurada, fale com administrador");
+        if (!in_array('opportunitysCnab', array_keys($this->config)) || !in_array($opportunity->id, array_keys($this->config['opportunitysCnab']))) {
+            $errors[] = i::__("Os campos para coletar os dados para o CNAB240 não estão configurados nesta oportunidade. Fale com o administrador.");
         }
         
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);

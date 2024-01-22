@@ -9,6 +9,7 @@
   },
 
   "devDependencies": {
+    "@mapas/scripts": "workspace:0.0.0",
     "laravel-mix": "^5.0.4",
     "sass": "^1.26.10",
     "sass-loader": "^8.0.2"

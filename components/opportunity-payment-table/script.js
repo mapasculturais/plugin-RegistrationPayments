@@ -27,33 +27,64 @@ app.component('opportunity-payment-table', {
                 { text: "Opções", value: "options"},
             ]
         },
+        paymentProcessedFiles() {
+            return $MAPAS.requestedEntity.payment_processed_files;
+        },
         paymentProcessed() {
-            let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
-            let dateTimeData = $MAPAS.requestedEntity.payment_processed_files;
+            
+            if(this.opportunity?.files && this.opportunity.files['import-financial-validator-files']){
+                let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
 
-            if (opportunityFiles) {            
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);
                     let file = opportunityFiles[index];
                     let name = file.name;  
                     let url = file.url;
+                    let id = file.id;
+                    let processed = false;
                 
-                    this.importedFiles[name] = { name, url };
+                    this.importedFiles[name] = {id, name, url,processed };
                 });
                 
-                Object.keys(dateTimeData).forEach(name => {
-                    let dateTime = dateTimeData[name];
-                
-                    if (this.importedFiles[name]) {
-                        this.importedFiles[name].dateTime = dateTime;
-                    }
-                });
+                if(this.paymentProcessedFiles) {
+                    Object.keys(this.paymentProcessedFiles).forEach(name => {
+                        let dateTime = this.paymentProcessedFiles[name];
+                    
+                        if (this.importedFiles[name]) {
+                            this.importedFiles[name].dateTime = dateTime;
+                            this.importedFiles[name].processed = true;
+                        }
+                    });
+                }
+               
                 
                 return this.importedFiles;
             } else {
                 return null;
             }
-        }
+        },
+        cnabProcessed() {
+            if(this.opportunity?.files && this.opportunity.files['export-cnab-files']){
+                let opportunityFiles = this.opportunity.files['export-cnab-files'];
+                let importedFiles = {};
+                
+                Object.keys(opportunityFiles).forEach(key => {
+                    let index = parseInt(key);
+                    let file = opportunityFiles[index];
+                    let name = file.name;  
+                    let url = file.url;
+                    let id = file.id;
+                    let processed = false;
+                    let dateTime = file.createTimestamp
+                
+                    importedFiles[name] = {id, name, url,processed,dateTime };
+                });
+
+                return importedFiles;
+            } else {
+                return null;
+            }
+        },
     },
 
     setup() {
@@ -69,6 +100,7 @@ app.component('opportunity-payment-table', {
             query: {
                 opportunity: `EQ(${this.opportunity.id})`,
                 status:`GTE(0)`,
+                '@permissions': 'view'
             },
             filters: {
                 paymentFrom: '',
@@ -148,9 +180,14 @@ app.component('opportunity-payment-table', {
             return result;
         },
 
-        statusFilter(event,entities) {            
-            this.filters.status?.includes(event.target.value) ? this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1) : this.filters.status.push(event.target.value);
-            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` :  `GTE(0)`;
+        statusFilter(event,entities) {  
+            if(event.target.checked) {
+                this.filters.status.push(event.target.value)
+            }else{
+                this.filters.status.splice(this.filters.status.indexOf(event.target.value), 1)
+            }
+
+            this.query['status'] = this.filters.status.length > 0 ? `IN(${this.filters.status})` : `GTE(0)`;
             entities.refresh();
         },
 
@@ -188,6 +225,28 @@ app.component('opportunity-payment-table', {
 
         downloadFile(url) {
             window.open(url, '_blank');
+        },
+        processFile(file) {
+            const messages = useMessages();
+            const api = new API();
+            let args = {
+                opportunity_id: this.opportunity.id,
+                file_id: file.id
+            };
+            let url = Utils.createUrl('payment', 'import', args);
+            
+            api.POST(url).then(res => res.json()).then(data => {
+                if (data?.error) {
+                    messages.error(this.text('processError'));
+                    this.response = data
+                } else {
+                    let date = new McDate(new Date());
+                    this.importedFiles[file.name].processed = true;
+                    this.importedFiles[file.name].dateTime = date.date('numeric year')+ ' ' + this.text('toThe') + ' ' + date.time('numeric')
+                    window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
+                    messages.success(this.text('processSuccess'));
+                }
+            });
         }
     },
 });

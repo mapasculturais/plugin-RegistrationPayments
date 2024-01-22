@@ -16,11 +16,11 @@ $this->import('
 ');
 ?>
 
-<template #tabs-alert>
+<!-- <template #tabs-alert>
     <mc-alert type="danger">
-        <?= i::__('Dados bancários ainda não foram configurados.') ?>
+        <?php //i::__('Dados bancários ainda não foram configurados.') ?>
     </mc-alert>
-</template>
+</template> -->
 
 <div class="payment-tab__container">
     <mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">

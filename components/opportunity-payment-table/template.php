@@ -43,7 +43,7 @@ $url = $app->createUrl('payment', 'export');
             <div class="opportunity-payment-table__actions grid-12">
                 <create-payment class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></create-payment>
                 
-                <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity"></payment-spreadsheet>
+                <payment-spreadsheet class="col-4 sm:col-12" :entity="opportunity" :entities="entities"></payment-spreadsheet>
                 
                 <extraction-cnab class="col-4 sm:col-12" :entity="opportunity"></extraction-cnab>
             </div>
@@ -58,9 +58,23 @@ $url = $app->createUrl('payment', 'export');
                     <div v-for="file in paymentProcessed">
                         <div @click="downloadFile(file.url)">
                             <mc-icon name="download"></mc-icon>
-                            {{file.name}}
+                            {{file.name}} 
                         </div>
-                        <div><?= i::__('Processado em') ?> {{file.dateTime}}</div>
+                        <button v-if="!file.processed" @click="processFile(file)" class="button button--primary--button button--icon">
+                            <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
+                        </button>
+                        <div v-if="file.processed">- <?= i::__('Processado em') ?> {{file.dateTime}}</div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <h4 class="bold"><?= i::__('Arquivos CNAB240') ?></h4>
+                    <div v-for="file in cnabProcessed">
+                        <div @click="downloadFile(file.url)">
+                            <mc-icon name="download"></mc-icon>
+                            {{file.name}} 
+                        </div>
+                        <div>- <?= i::__('Extraido em') ?> {{file.dateTime.date('numeric year')}} <?= i::__('às') ?> {{file.dateTime.time('numeric')}}</div>
                     </div>
                 </div>
             </div>

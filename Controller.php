@@ -4,15 +4,16 @@ namespace RegistrationPayments;
 
 use DateTime;
 use MapasCulturais\i;
-use League\Csv\Writer;
 use League\Csv\Reader;
-use League\Csv\Statement;
+use League\Csv\Writer;
 use MapasCulturais\App;
+use League\Csv\Statement;
 use MapasCulturais\Traits;
 use CnabPHP\RemessaAbstract;
 use RegistrationPayments\Plugin;
 use RegistrationPayments\Payment;
 use MapasCulturais\Entities\Opportunity;
+use MapasCulturais\Entities\Registration;
 
 /**
  * Payment Controller
@@ -124,11 +125,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $from = isset($this->data['from']) ? DateTime::createFromFormat('Y-m-d', $this->data['from']) : null;
         $to = isset($this->data['to']) ? DateTime::createFromFormat('Y-m-d', $this->data['to']) : null;
 
-        $dql_params['from'] = $from ?: '';
-        $dql_from = $from ? "e.sentTimestamp >= :from AND" : '';
-
-        $dql_params['to'] = $to ?: '';
-        $dql_to = $to ? "e.sentTimestamp <= :to AND" : '';
+        $dql_to = "";
+        $dql_from = "";
+        if($from && $to) {
+            $dql_params['from'] = $from->format('Y-m-d') ?: '';
+            $dql_from = $from ? " e.sentTimestamp >= :from AND " : '';
+    
+            $dql_params['to'] = $to->format('Y-m-d') ?: '';
+            $dql_to = $to ? " e.sentTimestamp <= :to AND " : '';
+        }
 
         $dql = "
             SELECT
@@ -138,7 +143,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             WHERE
                 $dql_to
                 $dql_from
-                e.status IN (1,10) AND
                 e.opportunity = :opportunity_Id";
 
         $query = $app->em->createQuery($dql);
@@ -255,159 +259,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     }
 
     /**
-     * Busca pagamentos da oportunidade
-     */
-    public function GET_findPayments($opportunity_id = null)
-    {
-        $this->requireAuthentication();
-        
-        $opportunity_id = $this->data['opportunity'];
-        $data = $this->data;
-        $complement = "";
-
-        $app = App::i();
-        $conn = $app->em->getConnection();
-
-        // $limit = isset($data['@limit']) ? $data['@limit'] : 50;
-        $page = isset($data['@page']) ? (int) $data['@page'] : 1;
-        $search = isset($data['search']) ? $data['search'] : "";
-        $status = isset($data['status']) ? $data['status'] : null;
-        // $offset = ($page - 1) * $limit;
-
-        //Parametros basicos de pesquisa
-        $params = [
-            "opp" => $opportunity_id,
-            "search" => "%" . $search . "%",
-            "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
-            "documento" => '%"documento":"' . $search . '%',
-            // "limit" => $limit,
-            // 'offset' => $offset,
-        ];
-
-        //incrementa parametros caso exista um filtro por status
-        if (is_numeric($status)) {
-            $complement .= " AND p.status = :status";
-            $params['status'] = $status;
-        }
-
-        //incrementa parametros caso exista um filtro por data
-        if (isset($data['from']) && !empty($data['from'])) {
-            $from = new DateTime($data['from']);
-            $params['from'] = $from->format('Y-m-d');
-            $complement .= " AND p.payment_date >= :from";
-
-            if (isset($data['to']) && !empty($data['to'])) {
-                $to = new DateTime($data['to']);
-                $params['to'] = $to->format('Y-m-d');
-                $complement .= " AND p.payment_date <= :to";
-            }
-        }
-
-        //Busca os ids das inscrições
-        $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
-        FROM registration r
-        RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
-        (r.number like :search OR r.agents_data like :nomeCompleto OR r.agents_data like :documento) {$complement}";
-
-        $payments = $conn->fetchAll($query, $params);
-
-        //Remonta o retorno de pagamentos para fazer tratamentos nos valores
-        $paymentsResultString = array_map(function ($payment) {
-            return [
-                "id" => $payment['id'],
-                "registration_id" => $payment['registration_id'],
-                "number" => $payment['number'],
-                "payment_date" => $payment['payment_date'],
-                "amount" => (float) $payment['amount'],
-                "metadata" => json_decode($payment['metadata']),
-                "status" => $payment['status'],
-            ];
-        }, $payments);
-
-        //Pega o total de pagamentos cadastrados
-        $filter = [
-            "opp" => $opportunity_id,
-        ];
-
-        //incrementa parametros caso exista um filtro por status
-        if (is_numeric($status)) {
-            $filter['status'] = $status;
-        }
-
-        //incrementa parametros caso exista um filtro por pagamento
-        if (isset($data['from']) && !empty($data['from'])) {
-            $from = new DateTime($data['from']);
-            $filter['from'] = $from->format('Y-m-d');
-            $complement .= " AND p.payment_date >= :from";
-
-            if (isset($data['to']) && !empty($data['to'])) {
-                $to = new DateTime($data['to']);
-                $filter['to'] = $to->format('Y-m-d');
-                $complement .= " AND p.payment_date <= :to";
-            }
-        }
-
-        //Faz a contabilização de resultados e devolve uma soma total de registros encontrados
-        $query = "SELECT count(p) as total
-        FROM registration r
-        RIGHT JOIN payment p
-        ON r.id = p.registration_id WHERE
-        p.opportunity_id = :opp {$complement}";
-        $total = $conn->fetchAll($query, $filter);
-
-        //Retorna os dados
-        $this->apiAddHeaderMetadata($this->data, $payments, $total[0]['total']);
-        $this->apiResponse($paymentsResultString);
-    }
-
-    /**
-     *
-     * @apiDefine APIPatch
-     * @apiDescription Atualiza parcialmente uma entidade.
-     * @apiParam {Array} [data] Array com valores para popular os atributos da entidade. Use o método describe para descobrir os atributos.
-     */
-    public function PATCH_single($data = null)
-    {
-
-        $this->requireAuthentication();
-
-        if (is_null($data)) {
-            $data = $this->postData;
-        }
-
-        $app = App::i();
-
-        $app->applyHookBoundTo($this, "PATCH({$this->id}.single):data", ['data' => &$data]);
-
-        $entity = $this->requestedEntity;
-
-        if (!$entity) {
-            $app->pass();
-        }
-
-        $function = null;
-
-        //Atribui a propriedade editada
-        foreach ($data as $field => $value) {
-            $entity->$field = $value;
-        }
-
-        if ($_errors = $entity->validationErrors) {
-            $errors = [];
-            foreach ($this->postData as $field => $value) {
-                if (key_exists($field, $_errors)) {
-                    $errors[$field] = $_errors[$field];
-                }
-            }
-
-            if ($errors) {
-                $this->errorJson($errors, 400);
-            }
-        }
-        $this->_finishRequest($entity, true, $function);
-    }
-
-    /**
      *
      * @apiDefine APIPost
      * @apiDescription Cria uma entidade.
@@ -443,13 +294,20 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "registration_id"){
-            $ids = explode(",",$data[$create_type]);
+            
+            if (strpos($data[$create_type], "\n") !== false) {
+                $delimiter = "\n";
+            } elseif (strpos($data[$create_type], ",") !== false) {
+                $delimiter = ",";
+            } 
+
+            $_ids = explode($delimiter,$data[$create_type]);
+
             $ids = array_map(function ($id) {
                 return trim(preg_replace('/[^0-9]/i', '', $id));
-            }, $ids);
+            }, $_ids);
             
             $ids = array_filter($ids);
-
             $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
 
             if (!$registrations) {
@@ -462,7 +320,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
 
             if (!$registrations) {
-                $status_description = Payment::getStatusById($data[$create_type]);
+                $status_description = Registration::getStatusNameById($data[$create_type]); 
                 $errors[] = i::__("Não foram encontradas inscrições com o status {$status_description}");
                 $this->errorJson($errors, 400);
             }
@@ -524,7 +382,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
        
         if ($status) {
             $complement .= " AND p.status IN (:status)";
-            $params["status"] = explode(',',$status);
+            $params["status"] = implode(',',$status);
         }
        
         //Busca os ids das inscrições
@@ -662,8 +520,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $this->errorJson($errors); 
         }
 
-        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
-        if (!$registration_ids = $this->getRegistrationsIds($opportunity,  $identifier)) {
+        if (!$registration_ids = $this->getRegistrationsIds($opportunity)) {
             $errors[] = i::__("Nao foram encontrado inscrições");
         }
 
@@ -707,7 +564,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         // Seta o tipo do lote
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
-
+        $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
 
         foreach($registration_ids as $key => $id){
             $app = App::i();
@@ -722,11 +579,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 $paymentInfo = [];
                 if(!$payment->metadata){
                     $paymentInfo['identifier'][] = $identifier;
-                    $payment->metadata = json_encode($paymentInfo);
+                    $payment->metadata = $paymentInfo;
                 }else{
                     $paymentInfo = (array)$payment->metadata ?? [];
                     $paymentInfo['identifier'][] = $identifier;
-                    $payment->metadata = json_encode($paymentInfo);
+                    $payment->metadata = $paymentInfo;
                 
                 }
             
@@ -860,12 +717,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($lot == '01' || $lot == '05'){
-            if($lot == '01'){
-                $acount = 'conta corrente';
-            }else if($lot == '05'){
-                $acount = 'conta poupança';
-            }
-
+            $acount = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['default_lot_type'][$lot];
             $complement_join .= " join registration_meta account on r.id = account.object_id";
             $complement_where .= " AND account.key = :field_type_account";
             $complement_where .= " AND account.value = :account";
@@ -895,8 +747,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                   WHERE 
                   r.status > :r_status AND 
                   r.opportunity_id = :opportunity_id {$complement_where}";
-
-
 
         $params += [
             'opportunity_id' => $opportunity->id,

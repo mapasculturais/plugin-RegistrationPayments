@@ -55,6 +55,15 @@ app.component('create-payment', {
         hasErrors() {
             return this.response?.error ? true : false;
         },
+        setPaymentStatus(selected) {
+            this.payment.status = selected.value
+        },
+        setRegistrationsStatus(selected) {
+            this.payment.registrationStatus = selected.value;
+        },
+        setCategory(selected) {
+            this.payment.category = selectec.value;
+        },
         save(modal) {
             const messages = useMessages();
             this.payment.amount = this.payment.amount?.replace(/\s/g, '').replace(',', '.');

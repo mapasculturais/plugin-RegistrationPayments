@@ -31,26 +31,28 @@ $this->import('
         </template>
 
         <template #default>
-            <div class="create-payment__modal-content grid-12">
-                <span v-if="hasErrors" class="field col-12">
-                    <small v-for="item in response?.data" class="field__error">* {{ item }}</small>
-                </span>
-                <div class="create-payment__filters col-12">
-                    
-                    <div class="create-payment__filter-field field field--horizontal">
-                        <label><?= i::__('Inscrições com data de envio inicial') ?></label>
-                        <input type="date" name="envioInicial" v-model="dataExport.from">
-                    </div>
-    
-                    <div class="create-payment__filter-field field field--horizontal">
-                        <label><?= i::__('Inscrições com data de envio Final') ?></label>
-                        <input type="date" name="envioFinal" v-model="dataExport.to">
+            <div class="create-payment__modal-content">
+                <div class="grid-12">
+                    <span v-if="hasErrors" class="field col-12">
+                        <small v-for="item in response?.data" class="field__error">* {{ item }}</small>
+                    </span>
+                    <div class="create-payment__filters col-12">
+                        
+                        <div class="create-payment__filter-field field field--horizontal">
+                            <label><?= i::__('Inscrições com data de envio inicial') ?></label>
+                            <input type="date" name="envioInicial" v-model="dataExport.from">
+                        </div>
+        
+                        <div class="create-payment__filter-field field field--horizontal">
+                            <label><?= i::__('Inscrições com data de envio Final') ?></label>
+                            <input type="date" name="envioFinal" v-model="dataExport.to">
+                        </div>
+
+                        <small class="create-payment__note"><?= i::__("*Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
                     </div>
 
-                    <small class="create-payment__note"><?= i::__("*Caso não queira filtrar entre datas, deixe os campos vazios.") ?></small>
+                    <mc-file @file-selected="setFile" class="col-12"></mc-file>
                 </div>
-
-                <mc-file @file-selected="setFile" class="col-12"></mc-file>
             </div>
         </template>
 

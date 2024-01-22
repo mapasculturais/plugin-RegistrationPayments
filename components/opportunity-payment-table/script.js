@@ -193,7 +193,8 @@ app.component('opportunity-payment-table', {
 
         showAllStatus(entities) {
             if (!this.$refs.allStatus.checked) {
-                this.clearFilters(entities);
+                this.filters.status = [];
+                this.query['status'] = `GTE(0)`;
             } else {
                 for (let status of this.statusList) {
                     if (!this.filters.status?.includes(status.value)) {

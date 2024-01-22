@@ -67,7 +67,7 @@ $url = $app->createUrl('payment', 'export');
                     </div>
                 </div>
 
-                <div class="col-6">
+                <div v-if="cnabProcessed" class="col-6">
                     <h4 class="bold"><?= i::__('Arquivos CNAB240') ?></h4>
                     <div v-for="file in cnabProcessed">
                         <div @click="downloadFile(file.url)">

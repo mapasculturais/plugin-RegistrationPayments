@@ -295,9 +295,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         if($create_type == "registration_id"){
             
-            if (strpos($data[$create_type], "\n") !== false) {
-                $delimiter = "\n";
-            } elseif (strpos($data[$create_type], ",") !== false) {
+            $delimiter = "\n";
+            if (strpos($data[$create_type], ",") !== false) {
                 $delimiter = ",";
             } 
 

@@ -11,6 +11,7 @@ $this->import('
     mc-modal
     mc-icon
     mc-select
+    mc-status
 ');
 ?>
 <div class="create-payment">

@@ -30,22 +30,4 @@
         padding: 24px 38px 0;
         justify-content: flex-end;
     }
-
-    /* estilização específica de componentes internos */
-    .entity-table__table {
-        .mc-select {
-            &__selected-option {
-                padding-block: 3px;
-
-                &::after {
-                    top: 12px;
-                    right: 20px;
-                }
-            }
-
-            &__option {
-                padding-block: 3px;
-            }
-        }
-    }
 }

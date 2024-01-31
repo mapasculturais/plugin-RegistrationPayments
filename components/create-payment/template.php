@@ -50,7 +50,7 @@ $this->import('
 
                     <div v-if="payment.createType == 'registration_id'" class="field col-12">
                         <label for="regId"><?= i::__('Inscrições') ?></label>
-                        <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5" placeholder="<?= i::__('Informe a lista de ID\'s das inscrições que deseja criar o pagamento, separadas por vírgula, ou um ID em cada linha') ?>"></textarea>
+                        <textarea v-model="payment.registration_id" name="regId" id="" cols="30" rows="5" placeholder="<?= i::__('Informe a lista de números (Ex.: on-1926833684) das inscrições que deseja criar o pagamento, separadas por vírgula, ou um número em cada linha') ?>"></textarea>
                     </div>
 
                     <div v-if="payment.createType == 'registrationStatus'" class="field col-12">

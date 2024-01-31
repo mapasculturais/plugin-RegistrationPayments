@@ -275,6 +275,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $data = $this->data;
         $create_type = trim($data['createType']);
         $opportunity = $app->repo('Opportunity')->find($data['opportunity']);
+        $lastPhase = $opportunity->lastPhase;
 
         $user = $app->getUser();
 
@@ -285,7 +286,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "category"){
-            $registrations = $app->repo('Registration')->findBy(['category' => $data[$create_type], 'opportunity' => $opportunity]);
+            $registrations = $app->repo('Registration')->findBy(['category' => $data[$create_type], 'opportunity' => $lastPhase->id]);
 
             if (!$registrations) {
                 $errors[] = i::__("Não foram encontradas inscrições na categoria {$data[$create_type]}");
@@ -327,7 +328,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         foreach ($registrations as $registration) {
             $payment = new Payment();
-            $payment->opportunity = $opportunity;
+            $payment->opportunity = $lastPhase;
             $payment->createdByUser = $user;
             $payment->registration = $registration;
             $payment->paymentDate = new DateTime($data['payment_date']);
@@ -357,11 +358,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $conn = $app->em->getConnection();
         $data = $this->data;
         $opportunity_id = $data["opportunity"];
+
+        $opportunity = $app->repo('Opportunity')->find($opportunity_id);
+        $lastPhase = $opportunity->lastPhase;
+
         $search = isset($data["search"]) ? $data["search"] : "";
         $complement = "";
         $status = isset($data["status"]) ? $data["status"] : [];
         $params = [
-            "opp" => $opportunity_id,
+            "opp" => $lastPhase->id,
             "search" => "%" . $search . "%",
             "nomeCompleto" => '%"nomeCompleto":"' . $search . '%',
             "documento" => '%"documento":"' . $search . '%',
@@ -687,7 +692,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $complement_join = "";
         $complement_where = "";
         $conn = $app->em->getConnection();
-        
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
 
         $test = false;
@@ -828,14 +832,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $file = $app->repo('File')->find($this->data['file_id']);
         $opportunity = $file->owner;
+        $lastPhase = $opportunity->lastPhase;
 
-        $opportunity->checkPermission('@control');
+        $lastPhase->checkPermission('@control');
 
         if($errors = $this->getImportValidateErros($file)) {
             $this->errorJson($errors);
         }
 
-        $this->import($opportunity, $file->getPath());
+        $this->import($lastPhase, $file->getPath());
     }
 
     /**
@@ -948,6 +953,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             }
             
             $registration = $app->repo('Registration')->findOneBy(['number' => $num, 'opportunity' => $opportunity]);
+
 
             if(!$registration){
                 $app->log->debug($num. " Não encontrada");

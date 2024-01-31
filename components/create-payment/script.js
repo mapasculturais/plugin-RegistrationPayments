@@ -62,7 +62,7 @@ app.component('create-payment', {
             this.payment.registrationStatus = selected.value;
         },
         setCategory(selected) {
-            this.payment.category = selectec.value;
+            this.payment.category = selected.value;
         },
         save(modal) {
             const messages = useMessages();

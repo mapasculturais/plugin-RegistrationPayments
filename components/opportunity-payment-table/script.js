@@ -9,6 +9,9 @@ app.component('opportunity-payment-table', {
     },
     
     computed: {
+        phasesIds() {
+            return $MAPAS.config.opportunityPaymentTable.phasesIds;
+        },
         statusList() {
             return $MAPAS.config.payment.statusDic;
         },
@@ -95,10 +98,11 @@ app.component('opportunity-payment-table', {
     },
 
     data() {
+        const phasesId = $MAPAS.config.opportunityPaymentTable.phasesIds;
         const api = new API();
         return {
             query: {
-                opportunity: `EQ(${this.opportunity.id})`,
+                opportunity: `IN(${phasesId})`,
                 status:`GTE(0)`,
                 '@permissions': 'view'
             },

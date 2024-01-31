@@ -302,21 +302,21 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
             $_ids = explode($delimiter,$data[$create_type]);
 
-            $ids = array_map(function ($id) {
-                return trim(preg_replace('/[^0-9]/i', '', $id));
+            $ids = array_map(function ($id) use ($app) {
+                return $app->config['registration.prefix'].trim(preg_replace('/[^0-9]/i', '', $id));
             }, $_ids);
             
             $ids = array_filter($ids);
-            $registrations = $app->repo('Registration')->findBy(['id' => $ids, 'opportunity' => $opportunity]);
+            $registrations = $app->repo('Registration')->findBy(['number' => $ids, 'opportunity' => $lastPhase->id]);
 
             if (!$registrations) {
-                $errors[] = i::__("As inscrições informadas não foram encontradas na oportunidade {$opportunity->name}");
+                $errors[] = i::__('As inscrições fornecidas não foram encontradas. Lembre-se de que, para efetuar o cadastro de um pagamento, as inscrições devem estar na última fase, ou seja, na etapa de "Publicação final do resultado".');
                 $this->errorJson($errors, 400);
             }
         }
 
         if($create_type == "registrationStatus"){
-            $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $opportunity]);
+            $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $lastPhase->id]);
 
             if (!$registrations) {
                 $status_description = Registration::getStatusNameById($data[$create_type]); 

@@ -57,10 +57,10 @@ class Plugin extends \MapasCulturais\Plugin{
                     if($field =="category"){
                         $id = $registration->$field;  
                         $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
-                        $_value = $metadata[$field_id] ?? null;
+                        $_value = $registration->$field_id ?: $metadata[$field_id] ?? null;
                     } else {
                         $field_id = "field_".$field;
-                        $_value = $metadata[$field_id] ?? null;
+                        $_value = $registration->$field_id ?: $metadata[$field_id];
                     }
                     
                     if($self->isJson($_value)){
@@ -74,52 +74,52 @@ class Plugin extends \MapasCulturais\Plugin{
                     if($field =="category"){                      
                         $id = $registration->$field;                          
                         $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_document'][$settings['social_type'][$id]];
-                        return $metadata[$field_id] ?? null;
+                        return $registration->$field_id ?: $metadata[$field_id] ?? null;
                     }
 
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'address' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'number' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'complement' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'zipcode' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'city' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'account_type' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'bank' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'branch' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'branch_dv' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    return $metadata[$field_id] ?? null;
+                    return $registration->$field_id ?: $metadata[$field_id] ?? null;
                 },
                 'account' => function($registration, $field, $settings,$metadata, $dependence){
 
                     $field_id = "field_".$field;
-                    $data = $metadata[$field_id] ?? null;
+                    $data = $registration->$field_id ?: $metadata[$field_id] ?? null;
 
                     $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
                     $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];

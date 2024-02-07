@@ -676,6 +676,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
         }
 
+        if(in_array('paymentDate', array_keys($this->data)) && $this->data['paymentDate']) {
+            $complement_where .= " AND p.payment_date = :paymentDate";
+            $params['paymentDate'] = $this->data['paymentDate'];
+        }
+
         $complement_where .= " AND p.status >= :p_status";
        
         $query = "SELECT r.id FROM registration r 
@@ -692,8 +697,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             'p_status' => 0
         ];
 
-       
-       
         $registrations_ids = $conn->fetchAll($query, $params);
 
         

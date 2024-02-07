@@ -18,7 +18,7 @@ $url = $app->createUrl('payment', 'generateCnab');
             <label for="identifier">Identificação do lote de pagamento</label>
             <input type="number" name="identifier" id="identifier" placeholder="EX.: 001">
 
-            <label for="identifier">Data de pagamento</label>
+            <label for="identifier">Filtrar pela data de pagamento</label>
             <input type="date" name="paymentDate" id="paymentDate">
 
             
@@ -40,7 +40,7 @@ $url = $app->createUrl('payment', 'generateCnab');
                 Exportar lote de teste
             </label> <br>
 
-            <small>OBS.: Caso a data de pagamento nao for informada, sera inserido a data que está cadastrada junto aos dados de pagamento</small>
+            <small>OBS.: Caso a data de pagamento não for informada, será exportado todos os pagamentos</small>
         </form>
     </edit-box>
 </div>

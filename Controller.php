@@ -507,11 +507,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         foreach($registration_ids as $key => $id){
             $app = App::i();
            
+            $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['id' => $id]);
             // Pega a inscrição pelo ID
-            $registration = $app->repo("Registration")->find(['id' => $id]);
+            $registration = $app->repo("Registration")->find(['id' => $payment->registration->id]);
 
             // Pega o pagamento
-            $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['registration' => $registration->id]);
 
             if(!$test){
                 $paymentInfo = [];
@@ -637,13 +637,16 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             }
             
             $ids = explode($delimiter, $registrationFilter);
-
-            $result = array_map(function($id){
-                return preg_replace('/[^0-9]/i', '', $id);
+          
+            $result = array_map(function($id) use ($opportunity, $conn){
+                $_id = trim ($id); 
+                $query = "SELECT * from registration r WHERE r.number = '{$_id}' and r.opportunity_id = '{$opportunity->id}'";
+                $reg = $conn->fetchAll($query);               
+                return preg_replace('/[^0-9]/i', '', $reg[0]['id']);
             },$ids);         
             
             $list = implode(",", array_filter($result));
-            $complement_where.= "AND r.id IN ({$list})";
+            $complement_where.= "AND p.registration_id IN ({$list})";
 
         }
 
@@ -682,9 +685,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         $complement_where .= " AND p.status >= :p_status";
-       
-        $query = "SELECT r.id FROM registration r 
-                  JOIN payment p on r.id = p.registration_id {$complement_join}
+
+        $query = "SELECT p.id FROM payment p 
+                  JOIN registration r on p.registration_id = r.id {$complement_join}
                   WHERE 
                   r.status > :r_status AND 
                   r.opportunity_id = :opportunity_id {$complement_where}";
@@ -698,7 +701,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         ];
 
         $registrations_ids = $conn->fetchAll($query, $params);
-
         
         $ids = [];
         foreach ($registrations_ids as $value) {

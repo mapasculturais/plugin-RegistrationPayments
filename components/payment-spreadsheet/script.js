@@ -72,7 +72,7 @@ app.component('payment-spreadsheet', {
                 group: 'import-financial-validator-files',   
             };
             
-            this.entity.upload(this.newFile, data).then((response) => {
+            this.lastPhase.upload(this.newFile, data).then((response) => {
                 window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
                 this.process.id = response.id;
                 this.process.active = true;
@@ -82,7 +82,7 @@ app.component('payment-spreadsheet', {
             const messages = useMessages();
             const api = new API();
             let args = {
-                opportunity_id: this.entity.id,
+                opportunity_id: this.lastPhase.id,
                 file_id: this.process.id
             };
             let url = Utils.createUrl('payment', 'import', args);

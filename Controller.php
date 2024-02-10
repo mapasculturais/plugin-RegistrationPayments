@@ -93,12 +93,13 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         //Oportunidade que a query deve filtrar
         $opportunity_id = $this->data['opportunity_id'];
         $opportunity = $app->repo('Opportunity')->find($opportunity_id);
+        $lastPhase = $opportunity->lastPhase;
 
-        $this->exportInit($opportunity);
+        $this->exportInit($lastPhase);
         
-        $registrations = $this->getRegistrations($opportunity);
+        $registrations = $this->getRegistrations($lastPhase);
         
-        if($errors = $this->getValidateErrors($opportunity, $registrations, $this->data)) {
+        if($errors = $this->getValidateErrors($lastPhase, $registrations, $this->data)) {
             $this->errorJson($errors);
         }
         
@@ -120,7 +121,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         $app = App::i();
         
-        $dql_params = [ 'opportunity_Id' => $opportunity->id ];
+        $dql_params = [
+            'opportunity_Id' => $opportunity->id,
+            'registration_status' => 10 
+        ];
 
         $from = isset($this->data['from']) ? DateTime::createFromFormat('Y-m-d', $this->data['from']) : null;
         $to = isset($this->data['to']) ? DateTime::createFromFormat('Y-m-d', $this->data['to']) : null;
@@ -143,7 +147,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             WHERE
                 $dql_to
                 $dql_from
-                e.opportunity = :opportunity_Id";
+                e.opportunity = :opportunity_Id AND
+                e.status = :registration_status";
 
         $query = $app->em->createQuery($dql);
 
@@ -301,11 +306,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 $delimiter = ",";
             } 
 
-            $_ids = explode($delimiter,$data[$create_type]);
-
-            $ids = array_map(function ($id) use ($app) {
-                return $app->config['registration.prefix'].trim(preg_replace('/[^0-9]/i', '', $id));
-            }, $_ids);
+            $ids = explode($delimiter,$data[$create_type]);
             
             $ids = array_filter($ids);
             $registrations = $app->repo('Registration')->findBy(['number' => $ids, 'opportunity' => $lastPhase->id]);
@@ -382,15 +383,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 $complement .= " AND p.payment_date <= :to";
             }
         }
+        
         //incrementa parametros caso exista um filtro por status
-       
         if ($status) {
             $complement .= " AND p.status IN (:status)";
             $params["status"] = implode(',',$status);
         }
        
         //Busca os ids das inscrições
-       
         $query = " SELECT p.id, p.registration_id, r.number, p.payment_date, p.amount, p.metadata, p.status
         FROM registration r
         RIGHT JOIN payment p ON r.id = p.registration_id  WHERE p.opportunity_id = :opp AND
@@ -517,8 +517,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $request = $this->data;
 
         $errors = [];
-        $opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);
-        $opportunity->registerRegistrationMetadata($opportunity);
+        $_opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);        
+        $opportunity = $_opportunity->lastPhase;
+        $opportunity->registerRegistrationMetadata();
         
         if($errors = $plugin->getCnabValidationErrors($opportunity, $request)) {
             $this->errorJson($errors); 
@@ -564,8 +565,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         ]);
 
-     
-
         // Seta o tipo do lote
         $lote = $arquivo->addLote(array('tipo_servico' => '98')); // 98 = Pagamentos diversos
         $identifier = "lote-" . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
@@ -573,11 +572,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         foreach($registration_ids as $key => $id){
             $app = App::i();
            
-            // Pega a inscrição pelo ID
-            $registration = $app->repo("Registration")->find(['id' => $id]);
+            $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['id' => $id]);
 
-            // Pega o pagamento
-            $payment = $app->repo('RegistrationPayments\\Payment')->findOneBy(['registration' => $registration->id]);
+            // Pega a inscrição pelo ID
+            $registration = $app->repo("Registration")->find(['id' => $payment->registration->id]);
 
             if(!$test){
                 $paymentInfo = [];
@@ -590,10 +588,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     $payment->metadata = $paymentInfo;
                 
                 }
-            
+                
+                $app->disableAccessControl();
                 $payment->status = Payment::STATUS_EXPORTED;
                 $payment->save(true);
+                $app->enableAccessControl();
             }
+
+        
                         
             // Insere 1 lote
             $lote->inserirDetalhe(array(
@@ -629,8 +631,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         // Salva a refêrencia do lote na oportunidade
+        $_opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);
+        $opportunity = $_opportunity->lastPhase;
+        
         if (!$test) {
-            $opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);
             $payment_lot_export[$identifier][] = $request['lotType'];
             $opportunity->payment_lot_export = json_encode($payment_lot_export);
             $opportunity->save(true);
@@ -641,6 +645,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $amount_file = preg_replace('/[^0-9]/i', '', RemessaAbstract::$sumValoesTrailer);
         $file_name = "pagamento-{$amount_file}---{$identifier}-{$name}--opp-{$opportunity->id}-{$fileType}-canb240.txt";
 
+
+        if($test) {
+            $file_name = "teste-".$file_name;
+        }
 
         $dir = BASE_PATH . '/cnab/';
 
@@ -655,7 +663,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         fwrite($stream, $arquivo->getText());
 
         fclose($stream);
-        
+        $opportunity = $app->repo("Opportunity")->find($opportunity->id);
+
         $class_name = $opportunity->fileClassName;
         $file = new $class_name([
             'name' => $file_name,
@@ -689,7 +698,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
       
         $params = [];
 
-        $complement_join = "";
+        $sub_query = "SELECT number FROM registration r";
         $complement_where = "";
         $conn = $app->em->getConnection();
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
@@ -719,46 +728,51 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         }
 
+        $cnab_config = $plugin->config['opportunitysCnab'][$opportunity->id];
         if($lot == '01' || $lot == '05'){
-            $acount = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['default_lot_type'][$lot];
-            $complement_join .= " join registration_meta account on r.id = account.object_id";
-            $complement_where .= " AND account.key = :field_type_account";
-            $complement_where .= " AND account.value = :account";
-            $params['field_type_account'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['account_type'];
-            $params['account'] = $acount;
 
+            $sub_query.= " JOIN registration_meta account ON r.id = account.object_id AND account.key = :field_type_account AND account.value = :account
+                            JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value = :bank_name";
 
-            
-            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
-            $complement_where .= " AND bank.key = :field_bank";
-            $complement_where .= " AND bank.value = :bank_name";
-            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
+            $params['field_type_account'] = "field_".$cnab_config['account_type'];
+            $params['account'] = $cnab_config['settings']['default_lot_type'][$lot];
+            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['bank_name'] = $cnab_config['canab_bb_default_value'];
             
         }else if($lot == '03'){
-            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
-            $complement_where .= " AND bank.key = :field_bank";
-            $complement_where .= " AND bank.value <> :bank_name";
-            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
+            $sub_query.= " JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value <> :bank_name";
+
+            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['bank_name'] = $cnab_config['canab_bb_default_value'];
+        }
+       
+        $phases_ids = [];
+        foreach($opportunity->allPhases as $phase){
+            $phases_ids[] = $phase->id;
         }
 
-        $complement_where .= " AND p.status >= :p_status";
-       
-        $query = "SELECT r.id FROM registration r 
-                  JOIN payment p on r.id = p.registration_id {$complement_join}
-                  WHERE 
-                  r.status > :r_status AND 
-                  r.opportunity_id = :opportunity_id {$complement_where}";
+        if(in_array('paymentDate', array_keys($this->data)) && $this->data['paymentDate']) {
+            $complement_where .= " AND p.payment_date = :paymentDate";
+            $params['paymentDate'] = $this->data['paymentDate'];
+        }
+
+        $phases_ids = implode(",", $phases_ids);
+
+        $query = "SELECT p.id
+                FROM
+                    payment p
+                    JOIN registration reg on p.registration_id = reg.id
+                WHERE
+                    reg.status > :r_status
+                    AND reg.opportunity_id IN ({$phases_ids})
+                    AND p.status >= :p_status 
+                    AND reg.number in ({$sub_query})";
 
         $params += [
-            'opportunity_id' => $opportunity->id,
             'r_status' => 0,
             'p_status' => 0
         ];
 
-       
-       
         $registrations_ids = $conn->fetchAll($query, $params);
 
         
@@ -795,13 +809,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $dependence = null;
         if(is_array($field_id) && isset($field_id['dependence'])){
-
-            
             if($field_id['dependence'] == "category"){
                 $field_id = $field_id['dependence']; 
             }else{
-                $id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
-                $dependence = $settings[$field_id['dependence']][$metadata['field_'.$id]]; 
+                $field_name = 'field_'.$plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
+                $dependence = $settings[$field_id['dependence']][$registration->$field_name]; 
                 $field_id = $field_id[$dependence];  
             }
                       
@@ -832,15 +844,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $app = App::i();
         $file = $app->repo('File')->find($this->data['file_id']);
         $opportunity = $file->owner;
-        $lastPhase = $opportunity->lastPhase;
 
-        $lastPhase->checkPermission('@control');
+        $opportunity->checkPermission('@control');
 
         if($errors = $this->getImportValidateErros($file)) {
             $this->errorJson($errors);
         }
 
-        $this->import($lastPhase, $file->getPath());
+        $this->import($opportunity, $file->getPath());
     }
 
     /**
@@ -954,7 +965,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             
             $registration = $app->repo('Registration')->findOneBy(['number' => $num, 'opportunity' => $opportunity]);
 
-
             if(!$registration){
                 $app->log->debug($num. " Não encontrada");
                 continue;
@@ -962,14 +972,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
             $registration->__skipQueuingPCacheRecreation = true;
 
-            $raw_data = $registration->{$slug . '_raw'};
-            $filesnames = $registration->{$slug . '_filename'};
-            
-            /* @TODO: implementar atualização de status?? */
-            /*if (in_array($filename, $filesnames)) {
-                $app->log->info("$name #{$count} {$registration} $eval - JÁ PROCESSADA");
-                continue;
-            }*/
+            $raw_data = $registration->{'financial_validator_raw'};
+            $filesnames = $registration->{'financial_validator_filename'};
             
             $mess = $column_status ?? $eval;
 
@@ -978,8 +982,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $raw_data[] = $line;
             $filesnames[] = $filename;
 
-            $registration->{$slug . '_raw'} = $raw_data;
-            $registration->{$slug . '_filename'} = $filesnames;
+            $registration->{'financial_validator_raw'} = $raw_data;
+            $registration->{'financial_validator_filename'} = $filesnames;
 
             $registration->save(true);
 
@@ -992,6 +996,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     $payment = new Payment;
                     $payment->createdByUser = $plugin->getUser();
                     $payment->paymentDate = $data;
+                    $payment->opportunity = $opportunity;
                     $payment->amount = str_replace(',','.',$valor);
                     $payment->registration = $registration;
                     $payment->metadata->csv_line = $line;
@@ -1009,9 +1014,6 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         // por causa do $app->em->clear(); não é possível mais utilizar a entidade para salvar
         $opportunity = $app->repo('Opportunity')->find($opportunity->id);
-
-        $slug = 'import-financial-validator-files';
-        //$slug = $this->plugin->getSlug();
 
         $opportunity->refresh();
         $opportunity->name = $opportunity->name . ' ';

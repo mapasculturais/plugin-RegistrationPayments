@@ -9,6 +9,16 @@ app.component('opportunity-payment-table', {
     },
     
     computed: {
+        lastPhase() {
+            let phase = null;
+            $MAPAS.opportunityPhases.forEach((item) => {
+                if(item.isLastPhase) {
+                    phase = item;
+                }
+            });
+
+            return phase;
+        },
         phasesIds() {
             return $MAPAS.config.opportunityPaymentTable.phasesIds;
         },

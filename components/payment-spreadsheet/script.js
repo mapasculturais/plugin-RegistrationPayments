@@ -13,6 +13,16 @@ app.component('payment-spreadsheet', {
     },
 
     computed: {
+        lastPhase() {
+            let phase = null;
+            $MAPAS.opportunityPhases.forEach((item) => {
+                if(item.isLastPhase) {
+                    phase = item;
+                }
+            });
+
+            return phase;
+        },
         hasErrors() {
             return this.response?.error ? true : false;
         },

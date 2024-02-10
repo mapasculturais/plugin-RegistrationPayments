@@ -14,6 +14,7 @@ use RegistrationPayments\Plugin;
 use RegistrationPayments\Payment;
 use MapasCulturais\Entities\Opportunity;
 use MapasCulturais\Entities\Registration;
+use MapasCulturais\Entities\RegistrationFieldConfiguration ;
 
 /**
  * Payment Controller
@@ -1077,5 +1078,31 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
         
         return $status;
+    }
+
+    public function POST_bankfields() {
+        $app = App::i();
+        $opportunity_id = $this->data['opportunity_id'];
+        $opportunity = $app->repo('Opportunity')->find($opportunity_id);
+
+        if($opportunity) {
+            $newField = new RegistrationFieldConfiguration;
+            $newField->owner = $opportunity;
+            $newField->title = i::__("Dados bancários.");
+            $newField->description = i::__("Dados bancários.");
+            $newField->categories = '';
+            $newField->required = true;
+            $newField->fieldType = 'agent-owner-field';
+            $newField->fieldOptions = '';
+            $newField->maxSize = '';
+            $newField->displayOrder = 1;
+            $newField->config = ['entityField' => '@bankFields'];
+            $newField->conditional = false;
+            $newField->conditionalField = '';
+            $newField->conditionalValue = '';
+            $newField->save(true);
+        } else {
+            return $this->errorJson(i::__("Oportunidade não encontrada!"));
+        }
     }
 }

@@ -53,7 +53,7 @@ app.component('extraction-cnab', {
             });
         },
         setCnabType(option) {
-            this.cnabData.lotType = option.value;
+            this.cnabData.lotType = parseInt(option.value);
         },
     },
 });

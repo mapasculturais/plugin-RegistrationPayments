@@ -54,11 +54,7 @@ $this->import('
                     </div>
 
                     <div v-if="payment.createType == 'registrationStatus'" class="field col-12">
-                        <label for="paymentStatus"><?= i::__('Status') ?></label>
-
-                        <mc-select :default-value="payment.registrationStatus" placeholder="<?= i::__('Selecione o status das inscrições que deseja criar o pagamento') ?>" @change-option="setRegistrationsStatus">
-                            <mc-status v-for="item in registrationStatus" :value="item.value" :status-name="item.label"></mc-status>
-                        </mc-select>
+                        <strong><i><?= i::__('Serão criados pagamentos para todas as inscrições que possuem o status "Selecionada"') ?></i></strong>                       
                     </div>
 
                     <div v-if="payment.createType == 'category'" class="field col-12">

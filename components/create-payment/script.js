@@ -70,6 +70,10 @@ app.component('create-payment', {
             const api = new API('payment');
             let url = Utils.createUrl('payment', 'createMultiple', { opportunity: this.entity.id });
 
+            if(this.payment.createType === "registrationStatus") {
+                this.payment.registrationStatus = 10;
+            }
+
             api.POST(url, this.payment).then(res => res.json()).then(data => {
                 if (data?.error) {
                     messages.error(this.text('createPaymentsError'));

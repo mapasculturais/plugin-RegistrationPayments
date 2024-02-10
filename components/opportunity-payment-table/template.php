@@ -56,9 +56,9 @@ $url = $app->createUrl('payment', 'export');
                     <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
 
                     <div v-for="file in paymentProcessed">
-                        <div @click="downloadFile(file.url)">
+                        <div @click="downloadFile(file.url)" :title="file.name">
                             <mc-icon name="download"></mc-icon>
-                            {{file.name}} 
+                            {{file.name.slice(0, 25)}}... 
                         </div>
                         <button v-if="!file.processed" @click="processFile(file)" class="button button--primary--button button--icon">
                             <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
@@ -70,11 +70,10 @@ $url = $app->createUrl('payment', 'export');
                 <div v-if="cnabProcessed" class="col-6">
                     <h4 class="bold"><?= i::__('Arquivos CNAB240') ?></h4>
                     <div v-for="file in cnabProcessed">
-                        <div @click="downloadFile(file.url)">
+                        <div @click="downloadFile(file.url)" :title="file.name">
                             <mc-icon name="download"></mc-icon>
-                            {{file.name}} 
+                            {{file.name.slice(0, 44)}}... 
                         </div>
-                        <div>- <?= i::__('Extraido em') ?> {{file.dateTime.date('numeric year')}} <?= i::__('às') ?> {{file.dateTime.time('numeric')}}</div>
                     </div>
                 </div>
             </div>

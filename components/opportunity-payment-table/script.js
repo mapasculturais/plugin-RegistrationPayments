@@ -41,12 +41,12 @@ app.component('opportunity-payment-table', {
             ]
         },
         paymentProcessedFiles() {
-            return $MAPAS.requestedEntity.payment_processed_files;
+            return this.lastPhase.payment_processed_files;
         },
         paymentProcessed() {
             
-            if(this.opportunity?.files && this.opportunity.files['import-financial-validator-files']){
-                let opportunityFiles = this.opportunity.files['import-financial-validator-files'];
+            if(this.lastPhase?.files && this.lastPhase.files['import-financial-validator-files']){
+                let opportunityFiles = this.lastPhase.files['import-financial-validator-files'];
 
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);
@@ -77,9 +77,11 @@ app.component('opportunity-payment-table', {
             }
         },
         cnabProcessed() {
-            if(this.opportunity?.files && this.opportunity.files['export-cnab-files']){
-                let opportunityFiles = this.opportunity.files['export-cnab-files'];
+            if(this.lastPhase?.files && this.lastPhase.files['export-cnab-files']){
+                let opportunityFiles = this.lastPhase.files['export-cnab-files'];
                 let importedFiles = {};
+                
+                console.log(this.lastPhase);
                 
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);

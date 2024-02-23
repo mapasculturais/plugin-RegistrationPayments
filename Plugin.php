@@ -123,9 +123,9 @@ class Plugin extends \MapasCulturais\Plugin{
 
                     $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
                     $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
-                    $search = "banco do brasil";
+                    $search = $this->config['opportunitysCnab'][$registration->opportunity->id]['canab_bb_default_value'];
                     
-                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id])) && substr($data, 0, 2) != "51"){
+                    if(in_array($registration->$account_type_field_id, ['Conta poupança']) && (preg_match("/{$search}/", mb_strtolower($registration->$bank_field_id))) && substr($data, 0, 2) != "51"){
                        
                         $account_temp = "51" . $data;
 

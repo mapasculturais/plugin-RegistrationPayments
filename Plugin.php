@@ -143,7 +143,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 },
                 'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
-                    $data = $metadata[$field_id] ?? 0;
+                    $data = $registration->$field_id ?: $metadata[$field_id] ?? null;
                     
                     if(!is_int($data) && (strlen($data) > 2)){
                         if(preg_match("/x/", mb_strtolower($data))){
@@ -155,9 +155,9 @@ class Plugin extends \MapasCulturais\Plugin{
                     
                     $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
                     $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
-                    $search = "banco do brasil";
+                    $search = $this->config['opportunitysCnab'][$registration->opportunity->id]['canab_bb_default_value'];
 
-                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id]))){
+                    if(in_array($registration->$account_type_field_id, ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($registration->$bank_field_id))){
                         return $this->config['fromToDvBranch'][$data];
                     }else{
                         $result =  $data;

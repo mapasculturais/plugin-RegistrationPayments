@@ -60,9 +60,13 @@ class Plugin extends \MapasCulturais\Plugin{
                         $_value = $registration->$field_id ?: $metadata[$field_id] ?? null;
                     } else {
                         $field_id = "field_".$field;
-                        $_value = $registration->$field_id ?: $metadata[$field_id];
+                        $_value = $registration->$field_id ?: $metadata[$field_id] ?? null;
                     }
-                    
+
+                    if(!$_value) {
+                        return "";
+                    }   
+
                     if($self->isJson($_value)){
                         return $self->normalizeString(json_decode($_value));
                     }else{

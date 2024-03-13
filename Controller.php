@@ -615,10 +615,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
       
         $params = [];
 
-        $complement_join = "";
+        $sub_query = "SELECT number FROM registration r";
         $complement_where = "";
         $conn = $app->em->getConnection();
-        
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
 
         $test = false;
@@ -629,54 +628,41 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         if($this->data['registrationFilter']){
 
             $registrationFilter = $this->data['registrationFilter'];
+            $delimiter = "\n";
 
             if(count(explode(",", $registrationFilter)) >1){
-                $delimiter = ",";
-            }else if(count(explode("\n", $registrationFilter)) >1){
-                $delimiter = "\n"; 
+                $delimiter = ","; 
+            }else if(count(explode(";", $registrationFilter)) >1){
+                $delimiter = ";"; 
             }
             
             $ids = explode($delimiter, $registrationFilter);
-          
-            $result = array_map(function($id) use ($opportunity, $conn){
-                $_id = trim ($id); 
-                $query = "SELECT * from registration r WHERE r.number = '{$_id}' and r.opportunity_id = '{$opportunity->id}'";
-                $reg = $conn->fetchAll($query);               
-                return preg_replace('/[^0-9]/i', '', $reg[0]['id']);
+
+            $result = array_map(function($id){
+                return preg_replace('/[^0-9]/i', '', $id);
             },$ids);         
             
             $list = implode(",", array_filter($result));
-            $complement_where.= "AND p.registration_id IN ({$list})";
+            $complement_where.= "AND r.id IN ({$list})";
 
         }
 
+        $cnab_config = $plugin->config['opportunitysCnab'][$opportunity->id];
         if($lot == '01' || $lot == '05'){
-            if($lot == '01'){
-                $acount = 'Conta corrente';
-            }else if($lot == '05'){
-                $acount = 'Conta poupança';
-            }
 
-            $complement_join .= " join registration_meta account on r.id = account.object_id";
-            $complement_where .= " AND account.key = :field_type_account";
-            $complement_where .= " AND account.value = :account";
-            $params['field_type_account'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['account_type'];
-            $params['account'] = $acount;
+            $sub_query.= " JOIN registration_meta account ON r.id = account.object_id AND account.key = :field_type_account AND account.value = :account
+                            JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value = :bank_name";
 
-
-            
-            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
-            $complement_where .= " AND bank.key = :field_bank";
-            $complement_where .= " AND bank.value = :bank_name";
-            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
+            $params['field_type_account'] = "field_".$cnab_config['account_type'];
+            $params['account'] = $cnab_config['settings']['default_lot_type'][$lot];
+            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['bank_name'] = $cnab_config['canab_bb_default_value'];
             
         }else if($lot == '03'){
-            $complement_join .= " join registration_meta bank on r.id = bank.object_id";
-            $complement_where .= " AND bank.key = :field_bank";
-            $complement_where .= " AND bank.value <> :bank_name";
-            $params['field_bank'] = "field_".$plugin->config['opportunitysCnab'][$opportunity->id]['bank'];
-            $params['bank_name'] = $plugin->config['opportunitysCnab'][$opportunity->id]['canab_bb_default_value'];
+            $sub_query.= " JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value <> :bank_name";
+
+            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['bank_name'] = $cnab_config['canab_bb_default_value'];
         }
 
         if(in_array('paymentDate', array_keys($this->data)) && $this->data['paymentDate']) {
@@ -684,23 +670,24 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $params['paymentDate'] = $this->data['paymentDate'];
         }
 
-        $complement_where .= " AND p.status >= :p_status";
 
-        $query = "SELECT p.id FROM payment p 
-                  JOIN registration r on p.registration_id = r.id {$complement_join}
-                  WHERE 
-                  r.status > :r_status AND 
-                  r.opportunity_id = :opportunity_id {$complement_where}";
-
-
+        $query = "SELECT p.id
+                FROM
+                    payment p
+                    JOIN registration reg on p.registration_id = reg.id
+                WHERE
+                    reg.status > :r_status
+                    AND reg.opportunity_id = $opportunity->id
+                    AND p.status >= :p_status 
+                    AND reg.number in ({$sub_query})";
 
         $params += [
-            'opportunity_id' => $opportunity->id,
             'r_status' => 0,
             'p_status' => 0
         ];
 
         $registrations_ids = $conn->fetchAll($query, $params);
+
         
         $ids = [];
         foreach ($registrations_ids as $value) {
@@ -735,13 +722,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $dependence = null;
         if(is_array($field_id) && isset($field_id['dependence'])){
-
-            
             if($field_id['dependence'] == "category"){
                 $field_id = $field_id['dependence']; 
             }else{
-                $id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
-                $dependence = $settings[$field_id['dependence']][$metadata['field_'.$id]]; 
+                $field_name = 'field_'.$plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
+                $dependence = $settings[$field_id['dependence']][$registration->$field_name]; 
                 $field_id = $field_id[$dependence];  
             }
                       

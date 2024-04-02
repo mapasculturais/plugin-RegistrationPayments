@@ -616,7 +616,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $params = [];
 
         $sub_query = "SELECT number FROM registration r";
-        $complement_where = "";
+        $sub_query_complement_where = "";
+        $query_complement_where  = "";
         $conn = $app->em->getConnection();
         $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
 
@@ -639,14 +640,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $ids = explode($delimiter, $registrationFilter);
 
             $result = array_map(function($id){
-                return preg_replace('/[^0-9]/i', '', $id);
+                return trim($id);
             },$ids);         
             
-            $list = implode(",", array_filter($result));
-            $complement_where.= "AND r.id IN ({$list})";
+            $list = implode("','", array_filter($result));
+
+            $sub_query_complement_where.= "AND r.number IN ('{$list}')";
 
         }
-
+     
         $cnab_config = $plugin->config['opportunitysCnab'][$opportunity->id];
         if($lot == '01' || $lot == '05'){
 
@@ -666,7 +668,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if(in_array('paymentDate', array_keys($this->data)) && $this->data['paymentDate']) {
-            $complement_where .= " AND p.payment_date = :paymentDate";
+            $query_complement_where .= " AND p.payment_date = :paymentDate";
             $params['paymentDate'] = $this->data['paymentDate'];
         }
 
@@ -679,7 +681,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     reg.status > :r_status
                     AND reg.opportunity_id = $opportunity->id
                     AND p.status >= :p_status 
-                    AND reg.number in ({$sub_query})";
+                    AND reg.number in ({$sub_query} {$sub_query_complement_where}) {$query_complement_where}";
 
         $params += [
             'r_status' => 0,

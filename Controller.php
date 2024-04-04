@@ -473,24 +473,39 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
        
+        $get_company_data = function($field) use ($opportunity, $company_data, $plugin) {
+            
+            $config = $plugin->config['opportunitysCnab'][$opportunity->id];
+
+            if(array_key_exists('company_data', $config)) {
+                $exclusive_company_data = $config['company_data'];
+                if(array_key_exists($field, $exclusive_company_data)) {
+                    return $exclusive_company_data[$field];
+                }else {
+                    return $company_data[$field];
+                }
+            }else {
+                return $company_data[$field];
+            }
+        };
 
         /** 
          * Instancia o CANB
          * @var Remessa  $arquivo
         */     
         $arquivo = $plugin->getCanbInstace('001', 'Cnab240', [
-            'nome_empresa' => $company_data['nome_empresa'],
-            'tipo_inscricao' => $company_data['tipo_inscricao'],
-            'numero_inscricao' => $company_data['numero_inscricao'],
-            'agencia' => $company_data['agencia'], 
-            'agencia_dv' => $company_data['agencia_dv'],
-            'conta' => $company_data['conta'], 
-            'conta_dv' => $company_data['conta_dv'], 
+            'nome_empresa' => $get_company_data('nome_empresa'),
+            'tipo_inscricao' => $get_company_data('tipo_inscricao'),
+            'numero_inscricao' => $get_company_data('numero_inscricao'),
+            'agencia' => $get_company_data('agencia'), 
+            'agencia_dv' => $get_company_data('agencia_dv'),
+            'conta' => $get_company_data('conta'), 
+            'conta_dv' => $get_company_data('conta_dv'), 
             'numero_sequencial_arquivo' => 1, 
-            'convenio' => $company_data['convenio'],
+            'convenio' => $get_company_data('convenio'),
             'carteira' => '',
             'situacao_arquivo' => $test ? 'TS' : ' ', 
-            'uso_bb1' => $company_data['convenio'],
+            'uso_bb1' => $get_company_data('convenio'),
             'uso_bb2' => '0126',
             'uso_bb4' => $test ? 'TS' : ' ',
             'operacao' => 'C',

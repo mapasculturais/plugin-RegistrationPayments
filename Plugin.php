@@ -562,7 +562,7 @@ class Plugin extends \MapasCulturais\Plugin{
      */
     private function normalizeString($valor): string
     {
-        $valor = Normalizer::normalize($valor, Normalizer::FORM_D);
+        $valor = $valor ? Normalizer::normalize($valor, Normalizer::FORM_D) : $valor;
         return preg_replace('/[^A-Za-z0-9 ]/i', '', $valor);
     }
 

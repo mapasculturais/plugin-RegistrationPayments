@@ -167,10 +167,10 @@ class Payment extends \MapasCulturais\Entity {
         }
     }
 
-    function setRegistration(\MapasCulturais\Entities\Registration $registration) {
-        $this->registration = $registration;
-        $this->opportunity = $registration->opportunity;
-    } 
+    // function setRegistration(\MapasCulturais\Entities\Registration $registration) {
+    //     $this->registration = $registration;
+    //     $this->opportunity = $registration->opportunity;
+    // } 
 
     protected function canUserCreate($user)
     {

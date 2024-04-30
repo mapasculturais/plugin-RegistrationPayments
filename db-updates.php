@@ -56,4 +56,46 @@ return [
             $app->enableAccessControl();
         }
     },
+    'Ajusta campo Metadada dos pagamentos' => function () use ($app, $em, $conn) {
+
+        if ($payments = $conn->fetchAll('SELECT * FROM payment')) {
+            $app->disableAccessControl();
+            foreach ($payments as $key => $payment) {
+                $_payment = $app->repo("\\RegistrationPayments\\Payment")->find($payment['id']);
+                $metadata = $_payment->metadata;
+
+                if (!is_array($metadata)) {
+                    $result = str_replace(['\\'], '', $metadata);
+                    $padrao = '/,"identifier":\["[^"]+"\]}/';
+                    if ($res = json_decode($result, true)) {
+                        $_payment->metadata = $res;
+                    } else {
+                        $result = str_replace(['\\', '{"0":'], '', $metadata);
+                        $resultado = preg_replace($padrao, '', $result);
+                        $pattern = '/^"*|(?<!")"$/';
+                        $str = preg_replace($pattern, '', $resultado);
+                        $str = str_replace("\\", "\\\\", $str);
+                        $str = str_replace(['"""""', '""'], '', $str) . '"}';
+                        $str = str_replace(['","OBSERVACOES":,'], '","OBSERVACOES":"",', $str);
+                        $str = str_replace(['""}'], '"}', $str);
+                        $str = str_replace(['"}"}'], '"}', $str);
+
+                        if ($res = json_decode($str, true)) {
+                            $_payment->metadata = $res;
+                        } else {
+                            $str = str_replace(['"}"}'], '"}', $str) . '}';
+                            if ($res = json_decode($str, true)) {
+                                $_payment->metadata = $res;
+                            }
+                        }
+                    }
+                    $app->log->debug("Coluna metadada do pagamento {$_payment->id} Ajustada");
+                    $_payment->save(true);
+                    $app->em->clear();
+                }
+            }
+
+            $app->enableAccessControl();
+        }
+    }
 ];

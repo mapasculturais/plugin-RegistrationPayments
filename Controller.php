@@ -273,6 +273,10 @@ class Controller extends \MapasCulturais\Controllers\EntityController
     public function POST_createMultiple($data = null)
     {
 
+        //Seta o timeout
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '768M');   
+
         $this->requireAuthentication();
 
         $app = App::i();
@@ -292,7 +296,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "category"){
-            $registrations = $app->repo('Registration')->findBy(['category' => $data[$create_type], 'opportunity' => $lastPhase->id]);
+            $registrations = $app->repo('Registration')->findBy(['category' => trim($data[$create_type]), 'opportunity' => $lastPhase->id, 'status' => '10']);
 
             if (!$registrations) {
                 $errors[] = i::__("Não foram encontradas inscrições na categoria {$data[$create_type]}");
@@ -310,7 +314,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $ids = explode($delimiter,$data[$create_type]);
             
             $ids = array_filter($ids);
-            $registrations = $app->repo('Registration')->findBy(['number' => $ids, 'opportunity' => $lastPhase->id]);
+            $registrations = $app->repo('Registration')->findBy(['number' => $ids, 'opportunity' => $lastPhase->id , 'status' => '10']);
 
             if (!$registrations) {
                 $errors[] = i::__('As inscrições fornecidas não foram encontradas. Lembre-se de que, para efetuar o cadastro de um pagamento, as inscrições devem estar na última fase, ou seja, na etapa de "Publicação final do resultado".');
@@ -319,7 +323,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         if($create_type == "registrationStatus"){
-            $registrations = $app->repo('Registration')->findBy(['status' => $data[$create_type], 'opportunity' => $lastPhase->id]);
+            $registrations = $app->repo('Registration')->findBy(['status' => '10', 'opportunity' => $lastPhase->id]);
 
             if (!$registrations) {
                 $status_description = Registration::getStatusNameById($data[$create_type]); 

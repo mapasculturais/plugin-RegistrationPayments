@@ -38,6 +38,7 @@ app.component('create-payment', {
         return {
             response: {},
             payment: this.skeleton(),
+            loading: false
         }
     },
 
@@ -74,7 +75,10 @@ app.component('create-payment', {
                 this.payment.registrationStatus = 10;
             }
 
+            this.loading = true;
             api.POST(url, this.payment).then(res => res.json()).then(data => {
+                this.loading = false;
+
                 if (data?.error) {
                     messages.error(this.text('createPaymentsError'));
                     this.response = data

@@ -10,6 +10,7 @@ use MapasCulturais\i;
 $this->import('
     mc-modal
     mc-icon
+    mc-loading
     mc-select
     mc-status
 ');
@@ -17,8 +18,11 @@ $this->import('
 <div class="create-payment">
     <mc-modal title="<?= i::__('Criar pagamentos:') ?>">
         <template #actions="modal">
-            <button class="button button--primary" @click="save(modal)"><?= i::__('Salvar') ?></button>
-            <button class="button button--text button--text-del" @click="modal.close()"><?= i::__('cancelar') ?></button>
+            <mc-loading :condition="loading"></mc-loading>
+            <span v-if="!loading">
+                <button class="button button--primary" @click="save(modal)"><?= i::__('Salvar') ?></button>
+                <button class="button button--text button--text-del" @click="modal.close()"><?= i::__('cancelar') ?></button>
+            </span>
         </template>
 
         <template #default>

@@ -132,12 +132,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $dql_to = "";
         $dql_from = "";
+        $join_period =  "";
         if($from && $to) {
+            $dql_params['firstPhase'] = $opportunity->firstPhase->id;
             $dql_params['from'] = $from->format('Y-m-d') ?: '';
-            $dql_from = $from ? " e.sentTimestamp >= :from AND " : '';
+            $dql_from = $from ? " r.sentTimestamp >= :from AND " : '';
     
             $dql_params['to'] = $to->format('Y-m-d') ?: '';
-            $dql_to = $to ? " e.sentTimestamp <= :to AND " : '';
+            $dql_to = $to ? " r.sentTimestamp <= :to " : '';
+            $join_period = "JOIN MapasCulturais\Entities\Registration r WITH e.number = r.number AND r.opportunity = :firstPhase AND {$dql_from} {$dql_to}";
         }
 
         $dql = "
@@ -145,16 +148,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 e
             FROM
                 MapasCulturais\Entities\Registration e
+                {$join_period}
             WHERE
-                $dql_to
-                $dql_from
                 e.opportunity = :opportunity_Id AND
                 e.status = :registration_status";
 
         $query = $app->em->createQuery($dql);
 
         $query->setParameters(array_filter($dql_params));
-
         return $query->getResult();
         
     }

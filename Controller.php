@@ -1013,7 +1013,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 }
             }
 
-            $app->em->clear();
+            // $app->em->clear();
         }
 
         $app->enableAccessControl();

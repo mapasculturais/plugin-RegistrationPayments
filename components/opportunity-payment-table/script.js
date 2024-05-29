@@ -55,8 +55,9 @@ app.component('opportunity-payment-table', {
                     let url = file.url;
                     let id = file.id;
                     let processed = false;
+                    let entityFile = file;
                 
-                    this.importedFiles[name] = {id, name, url,processed };
+                    this.importedFiles[name] = {id, name, url,processed, entityFile};
                 });
                 
                 if(this.paymentProcessedFiles) {
@@ -264,6 +265,12 @@ app.component('opportunity-payment-table', {
                     messages.success(this.text('processSuccess'));
                 }
             });
+        },
+        deletePaymentUnprocessedFile(file) {
+            const messages = useMessages();
+            delete this.paymentProcessed[file.name];
+            file.entityFile.delete();
+            messages.success(this.text('successDeletePaymentFile'));
         }
     },
 });

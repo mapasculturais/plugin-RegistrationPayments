@@ -12,4 +12,5 @@ return [
     'processSuccess' => i::__('Validador financeiro processado com sucesso'),
     'processError' => i::__('Validador financeiro processado com sucesso'),
     'toThe' => i::__('às'),
+    'successDeletePaymentFile' => i::__('Validador financeiro deletado com sucesso'),
 ];

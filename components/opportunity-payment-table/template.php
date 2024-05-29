@@ -51,7 +51,7 @@ $url = $app->createUrl('payment', 'export');
         </template>
 
         <template #advanced-actions="{entities}">
-            <div class="grid-12">
+            <div class="grid-12 advanced-actions">
                 <div v-if="paymentProcessed" class="col-6">
                     <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
 
@@ -60,9 +60,21 @@ $url = $app->createUrl('payment', 'export');
                             <mc-icon name="download"></mc-icon>
                             {{file.name.slice(0, 25)}}... 
                         </div>
-                        <button v-if="!file.processed" @click="processFile(file)" class="button button--primary--button button--icon">
-                            <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
-                        </button>
+                        <div class="opportunity-payment-table__advanced-actions">
+                            <button v-if="!file.processed" @click="processFile(file)" class="button button--primary--button button--icon">
+                                <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
+                            </button>
+
+                            <mc-confirm-button v-if="!file.processed"  @confirm="deletePaymentUnprocessedFile(file)">
+                                <template #button="{open}">
+                                    <mc-icon name="trash" @click="open()"></mc-icon>
+                                </template>
+                                <template #message="message">
+                                    <?php i::_e('Deseja deletar o validador financeiro?') ?>
+                                </template>
+                            </mc-confirm-button>
+
+                        </div>
                         <div v-if="file.processed">- <?= i::__('Processado em') ?> {{file.dateTime}}</div>
                     </div>
                 </div>

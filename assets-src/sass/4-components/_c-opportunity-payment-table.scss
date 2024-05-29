@@ -30,4 +30,11 @@
         padding: 24px 38px 0;
         justify-content: flex-end;
     }
+
+    &__advanced-actions {
+        align-items: center;
+        display: flex;
+        gap: 18px;
+        margin-bottom: 7px;
+    }
 }

@@ -293,6 +293,17 @@ class Plugin extends \MapasCulturais\Plugin{
             $where .= " OR unaccent(lower(owner.name)) LIKE unaccent(lower(:keyword)) ";
         });
 
+        //Insere botão que ativa o pagamento dentro do mc-stepper-vertical
+        $app->hook('template(opportunity.edit.mc-stepper-vertical:after)', function() use ($app) {
+           /** @var Theme $this */ 
+           $this->part('payments/opportunity-payments-enable');
+        });
+
+        $app->hook('template(opportunity.edit.mc-stepper-vertical:end)', function() use ($app) {
+            /** @var Theme $this */ 
+            $this->part('payments/opportunity-payments-config');
+         });
+
     }
 
     function enqueueScriptsAndStyles() {

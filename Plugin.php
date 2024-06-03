@@ -317,9 +317,10 @@ class Plugin extends \MapasCulturais\Plugin{
             $self->enqueueScriptsAndStyles();
         });
 
-        $this->registerOpportunityMetadata('is_payment_phase', [
-            'label' => 'Será uma fase de pagamentos',
-            'type' => 'checkbox',
+        $this->registerOpportunityMetadata('has_payment_phase', [
+            'label' => 'Terá fase de pagamento',
+            'type' => 'boolean',
+            'default' => false,
         ]);
         
         $this->registerRegistrationMetadata('financial_validator_filename', [

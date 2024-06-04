@@ -311,7 +311,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
         $app = App::i();
         $app->registerController('payment', Controller::class);
-
+        
         $self = $this;
         $app->hook('view.includeAngularEntityAssets:after', function () use ($self) {
             $self->enqueueScriptsAndStyles();
@@ -353,7 +353,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'label' => i::__('Lotes exportados'),
             'type' => 'json',
             'private' => true,
-            'dafault' => '[]',
+            'default' => '[]',
         ]);
 
         $this->registerMetadata(
@@ -365,6 +365,63 @@ class Plugin extends \MapasCulturais\Plugin{
                 'default' => false,
             ]
         );
+
+        $app->hook("entity(Opportunity).registrationMetadata", function() {
+            if($this->has_payment_phase) {
+                $this->registerMetadata(
+                    'MapasCulturais\Entities\Opportunity',
+                    'cnab_company_data', 
+                    [
+                        'label' => i::__('Dados da empresa'),
+                        'type' => 'json',
+                        'default' => '[]'
+                    ]
+                );
+        
+                $this->registerMetadata(
+                    'MapasCulturais\Entities\Registration',
+                    'cnab_social_type',
+                    [
+                        'label' => i::__('Tipo social'),
+                        'type' => 'select',
+                        'options' => json_encode([
+                            1 => i::__('Pessoa física'),
+                            2 => i::__('Pessoa jurídica'),
+                        ])
+                    ]
+                );
+
+                $this->registerMetadata(
+                    'MapasCulturais\Entities\Registration',
+                    'cnab_proponent_name',
+                    [
+                        'label' => i::__('Nome do proponente'),
+                        'type' => 'string',
+                    ]
+                );
+
+                $this->registerMetadata(
+                    'MapasCulturais\Entities\Registration',
+                    'cnab_proponent_document',
+                    [
+                        'label' => i::__('Documento do proponente'),
+                        'type' => 'string',
+                    ]
+                );
+
+                $this->registerMetadata(
+                    'MapasCulturais\Entities\Registration',
+                    'cnab_bank_data', 
+                    [
+                        'label' => i::__('Dados do banco'),
+                        'type' => 'json',
+                        'default' => '[]'
+                    ]
+                );
+            }
+        });
+
+
         
         $app->registerFileGroup(
             'opportunity',

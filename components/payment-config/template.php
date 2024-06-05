@@ -9,6 +9,7 @@ use MapasCulturais\i;
 
 $this->import('
     opportunity-payment-table
+    mc-confirm-button
 ')
 
 ?>
@@ -22,8 +23,19 @@ $this->import('
             <a class="expand-stepper" v-if="step.active" @click="step.close()"><label><?= i::__('Diminuir') ?></label><mc-icon name="arrowPoint-up"></mc-icon></a>
             <a class="expand-stepper" v-if="!step.active" @click="step.open()"><label><?= i::__('Expandir') ?></label> <mc-icon name="arrowPoint-down"></mc-icon></a>  
         </header>
-        <main class="stepper-main" v-if="step.active">
-            <opportunity-payment-table :opportunity="entity"></opportunity-payment-table>
+        <main class="stepper-main grid-12" v-if="step.active">
+            <div class="phase-delete col-12">
+                <mc-confirm-button message="<?= i::esc_attr__('Confirma a execução da ação?')?>" @confirm="deletePaymentPhase()">
+                    <template #button="modal">
+                        <button class="phase-delete__trash button button--text button--sm" @click="modal.open()">
+                            <div class="icon">
+                                <mc-icon name="trash" class="secondary__color"></mc-icon> 
+                            </div>
+                            <h5><?= i::__("Excluir fase de pagamentos") ?></h5>
+                        </button>
+                    </template>
+                </mc-confirm-button>
+            </div>
         </main>
     </section>
 </li>

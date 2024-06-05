@@ -176,18 +176,6 @@ $url = $app->createUrl('payment', 'export');
     </entity-table>
 
     <div class="opportunity-payment-table__download-btn">
-        <div class="phase-delete">
-            <mc-confirm-button message="<?= i::esc_attr__('Confirma a execução da ação?')?>" @confirm="deletePaymentPhase()">
-                <template #button="modal">
-                    <button class="phase-delete__trash button button--text button--sm" @click="modal.open()">
-                        <div class="icon">
-                            <mc-icon name="trash" class="secondary__color"></mc-icon> 
-                        </div>
-                        <h5><?= i::__("Excluir fase de pagamentos") ?></h5>
-                    </button>
-                </template>
-            </mc-confirm-button>
-        </div>
         <export-filters-spreadsheet :entity="opportunity" :filters="filters"></export-filters-spreadsheet>
     </div>
 </div>

@@ -302,7 +302,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook('template(opportunity.edit.mc-stepper-vertical:end)', function() use ($app) {
             /** @var Theme $this */ 
             $this->part('payments/opportunity-payments-config');
-         });
+        });
 
     }
 

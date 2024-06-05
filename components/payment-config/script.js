@@ -54,6 +54,11 @@ app.component('payment-config', {
             } else {
                 this.open(index);
             }
-        }
+        },
+
+        deletePaymentPhase () {
+            this.entity.has_payment_phase = !this.entity.has_payment_phase;
+            this.entity.save();
+        },
     },
 });

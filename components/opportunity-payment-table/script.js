@@ -5,7 +5,7 @@ app.component('opportunity-payment-table', {
         opportunity: {
             type: Entity,
             required: true,
-        }
+        },
     },
     
     computed: {
@@ -271,6 +271,11 @@ app.component('opportunity-payment-table', {
             delete this.paymentProcessed[file.name];
             file.entityFile.delete();
             messages.success(this.text('successDeletePaymentFile'));
-        }
+        },
+
+        deletePaymentPhase () {
+            this.opportunity.has_payment_phase = !this.opportunity.has_payment_phase;
+            this.opportunity.save();
+        },
     },
 });

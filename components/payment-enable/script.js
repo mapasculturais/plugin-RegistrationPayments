@@ -9,11 +9,12 @@ app.component('payment-enable', {
     },
 
     computed: {
-       
+        
     },
 
     data() {
         return {
+
         }
     },
 

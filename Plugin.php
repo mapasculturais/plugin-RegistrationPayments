@@ -534,6 +534,13 @@ class Plugin extends \MapasCulturais\Plugin{
                 'O arquivo não e valido',
             )
         );
+
+        $app->hook("template(registration.view.single-tab):end", function() use ($self) {
+            $registration_class = $this->controller->requestedEntity;
+            if($registration_class->opportunity->has_payment_phase && $registration_class->status == 10) {
+                $this->part("registration/registration-tab", ['entity' => $registration_class]);
+            }
+        });
     }
 
     /**

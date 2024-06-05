@@ -541,6 +541,11 @@ class Plugin extends \MapasCulturais\Plugin{
                 $this->part("registration/registration-tab", ['entity' => $registration_class]);
             }
         });
+
+                
+        $app->hook("component(opportunity-phases-timeline).item:end", function() use ($self) {
+            //Criar part e componente da timeline
+        });
     }
 
     /**

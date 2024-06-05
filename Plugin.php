@@ -439,8 +439,12 @@ class Plugin extends \MapasCulturais\Plugin{
                     'MapasCulturais\Entities\Registration',
                     'payment_social_type',
                     [
-                        'label' => i::__('Tipo social'),
-                        'type' => 'string'
+                        'label' => 'ALGO',
+                        'type' => 'select',
+                        'options' => [
+                            1 => i::__('Pessoa física'),
+                            2 => i::__('Pessoa jurídica'),
+                        ]
                     ]
                 );
 

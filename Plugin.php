@@ -366,21 +366,66 @@ class Plugin extends \MapasCulturais\Plugin{
             ]
         );
 
-        $app->hook("entity(Opportunity).registrationMetadata", function() {
+        $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {
             if($this->has_payment_phase) {
-                $this->registerMetadata(
-                    'MapasCulturais\Entities\Opportunity',
-                    'cnab_company_data', 
-                    [
-                        'label' => i::__('Dados da empresa'),
-                        'type' => 'json',
-                        'default' => '[]'
-                    ]
-                );
+                $self->registerOpportunityMetadata('payment_name', [
+                    'label' => i::__('Nome do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_registration_type', [
+                    'label' => i::__('Tipo de registro do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_registration_number', [
+                    'label' => i::__('Número do registro do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_branch', [
+                    'label' => i::__('Agência do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_branch_dv', [
+                    'label' => i::__('Dígito verificador do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_account', [
+                    'label' => i::__('Conta do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_account_dv', [
+                    'label' => i::__('Dígito verificador do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_file_sequential_number', [
+                    'label' => i::__('Número sequencial do pagamento'),
+                    'type' => 'integer',
+                    'default' => 1
+                ]);
+                $self->registerOpportunityMetadata('payment_agreement', [
+                    'label' => i::__('Convênio do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_collection', [
+                    'label' => i::__('Cobrança do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_file_status', [
+                    'label' => i::__('Status do arquivo do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_uso_bb1', [
+                    'label' => i::__('Uso interno do banco do pagamento'),
+                    'type' => 'string',
+                ]);
+                $self->registerOpportunityMetadata('payment_operation', [
+                    'label' => i::__('Operação do pagamento'),
+                    'type' => 'string',
+                    'default' => 'C'
+                ]);
         
-                $this->registerMetadata(
+                $self->registerMetadata(
                     'MapasCulturais\Entities\Registration',
-                    'cnab_social_type',
+                    'payment_social_type',
                     [
                         'label' => i::__('Tipo social'),
                         'type' => 'select',
@@ -391,33 +436,49 @@ class Plugin extends \MapasCulturais\Plugin{
                     ]
                 );
 
-                $this->registerMetadata(
+                $self->registerMetadata(
                     'MapasCulturais\Entities\Registration',
-                    'cnab_proponent_name',
+                    'payment_proponent_name',
                     [
                         'label' => i::__('Nome do proponente'),
                         'type' => 'string',
+                        'default' => ''
                     ]
                 );
 
-                $this->registerMetadata(
+                $self->registerMetadata(
                     'MapasCulturais\Entities\Registration',
-                    'cnab_proponent_document',
+                    'payment_proponent_document',
                     [
                         'label' => i::__('Documento do proponente'),
                         'type' => 'string',
                     ]
                 );
 
-                $this->registerMetadata(
-                    'MapasCulturais\Entities\Registration',
-                    'cnab_bank_data', 
-                    [
-                        'label' => i::__('Dados do banco'),
-                        'type' => 'json',
-                        'default' => '[]'
-                    ]
-                );
+                $self->registerRegistrationMetadata('payment_account_type', [
+                    'label' => i::__('Tipo de conta'),
+                    'type' => 'string',
+                ]);
+                $self->registerRegistrationMetadata('payment_bank', [
+                    'label' => i::__('Banco'),
+                    'type' => 'string',
+                ]);
+                $self->registerRegistrationMetadata('payment_branch', [
+                    'label' => i::__('Agência'),
+                    'type' => 'string',
+                ]);
+                $self->registerRegistrationMetadata('payment_branch_dv', [
+                    'label' => i::__('Dígito verificador da agência'),
+                    'type' => 'string',
+                ]);
+                $self->registerRegistrationMetadata('payment_account', [
+                    'label' => i::__('Conta'),
+                    'type' => 'string',
+                ]);
+                $self->registerRegistrationMetadata('payment_account_dv', [
+                    'label' => i::__('Dígito verificador da conta'),
+                    'type' => 'string',
+                ]);
             }
         });
 

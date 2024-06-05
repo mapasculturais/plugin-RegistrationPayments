@@ -26,4 +26,3 @@ $this->import('
     </mc-tab>
 </div>
 
-{{entity.has_payment_phase}}

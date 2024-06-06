@@ -16,7 +16,7 @@ $this->import('
 
 ?>
 
-<li v-if="global.mcTabActive == 'config' " v-for="(step, index) in steps" :class="{active: step.active}">
+<li v-if="global.mcTabActive == 'config' && entity.has_payment_phase" v-for="(step, index) in steps" :class="{active: step.active}">
     <section class="stepper-step">
         <header :class="['stepper-header', {'open':step.active}]">
             <div class="stepper-header__content">

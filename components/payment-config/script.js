@@ -64,6 +64,18 @@ app.component('payment-config', {
         deletePaymentPhase () {
             this.entity.has_payment_phase = !this.entity.has_payment_phase;
             this.entity.save();
+            this.unregisterProperties();
         },
+        unregisterProperties() {
+            delete $DESCRIPTIONS.opportunity.payment_company_data_name
+            delete $DESCRIPTIONS.opportunity.payment_company_data_registration_type
+            delete $DESCRIPTIONS.opportunity.payment_company_data_registration_number
+            delete $DESCRIPTIONS.opportunity.payment_company_data_bank
+            delete $DESCRIPTIONS.opportunity.payment_company_data_branch
+            delete $DESCRIPTIONS.opportunity.payment_company_data_branch_dv
+            delete $DESCRIPTIONS.opportunity.payment_company_data_account
+            delete $DESCRIPTIONS.opportunity.payment_company_data_account_dv
+            delete $DESCRIPTIONS.opportunity.payment_company_data_agreement
+        }
     },
 });

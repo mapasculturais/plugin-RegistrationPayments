@@ -37,6 +37,11 @@ app.component('payment-config', {
     },
 
     methods: {
+        documentMask() {
+            let social_type = this.entity.payment_company_data_registration_type;
+            return !social_type || social_type == 1 ? "###.###.###-##" : "##.###.###/####-##"
+        },
+
         open(index) {
             if (!this.allowMultiple) {
                 this.activeItems = {};

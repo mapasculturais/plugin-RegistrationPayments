@@ -38,6 +38,7 @@ $this->import('
             <h3><?= i::__('Dados bancários do proponente') ?></h3>
 
             <div class="grid-12">
+                <!-- Faze v-if para todos os campos e desativar o botão enviar -->
                 <div class="col-12">
                     <entity-field :entity="entity" prop="payment_account_type" :autosave="3000"></entity-field>
                 </div>
@@ -61,8 +62,6 @@ $this->import('
                     <entity-field :entity="entity" prop="payment_account_dv" :autosave="3000"></entity-field>
                 </div>
             </div>
-
-
         </mc-card>
     </div>
 </mc-tab>

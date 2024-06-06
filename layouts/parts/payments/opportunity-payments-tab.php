@@ -20,9 +20,7 @@ $this->import('
     </mc-alert>
 </template> -->
 
-<div v-if="entity.has_payment_phase" class="payment-tab__container">
-    <mc-tab label="<?= i::__('Pagamentos') ?>" slug="payment">
-        <opportunity-payment-table :opportunity="entity"></opportunity-payment-table>
-    </mc-tab>
-</div>
+<mc-tab v-if="entity.has_payment_phase" label="<?= i::__('Pagamentos') ?>" slug="payment">
+    <opportunity-payment-table :opportunity="entity"></opportunity-payment-table>
+</mc-tab>
 

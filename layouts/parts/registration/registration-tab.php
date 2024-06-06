@@ -29,7 +29,7 @@ $this->import('
                 </div>
 
                 <div class="col-6">
-                    <entity-field :entity="entity" prop="payment_proponent_document" :autosave="3000"></entity-field>
+                    <entity-field :entity="entity" prop="payment_proponent_document" :autosave="3000" mask="['###.###.###-##', '##.###.###/####-##']"></entity-field>
                 </div>
             </div>
         </mc-card>
@@ -50,7 +50,7 @@ $this->import('
                     <entity-field :entity="entity" prop="payment_branch" :autosave="3000"></entity-field>
                 </div>
                 <div class="col-6">
-                    <entity-field :entity="entity" prop="payment_branch_dv" :autosave="3000"></entity-field>
+                    <entity-field :entity="entity" prop="payment_branch_dv" :autosave="3000" mask="**"></entity-field>
                 </div>
 
                 <div class="col-6">

@@ -804,14 +804,22 @@ class Plugin extends \MapasCulturais\Plugin{
 
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
             $registration_class = $this->controller->requestedEntity;
+            
             if($registration_class->opportunity->has_payment_phase && $registration_class->status == 10) {
-                $this->part("registration/registration-tab", ['entity' => $registration_class]);
+                $this->part("registration/registration-payment-tab", ['entity' => $registration_class]);
             }
         });
 
-                
         $app->hook("component(opportunity-phases-timeline).item:end", function() use ($self) {
             //Criar part e componente da timeline
+        });
+
+        $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
+            $opportunity = $this->opportunity;
+
+            if($opportunity->firstPhase->has_payment_phase && $this->status == 10) {
+                $result = true;
+            }
         });
     }
 

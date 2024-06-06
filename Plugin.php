@@ -378,75 +378,81 @@ class Plugin extends \MapasCulturais\Plugin{
             ]
         );
 
-        $this->registerOpportunityMetadata('payment_company_data_name', [
-            'label' => i::__('Nome ou Razão Social'),
-            'type' => 'string',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("Nome ou Razão Social é obrigatório")
-            ]
-        ]);
-
-        $this->registerOpportunityMetadata('payment_company_data_registration_type', [
-            'label' => i::__('Tipo social'),
-            'type' => 'select',
-            'options' => [
-                1 => i::__('Pessoa física - CPF'),
-                2 => i::__('Pessoa jurídica - CNPJ'),
-            ],
-            'validations' => [
-                'required' => \MapasCulturais\i::__("Tipo social é obrigatório")
-            ]
-        ]);
-
-        $this->registerOpportunityMetadata('payment_company_data_registration_number', [
-            'label' => i::__('CPF/CNPJ'),
-            'type' => 'string',
-            'field_type' => 'fieldMask',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("CPF/CNPJ é obrigatório")
-            ]
-        ]);
-
-        $this->registerOpportunityMetadata('payment_company_data_bank', [
-            'label' => i::__('Banco'),
-            'type' => 'string',
-            'default' => '001'
-        ]);
-
-        $this->registerOpportunityMetadata('payment_company_data_branch', [
-            'label' => i::__('Agência'),
-            'type' => 'string',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("A dígito agência é obrigatória")
-            ]
-        ]);
+        $app->hook('<<GET|PUT|PATCH|DELETE>>(<<opportunity|payment>>.<<*>>):before', function() use ($self) {
+            $opportunity = $this->getRequestedEntity();
+            
+            if($opportunity->has_payment_phase) {
+                $self->registerOpportunityMetadata('payment_company_data_name', [
+                    'label' => i::__('Nome ou Razão Social'),
+                    'type' => 'string',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("Nome ou Razão Social é obrigatório")
+                    ]
+                ]);
         
-        $this->registerOpportunityMetadata('payment_company_data_branch_dv', [
-            'label' => i::__('Dígito verificador da agência'),
-            'type' => 'string'
-        ]);
-        $this->registerOpportunityMetadata('payment_company_data_account', [
-            'label' => i::__('Conta'),
-            'type' => 'string',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("A conta é obrigatória")
-            ]
-        ]);
-        $this->registerOpportunityMetadata('payment_company_data_account_dv', [
-            'label' => i::__('Dígito verificador da conta'),
-            'type' => 'string',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("O dígito verificador da conta é obrigatório")
-            ]
-        ]);
-       
-        $this->registerOpportunityMetadata('payment_company_data_agreement', [
-            'label' => i::__('Convênio'),
-            'type' => 'string',
-            'validations' => [
-                'required' => \MapasCulturais\i::__("O Convênio é obrigatório")
-            ]
-        ]);
+                $self->registerOpportunityMetadata('payment_company_data_registration_type', [
+                    'label' => i::__('Tipo social'),
+                    'type' => 'select',
+                    'options' => [
+                        1 => i::__('Pessoa física - CPF'),
+                        2 => i::__('Pessoa jurídica - CNPJ'),
+                    ],
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("Tipo social é obrigatório")
+                    ]
+                ]);
+        
+                $self->registerOpportunityMetadata('payment_company_data_registration_number', [
+                    'label' => i::__('CPF/CNPJ'),
+                    'type' => 'string',
+                    'field_type' => 'fieldMask',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("CPF/CNPJ é obrigatório")
+                    ]
+                ]);
+        
+                $self->registerOpportunityMetadata('payment_company_data_bank', [
+                    'label' => i::__('Banco'),
+                    'type' => 'string',
+                    'default' => '001'
+                ]);
+        
+                $self->registerOpportunityMetadata('payment_company_data_branch', [
+                    'label' => i::__('Agência'),
+                    'type' => 'string',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("A dígito agência é obrigatória")
+                    ]
+                ]);
+                
+                $self->registerOpportunityMetadata('payment_company_data_branch_dv', [
+                    'label' => i::__('Dígito verificador da agência'),
+                    'type' => 'string'
+                ]);
+                $self->registerOpportunityMetadata('payment_company_data_account', [
+                    'label' => i::__('Conta'),
+                    'type' => 'string',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("A conta é obrigatória")
+                    ]
+                ]);
+                $self->registerOpportunityMetadata('payment_company_data_account_dv', [
+                    'label' => i::__('Dígito verificador da conta'),
+                    'type' => 'string',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("O dígito verificador da conta é obrigatório")
+                    ]
+                ]);
+               
+                $self->registerOpportunityMetadata('payment_company_data_agreement', [
+                    'label' => i::__('Convênio'),
+                    'type' => 'string',
+                    'validations' => [
+                        'required' => \MapasCulturais\i::__("O Convênio é obrigatório")
+                    ]
+                ]);
+            }
+        });
        
 
         $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {

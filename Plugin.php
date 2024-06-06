@@ -818,10 +818,15 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {
-            $registration_class = $this->controller->requestedEntity;
-            
-            if($registration_class->opportunity->has_payment_phase && $registration_class->status == 10) {
-                $this->part("registration/registration-payment-timeline");
+            $entity = $this->controller->requestedEntity;
+            if($entity instanceof \MapasCulturais\Entities\Registration) {
+                if($entity->opportunity->firstPhase->has_payment_phase && $entity->lastPhase->status == 10) {
+                    $this->part("registration/registration-payment-timeline", ['isOpportunity' => false]);
+                }
+            } elseif ($entity instanceof \MapasCulturais\Entities\Opportunity) {
+                if($entity->firstPhase->has_payment_phase) {
+                    $this->part("registration/registration-payment-timeline", ['isOpportunity' => true]);
+                }
             }
         });
 

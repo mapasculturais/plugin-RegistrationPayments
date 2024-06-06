@@ -23,17 +23,33 @@ app.component('registration-payment-tab', {
         }
     },
 
+    watch: {
+        'entity.payment_sent_timestamp'(_new, _old){
+            console.log(_new)
+            if(this.entity.payment_sent_timestamp !== null || this.entity.payment_sent_timestamp !== '') {
+                this.dataSent = true;
+            }
+        }
+    },
+
     methods: {
         sendPaymentData() { 
             this.entity.payment_sent_timestamp = new Date();
             this.entity.save();
 
             this.dataSent = true;
+        },
+
+        formatDate(value) {
+            if(value) {
+                let date = new McDate(value);
+                return `${date.date('numeric year')} ${this.text('as')} ${date.time('numeric')} `;
+            }
         }
     },
 
     mounted() {
-        if(this.entity.payment_sent_timestamp !== null) {
+        if(this.entity.payment_sent_timestamp !== null || this.entity.payment_sent_timestamp !== '') {
             this.dataSent = true;
         }
     }

@@ -16,6 +16,8 @@ $this->import('
 
 <mc-tab label="<?= i::_e('Dados de pagamento') ?>" slug="payment">
     <div class="registration__content">
+        <h4 class="bold" v-if="dataSent"><?= i::__('Dados enviados no dia') ?>: {{formatDate(entity.payment_sent_timestamp)}}</h4>
+        
         <mc-card>
             <h3><?= i::__('Dados do proponente') ?></h3>
 

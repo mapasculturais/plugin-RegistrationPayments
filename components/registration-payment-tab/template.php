@@ -16,13 +16,12 @@ $this->import('
 
 <mc-tab label="<?= i::_e('Dados de pagamento') ?>" slug="payment">
     <div class="registration__content">
-        <h4 class="bold" v-if="dataSent"><?= i::__('Dados enviados no dia') ?>: {{formatDate(entity.payment_sent_timestamp)}}</h4>
-        
+        <h4 class="bold" v-if="!isEditable()"><?= i::__('Dados enviados no dia') ?>: {{formatDate(entity.payment_sent_timestamp)}}</h4>
         <mc-card>
             <h3><?= i::__('Dados do proponente') ?></h3>
 
             <div class="grid-12">
-                <div v-if="!dataSent" class="col-12">
+                <div v-if="isEditable()" class="col-12">
                     <entity-field :entity="entity" prop="payment_proponent_name"></entity-field>
                 </div>
                 <div v-else class="col-12 field">
@@ -30,7 +29,7 @@ $this->import('
                     <input id="payment_proponent_name" :value="entity.payment_proponent_name" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_social_type"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -38,7 +37,7 @@ $this->import('
                     <input id="payment_social_type" :value="entity.payment_social_type" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_proponent_document" mask="['###.###.###-##', '##.###.###/####-##']"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -52,7 +51,7 @@ $this->import('
             <h3><?= i::__('Dados bancários do proponente') ?></h3>
 
             <div class="grid-12">
-                <div v-if="!dataSent" class="col-12">
+                <div v-if="isEditable()" class="col-12">
                     <entity-field :entity="entity" prop="payment_account_type"></entity-field>
                 </div>
                 <div v-else class="col-12 field">
@@ -60,7 +59,7 @@ $this->import('
                     <input id="payment_account_type" :value="entity.payment_account_type" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-12">
+                <div v-if="isEditable()" class="col-12">
                     <entity-field :entity="entity" prop="payment_bank"></entity-field>
                 </div>
                 <div v-else class="col-12 field">
@@ -68,7 +67,7 @@ $this->import('
                     <input id="payment_bank" :value="entity.payment_bank" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_branch"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -76,7 +75,7 @@ $this->import('
                     <input id="payment_branch" :value="entity.payment_branch" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_branch_dv" mask="**"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -84,7 +83,7 @@ $this->import('
                     <input id="payment_branch_dv" :value="entity.payment_branch_dv" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_account"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -92,7 +91,7 @@ $this->import('
                     <input id="payment_account" :value="entity.payment_account" type="text" autocomplete="off" disabled>
                 </div>
 
-                <div v-if="!dataSent" class="col-6">
+                <div v-if="isEditable()" class="col-6">
                     <entity-field :entity="entity" prop="payment_account_dv"></entity-field>
                 </div>
                 <div v-else class="col-6 field">
@@ -102,6 +101,6 @@ $this->import('
             </div>
         </mc-card>
         
-        <button class="button button--primary" @click="sendPaymentData" :disabled="dataSent"><?= i::__('Enviar') ?></button>
+        <button class="button button--primary" @click="sendPaymentData" :disabled="!isEditable()"><?= i::__('Enviar') ?></button>
     </div>
 </mc-tab>

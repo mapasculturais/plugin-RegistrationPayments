@@ -13,6 +13,7 @@ use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
 use RegistrationPayments\JobTypes\GenerateCnab;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
+use DateTime;
 
 require_once 'vendor/autoload.php';
 class Plugin extends \MapasCulturais\Plugin{
@@ -766,7 +767,17 @@ class Plugin extends \MapasCulturais\Plugin{
                 ]);
                 $self->registerRegistrationMetadata('payment_sent_timestamp', [
                     'label' => i::__('Data de envio dos dados de pagamento'),
-                    'type' => 'DateTime',
+                    'type' => 'string',
+                    'serialize' => function($value) {
+                        if($value) {
+                            return (new DateTime('now'))->format('Y-m-d H:i:s');
+                        }
+                    },
+                    'unserialize' => function($value) {
+                        if($value) {
+                            return (new DateTime($value))->format('Y-m-d H:i:s');
+                        }
+                    }
                 ]);
             }
         });

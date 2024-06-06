@@ -810,8 +810,12 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
-        $app->hook("component(opportunity-phases-timeline).item:end", function() use ($self) {
-            //Criar part e componente da timeline
+        $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {
+            $registration_class = $this->controller->requestedEntity;
+            
+            if($registration_class->opportunity->has_payment_phase && $registration_class->status == 10) {
+                $this->part("registration/registration-payment-timeline");
+            }
         });
 
         $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {

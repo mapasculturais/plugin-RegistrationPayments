@@ -844,7 +844,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
             $opportunity = $this->opportunity;
 
-            if($opportunity->firstPhase->has_payment_phase && $this->status == 10) {
+            if($opportunity->firstPhase->has_payment_phase && $this->status == 10 && !$this->payment_sent_timestamp) {
                 $result = true;
             }
         });

@@ -12,9 +12,11 @@ use MapasCulturais\i;
 <div class="item">
     <div class="item__dot"> <span class="dot"></span> </div>
     <div class="item__content--title">
-        <?= i::__('Dados de pagamento') ?>
-    </div>
-    <div class="item__content--description">
-        <button class="button button--primary" @click="changeTab"><?= i::__('Inserir dados de pagamento') ?></button>
+        <div>
+            <?= i::__('Dados de pagamento') ?>
+        </div>
+        <div>
+            <button v-if="!isOpportunity" class="button button--primary" @click="changeTab"><?= i::__('Inserir dados de pagamento') ?></button>
+        </div>
     </div>
 </div>

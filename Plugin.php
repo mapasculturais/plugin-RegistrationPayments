@@ -378,63 +378,80 @@ class Plugin extends \MapasCulturais\Plugin{
             ]
         );
 
+        $this->registerOpportunityMetadata('payment_company_data_name', [
+            'label' => i::__('Nome ou Razão Social'),
+            'type' => 'string',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("Nome ou Razão Social é obrigatório")
+            ]
+        ]);
+
+        $this->registerOpportunityMetadata('payment_company_data_registration_type', [
+            'label' => i::__('Tipo social'),
+            'type' => 'select',
+            'options' => [
+                1 => i::__('Pessoa física - CPF'),
+                2 => i::__('Pessoa jurídica - CNPJ'),
+            ],
+            'validations' => [
+                'required' => \MapasCulturais\i::__("Tipo social é obrigatório")
+            ]
+        ]);
+
+        $this->registerOpportunityMetadata('payment_company_data_registration_number', [
+            'label' => i::__('CPF/CNPJ'),
+            'type' => 'string',
+            'field_type' => 'fieldMask',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("CPF/CNPJ é obrigatório")
+            ]
+        ]);
+
+        $this->registerOpportunityMetadata('payment_company_data_bank', [
+            'label' => i::__('Banco'),
+            'type' => 'string',
+            'default' => '001'
+        ]);
+
+        $this->registerOpportunityMetadata('payment_company_data_branch', [
+            'label' => i::__('Agência'),
+            'type' => 'string',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("A dígito agência é obrigatória")
+            ]
+        ]);
+        
+        $this->registerOpportunityMetadata('payment_company_data_branch_dv', [
+            'label' => i::__('Dígito verificador da agência'),
+            'type' => 'string'
+        ]);
+        $this->registerOpportunityMetadata('payment_company_data_account', [
+            'label' => i::__('Conta'),
+            'type' => 'string',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("A conta é obrigatória")
+            ]
+        ]);
+        $this->registerOpportunityMetadata('payment_company_data_account_dv', [
+            'label' => i::__('Dígito verificador da conta'),
+            'type' => 'string',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("O dígito verificador da conta é obrigatório")
+            ]
+        ]);
+       
+        $this->registerOpportunityMetadata('payment_company_data_agreement', [
+            'label' => i::__('Convênio'),
+            'type' => 'string',
+            'validations' => [
+                'required' => \MapasCulturais\i::__("O Convênio é obrigatório")
+            ]
+        ]);
+       
+
         $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {
             if($this->has_payment_phase) {
-                $self->registerOpportunityMetadata('payment_name', [
-                    'label' => i::__('Nome do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_registration_type', [
-                    'label' => i::__('Tipo de registro do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_registration_number', [
-                    'label' => i::__('Número do registro do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_branch', [
-                    'label' => i::__('Agência do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_branch_dv', [
-                    'label' => i::__('Dígito verificador do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_account', [
-                    'label' => i::__('Conta do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_account_dv', [
-                    'label' => i::__('Dígito verificador do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_file_sequential_number', [
-                    'label' => i::__('Número sequencial do pagamento'),
-                    'type' => 'integer',
-                    'default' => 1
-                ]);
-                $self->registerOpportunityMetadata('payment_agreement', [
-                    'label' => i::__('Convênio do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_collection', [
-                    'label' => i::__('Cobrança do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_file_status', [
-                    'label' => i::__('Status do arquivo do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_uso_bb1', [
-                    'label' => i::__('Uso interno do banco do pagamento'),
-                    'type' => 'string',
-                ]);
-                $self->registerOpportunityMetadata('payment_operation', [
-                    'label' => i::__('Operação do pagamento'),
-                    'type' => 'string',
-                    'default' => 'C'
-                ]);
-        
+
                 $self->registerMetadata(
                     'MapasCulturais\Entities\Registration',
                     'payment_social_type',

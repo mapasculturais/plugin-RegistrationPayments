@@ -764,10 +764,12 @@ class Plugin extends \MapasCulturais\Plugin{
                         'required' => \MapasCulturais\i::__("O Dígito verificador da conta obrigatória")
                     ]
                 ]);
+                $self->registerRegistrationMetadata('payment_sent_timestamp', [
+                    'label' => i::__('Data de envio dos dados de pagamento'),
+                    'type' => 'DateTime',
+                ]);
             }
         });
-
-
         
         $app->registerFileGroup(
             'opportunity',

@@ -811,7 +811,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
             $registration = $this->controller->requestedEntity;
             if($registration->opportunity->firstPhase->has_payment_phase && $registration->lastPhase->status == 10) {
-                $this->part("registration/registration-tab", ['entity' => $registration]);
+                $this->part("registration/registration-payment-tab", ['entity' => $registration]);
             }
         });
 

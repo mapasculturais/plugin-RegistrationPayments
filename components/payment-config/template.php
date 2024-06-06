@@ -20,7 +20,7 @@ $this->import('
     <section class="stepper-step">
         <header :class="['stepper-header', {'open':step.active}]">
             <div class="stepper-header__content">
-                <h3 class="info__title"><?= i::__('Configuração de pagamentos') ?></h3>
+                <h3 class="info__title"><?= i::__('Fase de pagamentos') ?></h3>
             </div>
             <a class="expand-stepper" v-if="step.active" @click="step.close()"><label><?= i::__('Diminuir') ?></label><mc-icon name="arrowPoint-up"></mc-icon></a>
             <a class="expand-stepper" v-if="!step.active" @click="step.open()"><label><?= i::__('Expandir') ?></label> <mc-icon name="arrowPoint-down"></mc-icon></a>

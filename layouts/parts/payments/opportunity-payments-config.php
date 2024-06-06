@@ -10,4 +10,4 @@ $this->import('
 ')
 ?>
 
-<payment-config :entity="items[0]"></payment-config>
+<payment-config v-if="global.mcTabActive === 'config'" :entity="items[0]"></payment-config>

@@ -809,9 +809,9 @@ class Plugin extends \MapasCulturais\Plugin{
         );
 
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
-            $registration_class = $this->controller->requestedEntity;
-            if($registration_class->opportunity->has_payment_phase && $registration_class->status == 10) {
-                $this->part("registration/registration-tab", ['entity' => $registration_class]);
+            $registration = $this->controller->requestedEntity;
+            if($registration->opportunity->firstPhase->has_payment_phase && $registration->lastPhase->status == 10) {
+                $this->part("registration/registration-tab", ['entity' => $registration]);
             }
         });
 

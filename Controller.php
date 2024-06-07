@@ -830,6 +830,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             }
                       
         }
+
+        include __DIR__."/registereds/payment_bank_data.php";
+        foreach($payment_bank_data as $key => $data) {
+            $plugin->registerRegistrationMetadata($key, $data);
+        }
         
         return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;
     }

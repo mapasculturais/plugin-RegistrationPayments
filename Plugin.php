@@ -342,20 +342,14 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook('<<GET|PUT|PATCH|DELETE>>(<<opportunity|payment>>.<<*>>):before', function() use ($self) {
             $opportunity = $this->getRequestedEntity();
             if($opportunity->has_payment_phase) {
-                include __DIR__."/registereds/payment_company_data.php";
-                foreach($payment_company_data as $key => $data) {
-                    $self->registerOpportunityMetadata($key, $data);
-                }
+                $self->registeredPaymentMetadata(); 
             }
         });
        
 
         $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {
             if($this->has_payment_phase) {
-                include __DIR__."/registereds/payment_bank_data.php";
-                foreach($payment_bank_data as $key => $data) {
-                    $self->registerRegistrationMetadata($key, $data);
-                }
+                $self->registeredPaymentMetadata(); 
             }
         });
 

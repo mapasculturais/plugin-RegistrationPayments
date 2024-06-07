@@ -529,12 +529,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $opportunity = $_opportunity->lastPhase;
         $opportunity->registerRegistrationMetadata(true);
         
-        include __DIR__."/registereds/payment_company_data.php";
-        foreach($payment_company_data as $key => $data) {
-            $def = new \MapasCulturais\Definitions\Metadata($key, $data);
-            $app->registerMetadata($def, 'MapasCulturais\Entities\Opportunity');
-        }
-
+        $plugin->registeredPaymentMetadata(); 
         
         if($errors = $plugin->getCnabValidationErrors($opportunity, $request)) {
             $this->errorJson($errors); 
@@ -833,10 +828,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                       
         }
 
-        include __DIR__."/registereds/payment_bank_data.php";
-        foreach($payment_bank_data as $key => $data) {
-            $plugin->registerRegistrationMetadata($key, $data);
-        }
+        $plugin->registeredPaymentMetadata();
         
         return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;
     }

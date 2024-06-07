@@ -358,6 +358,17 @@ class Plugin extends \MapasCulturais\Plugin{
                 }
             }
         });
+
+        // Remove os erros de validação dos campos de pagamento para inscrições nao selecionadas na fase final
+        $app->hook('entity(Registration).validationErrors', function(&$errors) {
+            if(!$this->lastPhase || $this->lastPhase->status != Registration::STATUS_APPROVED) {
+                include __DIR__."/registereds/payment_bank_data.php";
+                $fields_meta = array_keys($payment_bank_data);
+                foreach($fields_meta as $value) {
+                    unset($errors[$value]);
+                }
+            }
+        });
         
         $app->registerFileGroup(
             'opportunity',

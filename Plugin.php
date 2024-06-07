@@ -115,8 +115,10 @@ class Plugin extends \MapasCulturais\Plugin{
                     return $registration->firstPhase->payment_branch_dv;
                 },
                 'account' => function($registration, $field, $settings,$metadata, $dependence){
-                    $data = $registration->firstPhase->payment_account;
-                    if($registration->firstPhase->payment_account_type == 2 && $registration->firstPhase->payment_bank == 1 && substr($data, 0, 2) != "51"){
+                    $first_phase = $registration->firstPhase;
+
+                    $data = $first_phase->payment_account;
+                    if($first_phase->payment_account_type == 2 && $first_phase->payment_bank == 1 && substr($data, 0, 2) != "51"){
                        
                         $account_temp = "51" . $data;
 
@@ -133,7 +135,9 @@ class Plugin extends \MapasCulturais\Plugin{
                    return $result;
                 },
                 'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
-                    $data = $registration->firstPhase->payment_account_dv ?: 0;
+                    $first_phase = $registration->firstPhase;
+
+                    $data = $first_phase->payment_account_dv ?: 0;
                     
                     if(!is_int($data) && (strlen($data) > 2)){
                         if(preg_match("/x/", mb_strtolower($data))){
@@ -143,7 +147,7 @@ class Plugin extends \MapasCulturais\Plugin{
                         }
                     }
 
-                    if($registration->firstPhase->payment_account_type == 2 && $registration->firstPhase->payment_bank){
+                    if($first_phase->payment_account_type == 2 && $first_phase->payment_bank){
                         return $this->config['fromToDvBranch'][$data];
                     }else{
                         $result =  $data;

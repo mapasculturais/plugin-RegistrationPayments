@@ -415,12 +415,10 @@ class Plugin extends \MapasCulturais\Plugin{
             $opportunity = $registration->opportunity;
             $current_date_time = new DateTime();
             $payment_registration_from = new DateTime($opportunity->firstPhase->payment_registration_from);
-            $payment_registration_to = new DateTime($opportunity->firstPhase->payment_registration_to);
 
             if($opportunity->firstPhase->has_payment_phase 
                 && $registration->lastPhase->status == Registration::STATUS_APPROVED
                 && $current_date_time >=  $payment_registration_from 
-                && $current_date_time < $payment_registration_to
             ) {
                 $this->part("registration/registration-payment-tab", ['entity' => $registration]);
             }

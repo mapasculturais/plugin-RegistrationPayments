@@ -17,12 +17,6 @@ app.component('registration-payment-tab', {
         return { text }
     },
 
-    data() {
-        return {
-            dataSent: false,
-        }
-    },
-
     methods: {
         sendPaymentData() { 
             this.entity.payment_sent_timestamp = new Date();

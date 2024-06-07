@@ -24,11 +24,19 @@ app.component('registration-payment-tab', {
     },
 
     methods: {
-        sendPaymentData() { 
-            this.entity.payment_sent_timestamp = new Date();
-            this.entity.save();
-
-            this.dataSent = true;
+        async sendPaymentData() {
+            const messages = useMessages();
+            try {
+                this.entity.payment_sent_timestamp = new Date();
+                await this.entity.save();
+                const success = await this.entity.POST('validateEntity', {});
+                if (success) {
+                    this.dataSent = true;
+                    messages.success(this.text('Validado'));
+                }
+            } catch (error) {
+                console.error(error);
+            }
         },
 
         formatDate(value) {

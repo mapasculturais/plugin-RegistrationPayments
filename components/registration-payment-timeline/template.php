@@ -16,7 +16,8 @@ use MapasCulturais\i;
             <?= i::__('Dados de pagamento') ?>
         </div>
         <div>
-            <button v-if="!isOpportunity" class="button button--primary" @click="changeTab"><?= i::__('Inserir dados de pagamento') ?></button>
+            
+            <button v-if="!isOpportunity && isPaymentDataOpen()" class="button button--primary" @click="changeTab"><?= i::__('Inserir dados de pagamento') ?></button>
         </div>
     </div>
 </div>

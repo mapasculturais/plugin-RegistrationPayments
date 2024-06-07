@@ -51,10 +51,13 @@ app.component('registration-payment-tab', {
             }
 
             return false;
+        },
+        
+        showButtons() {
+            const paymentTo = this.entity.opportunity.payment_registration_to
+            const currentDate = new Date();
+            
+            return paymentTo._date > currentDate;
         }
-    },
-
-    mounted() {
-      
     }
 });

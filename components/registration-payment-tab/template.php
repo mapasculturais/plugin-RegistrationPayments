@@ -100,8 +100,10 @@ $this->import('
                 </div>
             </div>
         </mc-card>
-        
-        <button v-if="isEditable()"  @click="sendPaymentData()"  class="button button--primary"><?= i::__('Enviar') ?></button>
-        <button v-if="!isEditable()" @click="entity.payment_sent_timestamp = null" class="button button--primary"><?= i::__('Editar') ?></button>
+
+        <div v-if="showButtons()" class="timeline">
+            <button v-if="isEditable()"  @click="sendPaymentData()"  class="button button--primary"><?= i::__('Enviar') ?></button>
+            <button v-if="!isEditable()" @click="entity.payment_sent_timestamp = null" class="button button--primary"><?= i::__('Editar') ?></button>
+        </div>
     </div>
 </mc-tab>

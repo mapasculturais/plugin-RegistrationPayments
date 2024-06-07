@@ -11,7 +11,7 @@ $payment_bank_data = [
             2 => i::__('Pessoa jurídica'),
         ],
         'validations' => [
-            'required' => \MapasCulturais\i::__("O Tipo social é obrigatório")
+            'required' => i::__("O Tipo social é obrigatório")
         ]
     ],
 
@@ -19,7 +19,7 @@ $payment_bank_data = [
         'label' => i::__('Nome do proponente'),
         'type' => 'string',
         'validations' => [
-            'required' => \MapasCulturais\i::__("O nome do proponente é obrigatório")
+            'required' => i::__("O nome do proponente é obrigatório")
         ]
     ],
 
@@ -28,7 +28,8 @@ $payment_bank_data = [
         'type' => 'string',
         'field_type' => 'fieldMask',
         'validations' => [
-            'required' => \MapasCulturais\i::__("O documento obrigatório")
+            'required' => i::__("O documento obrigatório"),
+            'v::oneOf(v::cpf(), v::cnpj())' => i::__("O número do documento é inválido"),
         ]
     ],
 
@@ -40,7 +41,7 @@ $payment_bank_data = [
             2 => i::__('Conta poupança'),
         ],
         'validations' => [
-            'required' => \MapasCulturais\i::__("O tipo de conta obrigatório")
+            'required' => i::__("O tipo de conta obrigatório")
         ]
     ],
 
@@ -264,7 +265,7 @@ $payment_bank_data = [
             '102' => i::__("Xp Investimentos S.A - 102"),
         ],
         'validations' => [
-            'required' => \MapasCulturais\i::__("O banco obrigatório")
+            'required' => i::__("O banco obrigatório")
         ]
     ],
 
@@ -272,7 +273,7 @@ $payment_bank_data = [
         'label' => i::__('Agência sem o dígito'),
         'type' => 'string',
         'validations' => [
-            'required' => \MapasCulturais\i::__("O agência obrigatório")
+            'required' => i::__("O agência obrigatório")
         ]
 
     ],
@@ -281,14 +282,14 @@ $payment_bank_data = [
         'type' => 'string',
         'field_type' => 'fieldMask',
         'validations' => [
-            'required' => \MapasCulturais\i::__("O dígito verificador da agência obrigatório")
+            'required' => i::__("O dígito verificador da agência obrigatório")
         ]
     ],
     'payment_account' =>  [
         'label' => i::__('Conta sem o dígito'),
         'type' => 'string',
         'validations' => [
-            'required' => \MapasCulturais\i::__("A conta obrigatória")
+            'required' => i::__("A conta obrigatória")
         ]
     ],
     'payment_account_dv' =>  [
@@ -296,7 +297,7 @@ $payment_bank_data = [
         'type' => 'string',
         'field_type' => 'fieldMask',
         'validations' => [
-            'required' => \MapasCulturais\i::__("O Dígito verificador da conta obrigatória")
+            'required' => i::__("O Dígito verificador da conta obrigatória")
         ]
     ],
     'payment_sent_timestamp' =>  [

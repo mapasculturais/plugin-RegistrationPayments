@@ -74,41 +74,13 @@ class Plugin extends \MapasCulturais\Plugin{
             ],
             'treatments' => [
                 'social_type' => function($registration, $field, $settings, $metadata, $dependence){
-                    if($field =="category"){
-                        $id = $registration->$field;                        
-                        return $settings['social_type'][$id];
-                    }
-
-                    $field_id = "field_".$field;
-                    $id = $registration->$field_id;
-                    return $settings['social_type'][$id];
+                    return $registration->firstPhase->payment_social_type;
                 },
                 'proponent_name' => function($registration, $field, $settings,$metadata, $dependence) use ($self){
-                    if($field =="category"){
-                        $id = $registration->$field;  
-                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_name'][$settings['social_type'][$id]];
-                        $_value = $registration->$field_id ?: $metadata[$field_id] ?? null;;
-                    } else {
-                        $field_id = "field_".$field;
-                        $_value = $registration->$field_id ?: $metadata[$field_id] ?? null;;
-                    }
-                    
-                    if($self->isJson($_value)){
-                        return $self->normalizeString(json_decode($_value));
-                    }else{
-                        return $self->normalizeString($_value);
-                    }
-                   
+                    return $registration->firstPhase->payment_proponent_name;                   
                 },
                 'proponent_document' => function($registration, $field, $settings,$metadata, $dependence){
-                    if($field =="category"){                      
-                        $id = $registration->$field;                          
-                        $field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['proponent_document'][$settings['social_type'][$id]];
-                        return $registration->$field_id ?: $metadata[$field_id] ?? null;;
-                    }
-
-                    $field_id = "field_".$field;
-                    return $registration->$field_id ?: $metadata[$field_id] ?? null;;
+                    return $registration->firstPhase->payment_proponent_document;
                 },
                 'address' => function($registration, $field, $settings,$metadata, $dependence){
                     $field_id = "field_".$field;
@@ -131,31 +103,20 @@ class Plugin extends \MapasCulturais\Plugin{
                     return $registration->$field_id ?: $metadata[$field_id] ?? null;;
                 },
                 'account_type' => function($registration, $field, $settings,$metadata, $dependence){
-                    $field_id = "field_".$field;
-                    return $registration->$field_id ?: $metadata[$field_id] ?? null;;
+                    return $registration->firstPhase->payment_account_type;
                 },
                 'bank' => function($registration, $field, $settings,$metadata, $dependence){
-                    $field_id = "field_".$field;
-                    return $registration->$field_id ?: $metadata[$field_id] ?? null;;
+                    return $registration->firstPhase->payment_bank;
                 },
                 'branch' => function($registration, $field, $settings,$metadata, $dependence){
-                    $field_id = "field_".$field;
-                    return $registration->$field_id ?: $metadata[$field_id] ?? null;;
+                    return $registration->firstPhase->payment_branch;
                 },
                 'branch_dv' => function($registration, $field, $settings,$metadata, $dependence){
-                    $field_id = "field_".$field;
-                    return $registration->$field_id ?: $metadata[$field_id] ?? null;;
+                    return $registration->firstPhase->payment_branch_dv;
                 },
                 'account' => function($registration, $field, $settings,$metadata, $dependence){
-
-                    $field_id = "field_".$field;
-                    $data = $registration->$field_id ?: $metadata[$field_id] ?? null;;
-
-                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
-                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
-                    $search = "banco do brasil";
-                    
-                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id])) && substr($data, 0, 2) != "51"){
+                    $data = $registration->firstPhase->payment_account;
+                    if($registration->firstPhase->payment_account_type == 2 && $registration->firstPhase->payment_bank == 1 && substr($data, 0, 2) != "51"){
                        
                         $account_temp = "51" . $data;
 
@@ -172,8 +133,7 @@ class Plugin extends \MapasCulturais\Plugin{
                    return $result;
                 },
                 'account_dv' => function($registration, $field, $settings,$metadata, $dependence){
-                    $field_id = "field_".$field;
-                    $data = $metadata[$field_id] ?? 0;
+                    $data = $registration->firstPhase->payment_account_dv ?: 0;
                     
                     if(!is_int($data) && (strlen($data) > 2)){
                         if(preg_match("/x/", mb_strtolower($data))){
@@ -182,12 +142,8 @@ class Plugin extends \MapasCulturais\Plugin{
                             $data = 0;
                         }
                     }
-                    
-                    $account_type_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['account_type'];
-                    $bank_field_id = "field_".$this->config['opportunitysCnab'][$registration->opportunity->id]['bank'];
-                    $search = "banco do brasil";
 
-                    if(in_array($metadata[$account_type_field_id], ['Conta poupança']) && preg_match("/{$search}/", mb_strtolower($metadata[$bank_field_id]))){
+                    if($registration->firstPhase->payment_account_type == 2 && $registration->firstPhase->payment_bank){
                         return $this->config['fromToDvBranch'][$data];
                     }else{
                         $result =  $data;
@@ -461,7 +417,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
             $opportunity = $this->opportunity;
 
-            if($opportunity->firstPhase->has_payment_phase && $this->status == 10 && !$this->payment_sent_timestamp) {
+            if($opportunity->firstPhase->has_payment_phase && $this->status == 10) {
                 $result = true;
             }
         });
@@ -694,12 +650,7 @@ class Plugin extends \MapasCulturais\Plugin{
         if (!$opportunity->canUser('@control')) {
             $errors[] = i::__("Você nao tem permissão para geração do CNAB240 nesta oportunidade");
         }
-        
-        $identifier = "lote-". str_pad($request['identifier'] , 4 , '0' , STR_PAD_LEFT);
-        if (!in_array('opportunitysCnab', array_keys($this->config)) || !in_array($opportunity->id, array_keys($this->config['opportunitysCnab']))) {
-            $errors[] = i::__("Os campos para coletar os dados para o CNAB240 não estão configurados nesta oportunidade. Fale com o administrador.");
-        }
-        
+                
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
 
         if($request['lotType'] && !$request['ts_lot']) {

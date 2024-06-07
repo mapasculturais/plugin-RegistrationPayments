@@ -21,7 +21,18 @@ $this->import('
         <header :class="['stepper-header', {'open':step.active}]">
             <div class="stepper-header__content">
                 <h3 class="info__title"><?= i::__('Fase de pagamentos') ?></h3>
+                <div class="dates">
+                    <div class="date">
+                        <div class="date__title"> <?= i::__('Data de início') ?> </div>
+                        <div v-if="entity.payment_registration_from" class="date__content">{{entity.payment_registration_from.date('2-digit year')}} {{entity.payment_registration_from.time('numeric')}}</div>
+                    </div>
+                    <div class="date">
+                        <div class="date__title"> <?= i::__('Data final') ?> </div>
+                        <div v-if="entity.payment_registration_to" class="date__content">{{entity.payment_registration_to.date('2-digit year')}} {{entity.payment_registration_to.time('numeric')}}</div>
+                    </div>
+                </div>
             </div>
+
             <a class="expand-stepper" v-if="step.active" @click="step.close()"><label><?= i::__('Diminuir') ?></label><mc-icon name="arrowPoint-up"></mc-icon></a>
             <a class="expand-stepper" v-if="!step.active" @click="step.open()"><label><?= i::__('Expandir') ?></label> <mc-icon name="arrowPoint-down"></mc-icon></a>
         </header>
@@ -30,8 +41,8 @@ $this->import('
                 <div class="grid-12">
                     <entity-field :entity="entity" prop="payment_registration_from" :autosave="3000" classes="col-6 sm:col-12"></entity-field>
                     <entity-field :entity="entity" prop="payment_registration_to" :autosave="3000" classes="col-6 sm:col-12"></entity-field>
-                </div><br/>
-                
+                </div><br />
+
                 <h4 class="bold"><?= i::__('Dados da fonte pagadora') ?></h4><br>
 
                 <div class="grid-12">

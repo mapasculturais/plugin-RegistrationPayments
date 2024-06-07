@@ -101,6 +101,7 @@ $this->import('
             </div>
         </mc-card>
         
-        <button class="button button--primary" @click="sendPaymentData" :disabled="!isEditable()"><?= i::__('Enviar') ?></button>
+        <button v-if="isEditable()"  @click="sendPaymentData()"  class="button button--primary"><?= i::__('Enviar') ?></button>
+        <button v-if="!isEditable()" @click="entity.payment_sent_timestamp = null" class="button button--primary"><?= i::__('Editar') ?></button>
     </div>
 </mc-tab>

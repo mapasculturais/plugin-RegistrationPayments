@@ -413,10 +413,12 @@ class Plugin extends \MapasCulturais\Plugin{
             $self->registeredPaymentMetadata(); 
             $registration = $this->controller->requestedEntity;
             $opportunity = $registration->opportunity;
+            $opp_first_phase = $opportunity->firstPhase;
+            
             $current_date_time = new DateTime();
-            $payment_registration_from = new DateTime($opportunity->firstPhase->payment_registration_from);
+            $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
 
-            if($opportunity->firstPhase->has_payment_phase 
+            if($opp_first_phase->has_payment_phase 
                 && $registration->lastPhase->status == Registration::STATUS_APPROVED
                 && $current_date_time >=  $payment_registration_from 
             ) {

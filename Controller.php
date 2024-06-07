@@ -527,6 +527,13 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $opportunity = $_opportunity->lastPhase;
         $opportunity->registerRegistrationMetadata();
         
+        include __DIR__."/registereds/payment_company_data.php";
+        foreach($payment_company_data as $key => $data) {
+            $def = new \MapasCulturais\Definitions\Metadata($key, $data);
+            $app->registerMetadata($def, 'MapasCulturais\Entities\Opportunity');
+        }
+
+        
         if($errors = $plugin->getCnabValidationErrors($opportunity, $request)) {
             $this->errorJson($errors); 
         }
@@ -552,23 +559,22 @@ class Controller extends \MapasCulturais\Controllers\EntityController
          * @var Remessa  $arquivo
         */     
         $arquivo = $plugin->getCanbInstace('001', 'Cnab240', [
-            'nome_empresa' => $company_data['nome_empresa'],
-            'tipo_inscricao' => $company_data['tipo_inscricao'],
-            'numero_inscricao' => $company_data['numero_inscricao'],
-            'agencia' => $company_data['agencia'], 
-            'agencia_dv' => $company_data['agencia_dv'],
-            'conta' => $company_data['conta'], 
-            'conta_dv' => $company_data['conta_dv'], 
+            'nome_empresa' => $opportunity->firstPhase->payment_company_data_name,
+            'tipo_inscricao' => $opportunity->firstPhase->payment_company_data_registration_type,
+            'numero_inscricao' => $opportunity->firstPhase->payment_company_data_registration_number,
+            'agencia' => $opportunity->firstPhase->payment_company_data_branch,
+            'agencia_dv' => $opportunity->firstPhase->payment_company_data_branch_dv,
+            'conta' => $opportunity->firstPhase->payment_company_data_account,
+            'conta_dv' => $opportunity->firstPhase->payment_company_data_account_dv, 
             'numero_sequencial_arquivo' => 1, 
-            'convenio' => $company_data['convenio'],
+            'convenio' => $opportunity->firstPhase->payment_company_data_agreement, 
             'carteira' => '',
             'situacao_arquivo' => $test ? 'TS' : ' ', 
-            'uso_bb1' => $company_data['convenio'],
+            'uso_bb1' => $opportunity->firstPhase->payment_company_data_agreement,
             'uso_bb2' => '0126',
             'uso_bb4' => $test ? 'TS' : ' ',
             'operacao' => 'C',
             'tipo_lancamento' => $lot,
-
         ]);
 
         // Seta o tipo do lote

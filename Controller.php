@@ -713,7 +713,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $sub_query = "SELECT number FROM registration r";
         $complement_where = "";
         $conn = $app->em->getConnection();
-        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
+        $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
 
         $test = false;
         if(isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on'){
@@ -740,21 +740,21 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         }
 
-        $cnab_config = $plugin->config['opportunitysCnab'][$opportunity->id];
+        $cnab_config = $plugin->config['opportunitysCnab'];
         if($lot == '01' || $lot == '05'){
 
             $sub_query.= " JOIN registration_meta account ON r.id = account.object_id AND account.key = :field_type_account AND account.value = :account
                             JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value = :bank_name";
 
-            $params['field_type_account'] = "field_".$cnab_config['account_type'];
-            $params['account'] = $cnab_config['settings']['default_lot_type'][$lot];
-            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['field_type_account'] = "payment_account_type";
+            $params['account'] = $cnab_config['default_lot_type'][$lot];
+            $params['field_bank'] = "payment_bank";
             $params['bank_name'] = $cnab_config['canab_bb_default_value'];
             
         }else if($lot == '03'){
             $sub_query.= " JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value <> :bank_name";
 
-            $params['field_bank'] = "field_".$cnab_config['bank'];
+            $params['field_bank'] = "payment_bank";
             $params['bank_name'] = $cnab_config['canab_bb_default_value'];
         }
        

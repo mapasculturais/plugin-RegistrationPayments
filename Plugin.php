@@ -411,7 +411,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
             $registration = $this->controller->requestedEntity;
-            if($registration->opportunity->firstPhase->has_payment_phase && $registration->lastPhase->status == 10) {
+            if($registration->opportunity->firstPhase->has_payment_phase && $registration->lastPhase->status == Registration::STATUS_APPROVED) {
                 $this->part("registration/registration-payment-tab", ['entity' => $registration]);
             }
         });
@@ -419,7 +419,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {
             $entity = $this->controller->requestedEntity;
             if($entity instanceof \MapasCulturais\Entities\Registration) {
-                if($entity->opportunity->firstPhase->has_payment_phase && $entity->lastPhase->status == 10) {
+                if($entity->opportunity->firstPhase->has_payment_phase && $entity->lastPhase->status == Registration::STATUS_APPROVED) {
                     $this->part("registration/registration-payment-timeline", ['isOpportunity' => false]);
                 }
             } elseif ($entity instanceof \MapasCulturais\Entities\Opportunity) {
@@ -432,7 +432,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
             $opportunity = $this->opportunity;
 
-            if($opportunity->firstPhase->has_payment_phase && $this->status == 10) {
+            if($opportunity->firstPhase->has_payment_phase && $this->status == Registration::STATUS_APPROVED) {
                 $result = true;
             }
         });

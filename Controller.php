@@ -523,9 +523,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $request = $this->data;
 
         $errors = [];
-        $_opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);        
+        $_opportunity = $app->repo("Opportunity")->find(['id' => $request['opportunity_id']]);    
+
+        /** @var Opportunity $opportunity */
         $opportunity = $_opportunity->lastPhase;
-        $opportunity->registerRegistrationMetadata();
+        $opportunity->registerRegistrationMetadata(true);
         
         include __DIR__."/registereds/payment_company_data.php";
         foreach($payment_company_data as $key => $data) {

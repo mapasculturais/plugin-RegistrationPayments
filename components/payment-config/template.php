@@ -83,13 +83,7 @@ $this->import('
                     <div class="col-6">
                         <entity-field :entity="entity" prop="payment_company_data_account_dv" :autosave="3000"></entity-field>
                     </div>
-
-                    
                 </div>
-
-              
-
-
             </article>
             <div class="phase-delete col-12">
 

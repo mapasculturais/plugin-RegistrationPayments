@@ -27,6 +27,11 @@ $this->import('
         </header>
         <main class="stepper-main grid-12" v-if="step.active">
             <article class="mc-card col-12">
+                <div class="grid-12">
+                    <entity-field :entity="entity" prop="payment_registration_from" :autosave="3000" classes="col-6 sm:col-12"></entity-field>
+                    <entity-field :entity="entity" prop="payment_registration_to" :autosave="3000" classes="col-6 sm:col-12"></entity-field>
+                </div><br/>
+                
                 <h4 class="bold"><?= i::__('Dados da fonte pagadora') ?></h4><br>
 
                 <div class="grid-12">

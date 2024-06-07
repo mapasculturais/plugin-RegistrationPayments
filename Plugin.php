@@ -395,8 +395,16 @@ class Plugin extends \MapasCulturais\Plugin{
         );
 
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
+            $self->registeredPaymentMetadata(); 
             $registration = $this->controller->requestedEntity;
-            if($registration->opportunity->firstPhase->has_payment_phase && $registration->lastPhase->status == 10) {
+            $opportunity = $registration->opportunity;
+            $current_date_time = new DateTime();
+            $payment_registration_from = new DateTime($opportunity->firstPhase->payment_registration_from);
+
+            if($opportunity->firstPhase->has_payment_phase 
+                && $registration->lastPhase->status == 10
+                && $payment_registration_from < $current_date_time
+            ) {
                 $this->part("registration/registration-payment-tab", ['entity' => $registration]);
             }
         });
@@ -415,9 +423,20 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
+            $self->registeredPaymentMetadata();            
             $opportunity = $this->opportunity;
 
-            if($opportunity->firstPhase->has_payment_phase && $this->status == 10) {
+            $current_date_time = new DateTime();
+            $payment_registration_from = new DateTime($opportunity->firstPhase->payment_registration_from);
+            $payment_registration_to = new DateTime($opportunity->firstPhase->payment_registration_to);
+
+            if($opportunity->firstPhase->has_payment_phase 
+                && $this->lastPhase->status == 10
+                && !($payment_registration_from > $current_date_time 
+                    || $payment_registration_to < $current_date_time)
+                && ($this->payment_sent_timestamp != null
+                    || $this->payment_sent_timestamp != '')
+            ) {
                 $result = true;
             }
         });
@@ -682,5 +701,21 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $fields_id = $this->config['fields'];
         return $fields_id[$value] ? "field_".$fields_id[$value] : null;
+    }
+
+    function registeredPaymentMetadata()
+    {
+        $app = App::i();
+
+        include __DIR__."/registereds/payment_company_data.php";
+        foreach($payment_company_data as $key => $data) {
+            $def = new \MapasCulturais\Definitions\Metadata($key, $data);
+            $app->registerMetadata($def, 'MapasCulturais\Entities\Opportunity');
+        }
+
+        include __DIR__."/registereds/payment_bank_data.php";
+        foreach($payment_bank_data as $key => $data) {
+            $this->registerRegistrationMetadata($key, $data);
+        }
     }
 }

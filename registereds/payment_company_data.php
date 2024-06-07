@@ -65,5 +65,19 @@ $payment_company_data = [
         'validations' => [
             'required' => \MapasCulturais\i::__("O Convênio é obrigatório")
         ]
+    ],
+    'payment_registration_from' => [
+        'label' => i::__('Data de início'),
+        'type' => 'datetime',
+        'validations' => [
+            'required' => \MapasCulturais\i::__("Data de início é obrigatório")
+        ]
+    ],
+    'payment_registration_to' => [
+        'label' => i::__('Data final'),
+        'type' => 'datetime',
+        'validations' => [
+            'required' => \MapasCulturais\i::__("Data final é obrigatório")
+        ]
     ]
 ];

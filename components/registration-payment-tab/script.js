@@ -29,7 +29,6 @@ app.component('registration-payment-tab', {
                 payment_branch_dv: this.entity.payment_branch_dv,
                 payment_account: this.entity.payment_account,
                 payment_account_dv: this.entity.payment_account_dv,
-                payment_sent_timestamp: this.entity.payment_sent_timestamp,
             };
             
             this.entity.POST('validateProperties', {data: properties, callback:(response) => {

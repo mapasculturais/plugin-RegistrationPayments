@@ -403,6 +403,7 @@ class Plugin extends \MapasCulturais\Plugin{
             )
         );
 
+        // Exibe a aba de pagamento para preencimento dos dados 
         $app->hook("template(registration.view.single-tab):end", function() use ($self) {
             $self->registeredPaymentMetadata(); 
             $registration = $this->controller->requestedEntity;
@@ -420,6 +421,7 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Exibe o botão e os dados sobre a fase de pagamentos nas timilines
         $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {
             $entity = $this->controller->requestedEntity;
             if($entity instanceof \MapasCulturais\Entities\Registration) {
@@ -433,7 +435,8 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
-        $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self) {
+        // Ajusta permissão de modificação do pagamento mesmo depois da inscrição enviada
+        $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self, $app) {
             $self->registeredPaymentMetadata();            
             $opportunity = $this->opportunity;
             $opp_first_phase = $opportunity->firstPhase;

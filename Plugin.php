@@ -441,18 +441,20 @@ class Plugin extends \MapasCulturais\Plugin{
             $opportunity = $this->opportunity;
             $opp_first_phase = $opportunity->firstPhase;
 
-            $current_date_time = new DateTime();
-            $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
-            $payment_registration_to = new DateTime($opp_first_phase->payment_registration_to);
-
-            if($opp_first_phase->has_payment_phase 
-                && $this->lastPhase->status == Registration::STATUS_APPROVED
-                && !($payment_registration_from > $current_date_time 
-                    || $payment_registration_to < $current_date_time)
-                && ($this->payment_sent_timestamp != null
-                    || $this->payment_sent_timestamp != '')
-            ) {
-                $result = true;
+            if($opp_first_phase->payment_registration_from && $opp_first_phase->payment_registration_to) {
+                $current_date_time = new DateTime();
+                $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
+                $payment_registration_to = new DateTime($opp_first_phase->payment_registration_to);
+    
+                if($opp_first_phase->has_payment_phase 
+                    && $this->lastPhase->status == Registration::STATUS_APPROVED
+                    && !($payment_registration_from > $current_date_time 
+                        || $payment_registration_to < $current_date_time)
+                    && ($this->payment_sent_timestamp != null
+                        || $this->payment_sent_timestamp != '')
+                ) {
+                    $result = true;
+                }
             }
         });
     }

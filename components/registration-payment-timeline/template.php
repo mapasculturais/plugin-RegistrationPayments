@@ -21,6 +21,7 @@ use MapasCulturais\i;
                 <span>{{opportunity.payment_registration_from.date('numeric year')}} {{opportunity.payment_registration_from.time('numeric')}}</span>  
                 <?= i::__('a') ?>
                 <span>{{opportunity.payment_registration_to.date('numeric year')}} {{opportunity.payment_registration_to.time('numeric')}}</span>  
+            </h5>
         </div>
 
         <div>

@@ -19,7 +19,8 @@ $payment_company_data = [
         ],
         'validations' => [
             'required' => \MapasCulturais\i::__("Tipo social é obrigatório")
-        ]
+        ],
+        'numericKeyValueOptions' => true,
     ],
     'payment_company_data_registration_number' => [
         'label' => i::__('CPF/CNPJ'),

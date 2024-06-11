@@ -12,7 +12,8 @@ $payment_bank_data = [
         ],
         'validations' => [
             'required' => i::__("O Tipo social é obrigatório")
-        ]
+        ],
+        'numericKeyValueOptions' => true,
     ],
 
     'payment_proponent_name' => [
@@ -42,7 +43,8 @@ $payment_bank_data = [
         ],
         'validations' => [
             'required' => i::__("O tipo de conta obrigatório")
-        ]
+        ],
+        'numericKeyValueOptions' => true,
     ],
 
     'payment_bank' =>  [
@@ -266,7 +268,8 @@ $payment_bank_data = [
         ],
         'validations' => [
             'required' => i::__("O banco obrigatório")
-        ]
+        ],
+        'numericKeyValueOptions' => true,
     ],
 
     'payment_branch' =>  [

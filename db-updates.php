@@ -99,7 +99,6 @@ return [
         }
     },
     'Cadastra dados da fonte pagadora nas oportunidades com configuração ativa do CNAB240' => function () use ($app, $em, $conn) {
-
         include __DIR__."/registereds/payment_company_data.php";
         foreach($payment_company_data as $key => $data) {
             $def = new \MapasCulturais\Definitions\Metadata($key, $data);
@@ -149,6 +148,5 @@ return [
 
         }
         $app->enableAccessControl();
-        return false;
     },
 ];

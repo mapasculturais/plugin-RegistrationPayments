@@ -57,7 +57,7 @@ app.component('registration-payment-tab', {
             const paymentTo = this.entity.opportunity.payment_registration_to
             const currentDate = new Date();
             
-            return paymentTo._date > currentDate;
+            return paymentTo?._date > currentDate;
         }
     }
 });

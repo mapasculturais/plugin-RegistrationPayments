@@ -97,5 +97,58 @@ return [
 
             $app->enableAccessControl();
         }
-    }
+    },
+    'Cadastra dados da fonte pagadora nas oportunidades com configuração ativa do CNAB240' => function () use ($app, $em, $conn) {
+
+        include __DIR__."/registereds/payment_company_data.php";
+        foreach($payment_company_data as $key => $data) {
+            $def = new \MapasCulturais\Definitions\Metadata($key, $data);
+            $app->registerMetadata($def, 'MapasCulturais\Entities\Opportunity');
+        }
+
+        $config = $app->config['plugins']['RegistrationPayments']['config'];
+        $cnab240_company_data = $config['cnab240_company_data'];
+        $opportunitysCnab = $config['opportunitysCnab'];
+
+        $company_data_fields = [
+            'nome_empresa' => 'payment_company_data_name',
+            'tipo_inscricao' => 'payment_company_data_registration_type',
+            'numero_inscricao' => 'payment_company_data_registration_number',
+            'agencia' => 'payment_company_data_branch',
+            'agencia_dv' => 'payment_company_data_branch_dv',
+            'conta' => 'payment_company_data_account',
+            'conta_dv' => 'payment_company_data_account_dv',
+            'convenio' => 'payment_company_data_agreement',
+        ];
+        
+        $app->disableAccessControl();
+        foreach($opportunitysCnab as $opp_id => $settings) {
+            if($opportunity = $app->repo('Opportunity')->find($opp_id)) {
+                
+                $firstPhase = $opportunity->firstPhase;
+                $firstPhase->has_payment_phase = true;
+                $firstPhase->payment_registration_from = $firstPhase->registrationFrom->format("Y-m-y H:i:s");
+                $firstPhase->payment_registration_to = $firstPhase->registrationTo->format("Y-m-y H:i:s");
+
+                foreach($company_data_fields as $key => $field) {
+                    $firstPhase->$field = trim($cnab240_company_data[$key]);
+
+                    if(isset($opportunitysCnab[$firstPhase->lastPhase->id]['company_data'])) {
+                        $personal_company_data = $opportunitysCnab[$firstPhase->lastPhase->id]['company_data'];
+                        foreach($personal_company_data as $_key => $value) {
+                            $_field = $company_data_fields[$_key];
+                            $firstPhase->$_field = trim($value);
+                        }
+                    }
+                    
+                    $app->log->debug("Atualiza informações da fonte pagadora para o CNAB240 na oportunidade {$firstPhase->id} - $firstPhase->name");
+                    $firstPhase->save(true);
+                }
+
+            }
+
+        }
+        $app->enableAccessControl();
+        return false;
+    },
 ];

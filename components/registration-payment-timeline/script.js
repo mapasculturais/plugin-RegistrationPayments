@@ -2,10 +2,6 @@ app.component('registration-payment-timeline', {
     template: $TEMPLATES['registration-payment-timeline'],
 
     props: {
-        registration: {
-            type: Entity,
-            required: true,
-        },
         opportunity: {
             type: Entity,
             required: true,

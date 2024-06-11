@@ -281,9 +281,6 @@ $payment_bank_data = [
         'label' => i::__('Dígito verificador da agência'),
         'type' => 'string',
         'field_type' => 'fieldMask',
-        'validations' => [
-            'required' => i::__("O dígito verificador da agência obrigatório")
-        ]
     ],
     'payment_account' =>  [
         'label' => i::__('Conta sem o dígito'),

@@ -29,6 +29,7 @@ return [
             $processValue = function($registration) use ($opportunitysCnab, $app, $banc_data_fields) {
                 $opportunity = $registration->opportunity->firstPhase;
                 $opportunity->lastPhase->registerRegistrationMetadata(true);
+                $reg_first_phase = $registration->firstPhase;
     
                 $config = $opportunitysCnab[$opportunity->lastPhase->id];
     
@@ -41,7 +42,7 @@ return [
                   
                 }
     
-                $registration->firstPhase->payment_social_type = $social_type;
+                $reg_first_phase->payment_social_type = $social_type;
                 
                 foreach($banc_data_fields as $ref => $field) {
                     $field = $banc_data_fields[$ref];
@@ -58,12 +59,12 @@ return [
                         $value = $value === "Conta corrente" ? 1 : 2;
                     }
     
-                    $registration->firstPhase->$field = $value;
-                    $registration->payment_sent_timestamp = $registration->sentTimestamp ? $registration->sentTimestamp->format('Y-m-d H:i:s') : (new DateTime('now'))->format('Y-m-d H:i:s');
+                    $reg_first_phase->$field = $value;
+                    $reg_first_phase->payment_sent_timestamp = $registration->sentTimestamp ? $registration->sentTimestamp->format('Y-m-d H:i:s') : (new DateTime('now'))->format('Y-m-d H:i:s');
                 }
     
                 $app->log->debug("Opportunidade {$registration->opportunity->id} -- Dados bancários da inscrição {$registration->id} salvo nos novos metadados");
-                $registration->firstPhase->save(true);
+                $reg_first_phase->save(true);
             };
 
             $processValue($registration);

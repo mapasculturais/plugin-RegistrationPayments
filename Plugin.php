@@ -446,7 +446,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
                 $payment_registration_to = new DateTime($opp_first_phase->payment_registration_to);
     
-                if($opp_first_phase->has_payment_phase 
+                if($this->lastPhase && $opp_first_phase->has_payment_phase 
                     && $this->lastPhase->status == Registration::STATUS_APPROVED
                     && !($payment_registration_from > $current_date_time 
                         || $payment_registration_to < $current_date_time)

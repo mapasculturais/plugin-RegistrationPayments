@@ -24,7 +24,7 @@ return [
         ];
 
         $opp_ids = implode(",",array_keys($opportunitysCnab));
-        DB_UPDATE::enqueue('Registration', "status = 10 AND opportunity_id in ({$opp_ids})", function (Registration $registration) use ($opportunitysCnab, $app, $banc_data_fields) {
+        DB_UPDATE::enqueue('Registration', "opportunity_id in ({$opp_ids})", function (Registration $registration) use ($opportunitysCnab, $app, $banc_data_fields) {
             
             $processValue = function($registration) use ($opportunitysCnab, $app, $banc_data_fields) {
                 $opportunity = $registration->opportunity->firstPhase;

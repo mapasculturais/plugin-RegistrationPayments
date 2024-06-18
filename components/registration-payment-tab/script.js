@@ -2,14 +2,23 @@ app.component('registration-payment-tab', {
     template: $TEMPLATES['registration-payment-tab'],
 
     props: {
-        entity: {
-            type: Entity,
-            required: true,
-        },
+        
+    },
+
+    data() {
+        let paymentData = $MAPAS.config.registrationPaymentTab.paymentData;
+        const firstPhase = new Entity('registration', paymentData.id);
+        firstPhase.populate(paymentData);
+
+        return {
+            entity: firstPhase
+        }
     },
 
     computed: {
-
+        opportunity() {
+            return $MAPAS.config.registrationPaymentTab.opportunity;
+        },
     },
 
     setup() {
@@ -54,10 +63,14 @@ app.component('registration-payment-tab', {
         },
         
         showButtons() {
-            const paymentTo = this.entity.opportunity.payment_registration_to
-            const currentDate = new Date();
+            let show = false
+            if(this.opportunity.payment_registration_to) {
+                const paymentTo = new McDate(this.opportunity.payment_registration_to)
+                const currentDate = new Date();
+                show = paymentTo?._date > currentDate
+            }
             
-            return paymentTo?._date > currentDate;
+            return show;
         }
     }
 });

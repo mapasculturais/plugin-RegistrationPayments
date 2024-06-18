@@ -457,6 +457,18 @@ class Plugin extends \MapasCulturais\Plugin{
                 }
             }
         });
+
+        // Faz o desparo de email quando selecionado na ultima fase
+        $app->hook("entity(Registration).status(approved)", function() use ($self){
+            $self->registeredPaymentMetadata();
+            $opportunity = $this->opportunity;
+            if($opportunity->firstPhase->has_payment_phase 
+                && $opportunity->isLastPhase
+                && (!$this->firstPhase->payment_sent_timestamp)
+            ) {
+                $self->sendEmail($this);
+            }
+        });
     }
 
     /**
@@ -734,5 +746,35 @@ class Plugin extends \MapasCulturais\Plugin{
         foreach($payment_bank_data as $key => $data) {
             $this->registerRegistrationMetadata($key, $data);
         }
+    }
+
+    public function sendEmail(Registration $registration){
+        $app = App::i();
+        
+        $file_name = $app->view->resolveFilename("templates", "registration-selected.html");
+        $template = file_get_contents($file_name);
+        $params = [
+            "siteName" => $app->siteName,
+            "user" => $registration->owner->name,
+            "idOpportunity" => $registration->firstPhase->id,
+            "registrationUrl" => $registration->firstPhase->singleUrl.'#payment',
+            "baseUrl" => $app->getBaseUrl(),
+        ];
+
+        $mustache = new \Mustache_Engine();
+        $content = $mustache->render($template, $params);
+
+        $email_params = [
+            "from" => $app->config["mailer.from"],
+            "to" => ($registration->owner->emailPrivado ??
+                        $registration->owner->emailPublico ??
+                        $registration->ownerUser->email),
+            "subject" => i::__("Prencher os dados do plugin de pagamentos"),
+            "body" => $content
+        ];
+        if (!isset($email_params["to"])) {
+            return;
+        }
+        $app->createAndSendMailMessage($email_params);
     }
 }

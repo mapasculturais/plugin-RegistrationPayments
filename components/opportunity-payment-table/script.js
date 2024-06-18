@@ -114,6 +114,7 @@ app.component('opportunity-payment-table', {
         const phasesId = $MAPAS.config.opportunityPaymentTable.phasesIds;
         const api = new API();
         return {
+            processFileLoading: false,
             query: {
                 opportunity: `IN(${phasesId})`,
                 status:`GTE(0)`,
@@ -253,6 +254,7 @@ app.component('opportunity-payment-table', {
             };
             let url = Utils.createUrl('payment', 'import', args);
             
+            this.processFileLoading = true;
             api.POST(url).then(res => res.json()).then(data => {
                 if (data?.error) {
                     messages.error(this.text('processError'));
@@ -264,6 +266,7 @@ app.component('opportunity-payment-table', {
                     window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
                     messages.success(this.text('processSuccess'));
                 }
+                this.processFileLoading = false;
             });
         },
         deletePaymentUnprocessedFile(file) {

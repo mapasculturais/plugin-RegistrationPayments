@@ -729,11 +729,11 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $ids = explode($delimiter, $registrationFilter);
 
             $result = array_map(function($id){
-                return preg_replace('/[^0-9]/i', '', $id);
+                return trim($id);
             },$ids);         
             
-            $list = implode(",", array_filter($result));
-            $complement_where.= "AND r.id IN ({$list})";
+            $list = implode("','", array_filter($result));
+            $sub_query.= " WHERE r.number IN ('{$list}')";
 
         }
 
@@ -775,7 +775,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     reg.status > :r_status
                     AND reg.opportunity_id IN ({$phases_ids})
                     AND p.status >= :p_status 
-                    AND reg.number in ({$sub_query})";
+                    AND reg.number in ({$sub_query}) {$complement_where}";
 
         $params += [
             'r_status' => 0,
@@ -810,6 +810,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'];
 
+        $social_type = $plugin->config['cnab240_company_data']['social_type'];
+
         $field_id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$value] ?? null;
        
         $tratament = $plugin->config['treatments'][$value] ?? null;
@@ -822,7 +824,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 $field_id = $field_id['dependence']; 
             }else{
                 $field_name = 'field_'.$plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
-                $dependence = $settings[$field_id['dependence']][$registration->$field_name]; 
+                $dependence = $social_type[$field_id['dependence']][$registration->$field_name]; 
                 $field_id = $field_id[$dependence];  
             }
                       

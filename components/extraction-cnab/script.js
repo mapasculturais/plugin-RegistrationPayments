@@ -16,6 +16,7 @@ app.component('extraction-cnab', {
 
     data() {
         return {
+            exportCnabLoading: false,
             response: {},
             cnabData: this.skeleton()
         }
@@ -40,6 +41,7 @@ app.component('extraction-cnab', {
             const api = new API();
             const messages = useMessages();
             let url = Utils.createUrl('payment', 'generateCnab', { opportunity_id: this.entity.id });
+            this.exportCnabLoading = true;
             api.POST(url, this.cnabData).then(res => res.json()).then(data => {
                 if (data?.error) {
                     messages.error(this.text('generateCnabError'));
@@ -50,6 +52,7 @@ app.component('extraction-cnab', {
                     window.open(data.url, '_blank');
                     this.response = {}
                 }
+                this.exportCnabLoading = false;
             });
         },
         setCnabType(option) {

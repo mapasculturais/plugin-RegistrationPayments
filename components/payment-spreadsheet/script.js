@@ -36,6 +36,8 @@ app.component('payment-spreadsheet', {
 
     data() {
         return {
+            uploadLoading: false,
+            processFileLoading: false,
             response: {},
             dataExport: {},
             newFile: null,
@@ -72,10 +74,12 @@ app.component('payment-spreadsheet', {
                 group: 'import-financial-validator-files',   
             };
             
+            this.uploadLoading = true;
             this.lastPhase.upload(this.newFile, data).then((response) => {
                 window.dispatchEvent(new CustomEvent('mcFileClear', {detail:null}));
                 this.process.id = response.id;
                 this.process.active = true;
+                this.uploadLoading = false;
             });
         },
         processFile(modal) {
@@ -87,7 +91,9 @@ app.component('payment-spreadsheet', {
             };
             let url = Utils.createUrl('payment', 'import', args);
             
+            this.processFileLoading = true; 
             api.POST(url).then(res => res.json()).then(data => {
+                this.processFileLoading = false;
                 if (data?.error) {
                     messages.error(this.text('importError'));
                     this.response = data

@@ -466,7 +466,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 && $opportunity->isLastPhase
                 && (!$this->firstPhase->payment_sent_timestamp)
             ) {
-                $self->sendEmail($this);
+                // $self->sendEmail($this);
             }
         });
     }

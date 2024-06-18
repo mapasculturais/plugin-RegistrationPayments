@@ -57,8 +57,9 @@ $this->import('
         </div>
 
         <template #actions="modal">
-            <button class="button button--primary" @click="exportCnab()"><?= i::__('Exportar') ?></button>
-            <button class="button button--text button--text-del" @click="modal.close()"><?= i::__('cancelar') ?></button>
+            <mc-loading :condition="exportCnabLoading"><?= i::__('Exportando arquivo CNAB240') ?></mc-loading>
+            <button v-if="!exportCnabLoading" class="button button--primary" @click="exportCnab()"><?= i::__('Exportar') ?></button>
+            <button v-if="!exportCnabLoading" class="button button--text button--text-del" @click="modal.close()"><?= i::__('cancelar') ?></button>
         </template>
 
         <template #button="modal">

@@ -9,9 +9,10 @@ use MapasCulturais\i;
 
 $this->import('
     entity-file
-    mc-icon
-    mc-modal
     mc-file
+    mc-icon
+    mc-loading
+    mc-modal
 ');
 ?>
 <div class="create-payment">
@@ -20,12 +21,14 @@ $this->import('
             <button class="button button--primary button--icon" @click="exportValidator(modal)">
                 <?= i::__('Baixar validador') ?> <mc-icon name="download"></mc-icon>
             </button>
-
-            <button class="button button--primary--button button--icon" @click="upload()">
+        
+            <mc-loading :condition="uploadLoading"><?= i::__('Carregando arquivo...') ?></mc-loading>
+            <button v-if="!uploadLoading && !processFileLoading" class="button button--primary--button button--icon" @click="upload()">
                 <?= i::__('Enviar') ?> <mc-icon name="upload"></mc-icon>
             </button>
 
-            <button v-if="process.active" class="button button--primary--button button--icon" @click="processFile(modal)">
+            <mc-loading :condition="processFileLoading"><?= i::__('Processando arquivo...') ?></mc-loading>
+            <button v-if="process.active && !processFileLoading && !uploadLoading" class="button button--primary--button button--icon" @click="processFile(modal)">
                 <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
             </button>
         </template>

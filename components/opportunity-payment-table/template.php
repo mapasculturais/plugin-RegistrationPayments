@@ -17,6 +17,7 @@ $this->import('
     extraction-cnab
     mc-confirm-button
     mc-icon
+    mc-loading
     mc-modal
     mc-select
     mc-status
@@ -55,13 +56,14 @@ $url = $app->createUrl('payment', 'export');
                     <div v-if="paymentProcessed" class="col-6">
                         <h4 class="bold"><?= i::__('Arquivos validador financeiro') ?></h4>
 
+                        <mc-loading :condition="processFileLoading"><?= i::__('Processando arquivo...') ?></mc-loading>
                         <div v-for="file in paymentProcessed">
                             <div @click="downloadFile(file.url)" :title="file.name">
                                 <mc-icon name="download"></mc-icon>
                                 {{file.name.slice(0, 25)}}... 
                             </div>
                             <div class="opportunity-payment-table__advanced-actions">
-                                <button v-if="!file.processed" @click="processFile(file)" class="button button--primary--button button--icon">
+                                <button v-if="!file.processed && !processFileLoading" @click="processFile(file)" class="button button--primary--button button--icon">
                                     <?= i::__('Processar') ?> <mc-icon name="process"></mc-icon>
                                 </button>
 

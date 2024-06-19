@@ -728,12 +728,13 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             
             $ids = explode($delimiter, $registrationFilter);
 
-            $result = array_map(function($id){
-                return trim($id);
-            },$ids);         
+            $result = array_map(function($id) use ($app, $opportunity){
+                $_reg = $app->repo('Registration')->findOneBy(['number' => $id, 'opportunity' => $opportunity->id]);
+                return preg_replace('/[^0-9]/i', '', $_reg->id);
+            },$ids);     
             
-            $list = implode("','", array_filter($result));
-            $sub_query.= " WHERE r.number IN ('{$list}')";
+            $list = implode(",", array_filter($result));
+            $complement_where.= "AND p.registration_id IN ({$list})";
 
         }
 
@@ -810,7 +811,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'];
 
-        $social_type = $plugin->config['cnab240_company_data']['social_type'];
+        $social_type = $plugin->config['opportunitysCnab']['social_type'];
 
         $field_id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$value] ?? null;
        

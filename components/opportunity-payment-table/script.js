@@ -82,8 +82,6 @@ app.component('opportunity-payment-table', {
                 let opportunityFiles = this.lastPhase.files['export-cnab-files'];
                 let importedFiles = {};
                 
-                console.log(this.lastPhase);
-                
                 Object.keys(opportunityFiles).forEach(key => {
                     let index = parseInt(key);
                     let file = opportunityFiles[index];
@@ -93,7 +91,9 @@ app.component('opportunity-payment-table', {
                     let processed = false;
                     let dateTime = file.createTimestamp
                 
-                    importedFiles[name] = {id, name, url,processed,dateTime };
+                    if(!name.startsWith("teste-pagamento")) {
+                        importedFiles[name] = {id, name, url,processed,dateTime };
+                    }
                 });
 
                 return importedFiles;

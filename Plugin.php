@@ -147,7 +147,7 @@ class Plugin extends \MapasCulturais\Plugin{
                         }
                     }
 
-                    if($first_phase->payment_account_type == 2 && $first_phase->payment_bank){
+                    if($first_phase->payment_account_type == 2 && $first_phase->payment_bank && $first_phase->payment_bank == 1){
                         return $this->config['fromToDvBranch'][$data];
                     }else{
                         $result =  $data;

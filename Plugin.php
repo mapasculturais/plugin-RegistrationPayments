@@ -248,10 +248,10 @@ class Plugin extends \MapasCulturais\Plugin{
             $joins .= " LEFT JOIN reg.owner owner ";
         });
 
-        $app->hook('repo(RegistrationPayments.Payment).getIdsByKeywordDQL.where', function (&$where, $keyword) {
+        $app->hook('repo(RegistrationPayments.Payment).getIdsByKeywordDQL.where', function (&$where, $keyword, $alias) {
             $or = trim($where) ? "OR" : "";
-            $where .= " {$or} reg.number LIKE lower(:keyword) ";
-            $where .= " OR unaccent(lower(owner.name)) LIKE unaccent(lower(:keyword)) ";
+            $where .= " {$or} reg.number LIKE lower(:{$alias}) ";
+            $where .= " OR unaccent(lower(owner.name)) LIKE unaccent(lower(:{$alias})) ";
         });
 
         //Insere botão que ativa o pagamento dentro do mc-stepper-vertical

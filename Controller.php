@@ -712,29 +712,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $conn = $app->em->getConnection();
         $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
 
-        $test = false;
-        if(isset($this->data['ts_lot']) && $this->data['ts_lot'] == 'on'){
-            $test = true;
-        }
-
         if($this->data['registrationFilter']){
 
-            $registrationFilter = $this->data['registrationFilter'];
-            $delimiter = "\n";
+            $registration_numbers = preg_split ('/[,|;|\n|\r]/', $this->data['registrationFilter']);
+            $registration_numbers = array_map(fn($number) => "'$number'", $registration_numbers);
+            $registration_numbers = implode(',', $registration_numbers);
 
-            if(count(explode(",", $registrationFilter)) >1){
-                $delimiter = "\n"; 
-            }
-            
-            $ids = explode($delimiter, $registrationFilter);
-
-            $result = array_map(function($id) use ($app, $opportunity){
-                $_reg = $app->repo('Registration')->findOneBy(['number' => $id, 'opportunity' => $opportunity->id]);
-                return preg_replace('/[^0-9]/i', '', $_reg->id);
-            },$ids);     
-            
-            $list = implode(",", array_filter($result));
-            $complement_where.= "AND p.registration_id IN ({$list})";
+   
+            $complement_where.= "AND p.registration_id IN (SELECT id FROM registration WHERE number IN ({$registration_numbers}))";
 
         }
 

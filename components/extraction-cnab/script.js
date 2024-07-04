@@ -48,7 +48,6 @@ app.component('extraction-cnab', {
                     this.response = data
                 } else {
                     messages.success(this.text('generateCnabSuccess'));
-                    this.cnabData = this.skeleton();
                     window.open(data.url, '_blank');
                     this.response = {}
                 }

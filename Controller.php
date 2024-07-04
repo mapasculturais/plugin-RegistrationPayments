@@ -543,7 +543,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $this->errorJson($errors); 
         }
 
-        $test = isset( $request['ts_lot']) &&  $request['ts_lot'] ? true : false;
+
+        
+        $test = isset( $request['ts_lot']) && $request['ts_lot'] ? true : false;
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
         $company_data = $plugin->config['cnab240_company_data'];
 
@@ -630,7 +632,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'valor_pagamento' => $payment->amount, 
                 'tipo_inscricao' => $this->processValues('social_type', $registration), 
                 'numero_inscricao' => $this->processValues('proponent_document', $registration),
-                'referencia_pagamento' => base_convert($registration->id, 10, 36)
+                'referencia_pagamento' => base_convert($registration->firstPhase->id, 10, 36)
 
             ));
 
@@ -650,9 +652,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         $fileType = str_replace(" ", "_", strtolower($plugin->config['file_type'][$request['lotType']]));
-        $name = mb_strtolower(str_replace(" ", "-", mb_substr($opportunity->name, 0, 20)));
+        $name = $app->slugify($opportunity->firstPhase->name);
         $amount_file = preg_replace('/[^0-9]/i', '', RemessaAbstract::$sumValoesTrailer);
-        $file_name = "pagamento-{$amount_file}---{$identifier}-{$name}--opp-{$opportunity->id}-{$fileType}-canb240.txt";
+        $file_name = "pagamento-{$amount_file}---{$identifier}-{$name}--opp-{$opportunity->firstPhase->id}-{$fileType}-canb240.txt";
 
 
         if($test) {
@@ -704,14 +706,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $plugin = Plugin::getInstance();       
 
-      
         $params = [];
 
         $sub_query = "SELECT number FROM registration r";
         $complement_where = "";
         $conn = $app->em->getConnection();
         $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
-
         if($this->data['registrationFilter']){
 
             $registration_numbers = preg_split ('/[,|;|\n|\r]/', $this->data['registrationFilter']);
@@ -726,18 +726,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $cnab_config = $plugin->config['opportunitysCnab'];
         if($lot == '01' || $lot == '05'){
 
-            $sub_query.= " JOIN registration_meta account ON r.id = account.object_id AND account.key = :field_type_account AND account.value = :account
-                            JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value = :bank_name";
+            $sub_query.= " JOIN registration_meta account ON r.id = account.object_id AND account.key = 'payment_account_type' AND account.value = :account
+                            JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = 'payment_bank' AND bank.value = :bank_name";
 
-            $params['field_type_account'] = "payment_account_type";
             $params['account'] = $cnab_config['default_lot_type'][$lot];
-            $params['field_bank'] = "payment_bank";
             $params['bank_name'] = $cnab_config['canab_bb_default_value'];
             
         }else if($lot == '03'){
-            $sub_query.= " JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = :field_bank AND bank.value <> :bank_name";
+            $sub_query.= " JOIN registration_meta bank ON r.id = bank.object_id AND bank.key = 'payment_bank' AND bank.value <> :bank_name";
 
-            $params['field_bank'] = "payment_bank";
             $params['bank_name'] = $cnab_config['canab_bb_default_value'];
         }
        
@@ -758,18 +755,13 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                     payment p
                     JOIN registration reg on p.registration_id = reg.id
                 WHERE
-                    reg.status > :r_status
+                    reg.status > 0
                     AND reg.opportunity_id IN ({$phases_ids})
-                    AND p.status >= :p_status 
+                    AND p.status >= 0
                     AND reg.number in ({$sub_query}) {$complement_where}";
 
-        $params += [
-            'r_status' => 0,
-            'p_status' => 0
-        ];
 
         $registrations_ids = $conn->fetchAll($query, $params);
-
         
         $ids = [];
         foreach ($registrations_ids as $value) {

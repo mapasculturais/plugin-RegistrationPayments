@@ -5,6 +5,7 @@ use MapasCulturais\Entities\Opportunity;
 use MapasCulturais\Entities\Registration;
 use MapasCulturais\i;
 use MapasCulturais\Utils;
+use RegistrationPayments\Plugin;
 
 return [
     'Cadastra dados bancários das inscrições elegível ao CNAB240 dos novos metadados' => function() {
@@ -23,8 +24,18 @@ return [
             'account_dv' => 'payment_account_dv',
         ];
 
-        $opp_ids = implode(",",array_keys($opportunitysCnab));
-        DB_UPDATE::enqueue('Registration', "opportunity_id in ({$opp_ids})", function (Registration $registration) use ($opportunitysCnab, $app, $banc_data_fields) {
+        $keys = array_keys($opportunitysCnab);
+        
+        // filter numeric values
+        $keys = array_filter($keys, function($value) {
+            return is_numeric($value);
+        });
+
+        $opp_ids = implode(",",$keys);
+
+        Plugin::getInstance()->registeredPaymentMetadata();
+
+        DB_UPDATE::enqueue('Registration', "status = 10 AND opportunity_id in ({$opp_ids})", function (Registration $registration) use ($opportunitysCnab, $app, $banc_data_fields) {
             
             $processValue = function($registration) use ($opportunitysCnab, $app, $banc_data_fields) {
                 $opportunity = $registration->opportunity->firstPhase;
@@ -38,12 +49,15 @@ return [
                     $social_type = $config['settings']['social_type'][ $category];
                 }else {
                     $_field = 'field_'.$config['social_type'];
+                    if(!($registration->$_field)) {
+                        echo "VAZIO =========================\n======================== \n\n(status: {$registration->status}) {$registration->number} {$registration->id} === $_field\n\n ==========\n";
+                    }
                     $social_type = $config['settings']['social_type'][$registration->$_field];
                   
                 }
     
                 $reg_first_phase->payment_social_type = $social_type;
-                
+                $modified = false;
                 foreach($banc_data_fields as $ref => $field) {
                     $field = $banc_data_fields[$ref];
     
@@ -59,12 +73,21 @@ return [
                         $value = $value === "Conta corrente" ? 1 : 2;
                     }
     
-                    $reg_first_phase->$field = $value;
-                    $reg_first_phase->payment_sent_timestamp = $registration->sentTimestamp ? $registration->sentTimestamp->format('Y-m-d H:i:s') : (new DateTime('now'))->format('Y-m-d H:i:s');
+                    if(!$reg_first_phase->$field && $value) {
+                        echo "$field ---------> $value\n";
+                        $modified = true;
+                        $reg_first_phase->$field = $value;
+                    }
                 }
-    
-                $app->log->debug("Opportunidade {$registration->opportunity->id} -- Dados bancários da inscrição {$registration->id} salvo nos novos metadados");
-                $reg_first_phase->save(true);
+                
+                if($modified) {
+                    $reg_first_phase->payment_sent_timestamp = $registration->sentTimestamp ? $registration->sentTimestamp->format('Y-m-d H:i:s') : (new DateTime('now'))->format('Y-m-d H:i:s');
+                    $app->log->debug("Opportunidade {$registration->opportunity->id} -- Dados bancários da inscrição {$registration->id} salvos nos novos metadados");
+                    echo "\n\n";
+
+                    $reg_first_phase->save(true);
+                }
+                
             };
 
             $processValue($registration);

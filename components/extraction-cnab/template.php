@@ -32,7 +32,7 @@ $this->import('
 
             <div class="field col-6" :class="{'error': fieldError('lotType')}">
                 <label><?= i::__('Tipo de exportação') ?> <span class="required">* <?= i::__('Obrigatório') ?></span></label>
-                <mc-select :default-value="cnabData.lotType" @change-option="setCnabType" class="col-6" :class="{'error': fieldError('lotType')}">
+                <mc-select v-model:default-value="cnabData.lotType" class="col-6" :class="{'error': fieldError('lotType')}">
                     <option value="1"><?= i::__('Corrente BB') ?></option>
                     <option value="2"><?= i::__('Poupança BB') ?></option>
                     <option value="3"><?= i::__('Outros Bancos') ?></option>

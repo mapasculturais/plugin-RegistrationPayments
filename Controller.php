@@ -714,7 +714,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
         if($this->data['registrationFilter']){
 
-            $registration_numbers = preg_split ('/[,|;|\n|\r]/', $this->data['registrationFilter']);
+            $registration_numbers = preg_split ('/[,|;|\n|\r ]+/', $this->data['registrationFilter']);
             $registration_numbers = array_map(fn($number) => "'$number'", $registration_numbers);
             $registration_numbers = implode(',', $registration_numbers);
 

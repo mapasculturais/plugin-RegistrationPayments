@@ -31,7 +31,7 @@ $url = $app->createUrl('payment', 'export');
 ?>
 <div class="payment-tab__container">
     <div class="opportunity-payment-table">
-        <entity-table type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options" visible="registration,paymentDate,amount,status,options" @clear-filters="clearFilters">
+        <entity-table showIndex identifier="opportunityPaymentTable" type="payment" :select="select" :query="query" :headers="headers" endpint required="registration,options" visible="registration,paymentDate,amount,status,options" @clear-filters="clearFilters" @remove-filter="removeFilter($event)">
             
             <template #title>
                 <h3 class="bold"><?= i::__('Pagamentos') ?></h3>
@@ -114,7 +114,7 @@ $url = $app->createUrl('payment', 'export');
                             <input ref="allStatus" type="checkbox" @click="showAllStatus(entities)"> <?= i::__('Todos os status') ?>
                         </label>
                         <label class="field__checkbox" v-for="status in statusList">
-                            <input :checked="filters.status?.includes(status.value)" type="checkbox" :value="status.value" @input="statusFilter($event,entities)"> {{status.label}} 
+                            <input ref="status" :checked="filters.status?.includes(status.value)" type="checkbox" :value="status.value" @input="statusFilter($event,entities)"> {{status.label}} 
                         </label>
                     </div>
                 </div>

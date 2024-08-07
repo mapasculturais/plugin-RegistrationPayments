@@ -227,12 +227,36 @@ app.component('opportunity-payment-table', {
 
         clearFilters(entities) {
             this.$refs.allStatus.checked = false;
+            this.$refs.status.forEach((checkbox) => {
+                if (checkbox.checked) {
+                  checkbox.checked = false;
+                }
+            });
             this.filters.status = [];
             this.filters.paymentFrom = '';
             this.filters.paymentTo = '';
             this.query['status'] = `GTE(0)`;
             delete this.query['paymentDate'];
             entities.refresh();
+        },
+
+        removeFilter(filter) {
+            switch(filter.prop) {
+                case 'status':
+                    this.filters.status = this.filters.status.filter(status => status != filter.value);
+                    this.$refs.status.forEach((checkbox) => {
+                        if (checkbox.checked) {
+                          checkbox.checked = false;
+                        }
+                    });
+                    break;
+                case 'paymentFrom':
+                    this.filters.paymentFrom = '';
+                    break;
+                case 'paymentTo':
+                    this.filters.paymentTo = '';
+                    break;
+            }
         },
 
         change(event,entities) {            

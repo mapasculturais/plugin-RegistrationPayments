@@ -6,8 +6,8 @@
  */
 
 $this->import('
-    payment-config
-')
+    payment-active-config
+');
 ?>
 
-<payment-config v-if="global.mcTabActive === 'config'" :entity="items[0]"></payment-config>
+<payment-active-config :entity="phase" :phases="phases"></payment-active-config>

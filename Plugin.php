@@ -294,6 +294,15 @@ class Plugin extends \MapasCulturais\Plugin{
             'type' => 'boolean',
             'default' => false,
         ]);
+
+        $this->registerOpportunityMetadata('active_payment_phase', [
+            'label' => 'Configurar pagamento',
+            'type' => 'boolean',
+            'default' => false,
+            'unserialize' => function($value){
+                return $value == 1 ? true : false;
+            }
+        ]);
         
         $this->registerRegistrationMetadata('financial_validator_filename', [
             'label' => 'Nome do arquivo de criação de pagamentos',

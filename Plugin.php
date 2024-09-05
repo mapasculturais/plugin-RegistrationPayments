@@ -260,7 +260,7 @@ class Plugin extends \MapasCulturais\Plugin{
            $this->part('payments/opportunity-payments-enable');
         });
 
-        $app->hook('template(opportunity.edit.mc-stepper-vertical:end)', function() use ($app) {
+        $app->hook('component(opportunity-phase-config-data-collection):bottom', function() use ($app) {
             /** @var Theme $this */ 
             $this->part('payments/opportunity-payments-config');
         });

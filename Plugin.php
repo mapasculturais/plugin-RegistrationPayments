@@ -346,14 +346,14 @@ class Plugin extends \MapasCulturais\Plugin{
         );
      
         $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {
-            if($this->has_payment_phase) {
+            if($this->active_payment_phase) {
                 $self->registeredPaymentMetadata(); 
             }
         });
 
         // Remove os erros de validação dos campos de pagamento para inscrições nao selecionadas na fase final
         $app->hook('entity(Registration).validationErrors', function(&$errors) {
-            if(!$this->lastPhase || $this->lastPhase->status != Registration::STATUS_APPROVED) {
+            if(!$this->opportunity->active_payment_phase) {
                 include __DIR__."/registereds/payment_bank_data.php";
                 $fields_meta = array_keys($payment_bank_data);
                 foreach($fields_meta as $value) {

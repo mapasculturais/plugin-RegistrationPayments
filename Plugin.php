@@ -19,6 +19,7 @@ require_once 'vendor/autoload.php';
 class Plugin extends \MapasCulturais\Plugin{
 
     protected static $instance = null;
+    public static $saved_ids;
 
     function __construct(array $config = [])
     {
@@ -206,10 +207,6 @@ class Plugin extends \MapasCulturais\Plugin{
             $app->enableAccessControl();
             $conn->commit();
         }
-
-        $app->hook("module(OpportunityPhases).dataCollectionPhaseData", function(&$mout_simplify) {
-            $mout_simplify.=",payment_processed_files";
-        });
 
         $app->hook('mapas.printJsObject:before', function () {            
             $statusDic = [
@@ -404,20 +401,62 @@ class Plugin extends \MapasCulturais\Plugin{
             )
         );
 
-        
-        
+        // Insere os metados payment_processed_files e active_payment_phase no retorno da API 
+        $app->hook("module(OpportunityPhases).dataCollectionPhaseData", function(&$mout_simplify) {
+            $mout_simplify.=",payment_processed_files,active_payment_phase";
+        });
 
-        // Exibe o botão e os dados sobre a fase de pagamentos nas timilines
-        $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {
-            $entity = $this->controller->requestedEntity;
-            if($entity instanceof \MapasCulturais\Entities\Registration) {
-                if($entity->opportunity->firstPhase->has_payment_phase && $entity->lastPhase->status == Registration::STATUS_APPROVED) {
-                    $this->part("registration/registration-payment-timeline", ['isOpportunity' => false]);
-                }
-            } elseif ($entity instanceof \MapasCulturais\Entities\Opportunity) {
-                if($entity->firstPhase->has_payment_phase) {
-                    $this->part("registration/registration-payment-timeline", ['isOpportunity' => true]);
-                }
+        // Registra os metadados de pagamento da oportunidade e inscrições em todas as requisições
+        $app->hook('<<GET|POST|PUT|PATCH|DELETE>>(<<registration|opportunity>>.<<*>>):before', function() {
+            $plugin = self::getInstance();
+            $plugin->registeredPaymentMetadata();      
+        });
+
+        // Cria setters na inscrição para os metadados dos dados de pagamento
+        $app->hook('entity(registration).set(<<payment_*>>)', function(&$value, $property_name) use($app){
+            if(!$this->opportunity->isFirstPhase) {
+                $plugin = self::getInstance();
+                $plugin->registeredPaymentMetadata();
+                $this->save_first_phase = true;
+                $first_phase = $this->firstPhase;
+                $first_phase->$property_name = $value;
+            }
+        });
+        
+        // salva o dados de pagamentos na primeira fase
+        $app->hook('entity(registration).save:finish', function() use($app){
+            if($this->save_first_phase && !isset(self::$saved_ids[$this->id])) {
+                self::$saved_ids[$this->id] = true; 
+                $this->firstPhase->save(true);
+            }
+        });
+
+        // Carrega o formulario dos dados de pagamento no formulario corrente da inscrição
+        $app->hook("component(registration-form):end", function() {
+            $registration = $this->controller->requestedEntity;
+            
+            if($registration->opportunity->active_payment_phase) {
+                $this->part("registration/registration-payment-form", ['entity' => $registration]);
+            }
+        });
+
+        // Insere o dados de pagamentos da primeira fase no jsonSerialize da inscrição
+        $app->hook('entity(registration).jsonSerialize', function(&$result) use($app){
+            $result['payment_social_type'] = $this->isFirstPhase ? $this->payment_social_type : $this->firstPhase->payment_social_type;
+            $result['payment_proponent_name'] = $this->isFirstPhase ? $this->payment_proponent_name : $this->firstPhase->payment_proponent_name;
+            $result['payment_proponent_document'] = $this->isFirstPhase ? $this->payment_proponent_document :$this->firstPhase->payment_proponent_document;
+            $result['payment_account_type'] = $this->isFirstPhase ? $this->payment_account_type : $this->firstPhase->payment_account_type;
+            $result['payment_bank'] = $this->isFirstPhase ? $this->payment_bank :$this->firstPhase->payment_bank;
+            $result['payment_branch'] = $this->isFirstPhase ? $this->payment_branch : $this->firstPhase->payment_branch;
+            $result['payment_branch_dv'] = $this->isFirstPhase ? $this->payment_branch_dv : $this->firstPhase->payment_branch_dv;
+            $result['payment_account'] = $this->isFirstPhase ? $this->payment_account : $this->firstPhase->payment_account;
+            $result['payment_account_dv'] = $this->isFirstPhase ? $this->payment_account_dv : $this->firstPhase->payment_account_dv;
+        });
+
+        // Faz o formulário ser exibido no modo de visualização da inscrição
+        $app->hook("template(registration.view.registration-form-view):after", function($registration) {
+            if($registration->opportunity->active_payment_phase) {
+                $this->part("registration/registration-payment-form-view", ['entity' => $registration]);
             }
         });
 

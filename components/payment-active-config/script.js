@@ -22,11 +22,7 @@ app.component('payment-active-config', {
         configPayment(){
             let toggle = !this.entity.active_payment_phase
             this.entity.active_payment_phase = toggle;
-
-            if (this.entity.active_payment_phase !== toggle) {
-                this.entity.active_payment_phase = toggle;
-                this.entity.save();
-            }
+            this.entity.save();
         },
     },
 });

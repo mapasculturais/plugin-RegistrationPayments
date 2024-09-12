@@ -347,15 +347,7 @@ class Plugin extends \MapasCulturais\Plugin{
                 'default' => false,
             ]
         );
-
-        $app->hook('<<GET|PUT|PATCH|DELETE>>(<<opportunity|payment>>.<<*>>):before', function() use ($self) {
-            $opportunity = $this->getRequestedEntity();
-            if($opportunity->has_payment_phase) {
-                $self->registeredPaymentMetadata(); 
-            }
-        });
-       
-
+     
         $app->hook("entity(Opportunity).registrationMetadata", function() use ($self) {
             if($this->has_payment_phase) {
                 $self->registeredPaymentMetadata(); 
@@ -412,23 +404,8 @@ class Plugin extends \MapasCulturais\Plugin{
             )
         );
 
-        // Exibe a aba de pagamento para preencimento dos dados 
-        $app->hook("template(registration.view.single-tab):end", function() use ($self) {
-            $self->registeredPaymentMetadata(); 
-            $registration = $this->controller->requestedEntity;
-            $opportunity = $registration->opportunity;
-            $opp_first_phase = $opportunity->firstPhase;
-            
-            $current_date_time = new DateTime();
-            $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
-
-            if($opp_first_phase->has_payment_phase 
-                && $registration->lastPhase->status == Registration::STATUS_APPROVED
-                && $current_date_time >=  $payment_registration_from 
-            ) {
-                $this->part("registration/registration-payment-tab", ['entity' => $registration]);
-            }
-        });
+        
+        
 
         // Exibe o botão e os dados sobre a fase de pagamentos nas timilines
         $app->hook("component(opportunity-phases-timeline).item:after", function() use ($self) {

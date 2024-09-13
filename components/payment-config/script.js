@@ -6,6 +6,10 @@ app.component('payment-config', {
             type: Entity,
             required: true,
         },
+        toggleConfigPayment: {
+            type: Object,
+            required: true,
+        }
     },
 
     computed: {

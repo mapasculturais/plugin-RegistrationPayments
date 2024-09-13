@@ -19,7 +19,7 @@ app.component('payment-active-config', {
     },
 
     methods: {
-        configPayment(){
+        toggleConfigPayment(){
             let toggle = !this.entity.active_payment_phase
             this.entity.active_payment_phase = toggle;
             this.entity.save();

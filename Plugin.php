@@ -477,6 +477,25 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Remove os erros dos campos de dados da entidade mantenedora na criação da oportunidade
+        $app->hook('entity(Opportunity).validationErrors', function(&$errors) {
+            if(!$this->active_payment_phase) {
+                include __DIR__."/registereds/payment_company_data.php";
+                $fields_meta = array_keys($payment_company_data);
+                foreach($fields_meta as $value) {
+                    unset($errors[$value]);
+                }
+            }
+        });
+
+        // Insere botão para preencher formulario na timeline
+        $app->hook("component(opportunity-phases-timeline).item:end", function() {
+            $entity = $this->controller->requestedEntity;
+            if($entity instanceof \MapasCulturais\Entities\Registration) {
+                $this->part("registration/registration-payment-timeline");
+            }
+        });
+
         // Faz o desparo de email quando selecionado na ultima fase
         $app->hook("entity(Registration).status(approved)", function() use ($self){
             $self->registeredPaymentMetadata();

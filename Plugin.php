@@ -350,17 +350,6 @@ class Plugin extends \MapasCulturais\Plugin{
                 $self->registeredPaymentMetadata(); 
             }
         });
-
-        // Remove os erros de validação dos campos de pagamento para inscrições nao selecionadas na fase final
-        $app->hook('entity(Registration).validationErrors', function(&$errors) {
-            if(!$this->opportunity->active_payment_phase) {
-                include __DIR__."/registereds/payment_bank_data.php";
-                $fields_meta = array_keys($payment_bank_data);
-                foreach($fields_meta as $value) {
-                    unset($errors[$value]);
-                }
-            }
-        });
         
         $app->registerFileGroup(
             'opportunity',
@@ -484,6 +473,18 @@ class Plugin extends \MapasCulturais\Plugin{
 
             if ($opportunity->active_payment_phase && $opportunity->isRegistrationOpen() && $this->status == 0) {
                 $result = true;
+            }
+        });
+
+         // Remove os erros de validação dos campos de pagamento para inscrições nao selecionadas na fase final
+         $app->hook('entity(Registration).validationErrors', function(&$errors) {
+            /** @var Registration $this */
+            if(!$this->opportunity->active_payment_phase || $this->isNew()) {
+                include __DIR__."/registereds/payment_bank_data.php";
+                $fields_meta = array_keys($payment_bank_data);
+                foreach($fields_meta as $value) {
+                    unset($errors[$value]);
+                }
             }
         });
 

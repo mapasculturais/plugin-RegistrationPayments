@@ -10,7 +10,7 @@ app.component('registration-payment-form', {
 
     computed: {
         opportunity() {
-            return $MAPAS.config.registrationPaymentTab.opportunity;
+            return $MAPAS.config.registrationPaymentForm.opportunity;
         },
     },
 
@@ -27,11 +27,13 @@ app.component('registration-payment-form', {
                 return `${date.date('numeric year')} ${this.text('as')} ${date.time('numeric')} `;
             }
         },
+        
         isEditable() {
-            if(this.entity?.sentTimestamp == null || this.entity?.sentTimestamp == '') {
+            if(this.entity.status == 0 || this.entity.active_payment_phase) {
                 return true;
             }
 
+            return false;
         },
         
         showButtons() {

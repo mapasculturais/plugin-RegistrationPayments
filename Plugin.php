@@ -432,7 +432,9 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         // Carrega o formulario dos dados de pagamento no formulario corrente da inscrição
-        $app->hook("component(registration-form):end", function() {
+        $app->hook("component(registration-form):end", function() 
+        {
+            /** @var Theme $this */
             $registration = $this->controller->requestedEntity;
             
             if($registration->opportunity->active_payment_phase) {
@@ -454,26 +456,35 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         // Faz o formulário ser exibido no modo de visualização da inscrição
-        $app->hook("template(registration.view.registration-form-view):after", function($registration) {
+        $app->hook("template(registration.view.registration-form-view):after", function($registration)  use ($self) {
+            /** @var Theme $this */
+            if($registration->opportunity->active_payment_phase) {
+                $this->part("registration/registration-payment-form-view", ['entity' => $registration]);
+            }
+        });
+
+         // Faz o formulário ser exibido na tela de avaliação para o avaliador
+         $app->hook("template(registration.evaluation.registration-evaluation-view):after", function($registration) {
+             /** @var Theme $this */
+            $plugin = self::getInstance();
+            $plugin->registeredPaymentMetadata();  
+
+            eval(\psy\sh());
             if($registration->opportunity->active_payment_phase) {
                 $this->part("registration/registration-payment-form-view", ['entity' => $registration]);
             }
         });
 
         // Ajusta permissão de modificação do pagamento mesmo depois da inscrição enviada
-        $app->hook("entity(Registration).canUser(modify)", function($user, &$result) use ($self, $app) {
-            $self->registeredPaymentMetadata();            
+        $app->hook("entity(Registration).canUser(modify)", function ($user, &$result) {
+            /** @var Opportunity $opportunity */
             $opportunity = $this->opportunity;
-            $opp_first_phase = $opportunity->firstPhase;
+            
+            $plugin = self::getInstance();
+            $plugin->registeredPaymentMetadata();  
 
-            if($opp_first_phase->payment_registration_from && $opp_first_phase->payment_registration_to) {
-                $current_date_time = new DateTime();
-                $payment_registration_from = new DateTime($opp_first_phase->payment_registration_from);
-                $payment_registration_to = new DateTime($opp_first_phase->payment_registration_to);
-    
-                if(($current_date_time >= $payment_registration_from  && $current_date_time < $payment_registration_to)) {
-                    $result = true;
-                }
+            if ($opportunity->active_payment_phase && $opportunity->isRegistrationOpen() && $this->status == 0) {
+                $result = true;
             }
         });
 
@@ -497,8 +508,10 @@ class Plugin extends \MapasCulturais\Plugin{
         });
 
         // Faz o desparo de email quando selecionado na ultima fase
-        $app->hook("entity(Registration).status(approved)", function() use ($self){
-            $self->registeredPaymentMetadata();
+        $app->hook("entity(Registration).status(approved)", function(){
+            $plugin = self::getInstance();
+            $plugin->registeredPaymentMetadata(); 
+
             $opportunity = $this->opportunity;
             if($opportunity->firstPhase->has_payment_phase 
                 && $opportunity->isLastPhase

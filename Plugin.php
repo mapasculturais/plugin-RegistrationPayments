@@ -469,7 +469,6 @@ class Plugin extends \MapasCulturais\Plugin{
             $plugin = self::getInstance();
             $plugin->registeredPaymentMetadata();  
 
-            eval(\psy\sh());
             if($registration->opportunity->active_payment_phase) {
                 $this->part("registration/registration-payment-form-view", ['entity' => $registration]);
             }

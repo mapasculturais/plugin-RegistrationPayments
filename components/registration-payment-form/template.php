@@ -18,7 +18,7 @@ $this->import('
         <h3><?= i::__('Informações bancárias') ?></h3>
 
         <div class="grid-12">
-        <div v-if="isEditable()" class="col-12">
+            <div v-if="isEditable()" class="col-12">
                 <entity-field :entity="entity" prop="payment_proponent_name"></entity-field>
             </div>
             <div v-else class="col-12 field">

@@ -126,8 +126,6 @@ return [
                 
                 $firstPhase = $opportunity->firstPhase;
                 $firstPhase->has_payment_phase = true;
-                $firstPhase->payment_registration_from = $firstPhase->registrationFrom->format("Y-m-y H:i:s");
-                $firstPhase->payment_registration_to = $firstPhase->registrationTo->format("Y-m-y H:i:s");
 
                 foreach($company_data_fields as $key => $field) {
                     $firstPhase->$field = trim($cnab240_company_data[$key]);

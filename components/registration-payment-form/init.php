@@ -11,9 +11,9 @@ use RegistrationPayments\Plugin;
  $entity = $this->controller->requestedEntity;
 
  $paymentData = $entity->firstPhase->simplify("id,payment_social_type,payment_proponent_name,payment_proponent_document,payment_account_type,payment_bank,payment_branch,payment_branch_dv,payment_account,payment_account_dv,payment_sent_timestamp");
- $opportunity = $entity->opportunity->firstPhase->simplify('id,payment_registration_from,payment_registration_to,active_payment_phase');
+ $opportunity = $entity->opportunity->firstPhase->simplify('id,active_payment_phase');
 
- $this->jsObject['config']['registrationPaymentTab'] = [
+ $this->jsObject['config']['registrationPaymentForm'] = [
     'paymentData' => $paymentData,
     'opportunity' => $opportunity
  ];

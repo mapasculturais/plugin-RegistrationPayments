@@ -2,12 +2,12 @@ app.component('registration-payment-timeline', {
     template: $TEMPLATES['registration-payment-timeline'],
 
     props: {
-        opportunity: {
+        registration: {
             type: Entity,
             required: true,
         },
-        isOpportunity: {
-            type: Boolean,
+        opportunity: {
+            type: Entity,
             required: true,
         },
     },
@@ -41,12 +41,8 @@ app.component('registration-payment-timeline', {
     },
 
     methods: {
-        isPaymentDataOpen() {
-            if((this.opportunity.payment_registration_from.isPast() || this.opportunity.payment_registration_from.isToday()) && this.opportunity.payment_registration_to.isFuture()) {
-                return true;
-            }
-
-            return false;
-        }
+        isDataCollectionPhase(opportunity) {
+            return opportunity.isDataCollection && opportunity.active_payment_phase && !this.registration.sentTimestamp;
+		},
     },
 });

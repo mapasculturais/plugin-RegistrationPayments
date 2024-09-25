@@ -14,6 +14,13 @@ app.component('registration-payment-form', {
         },
     },
 
+    created() {
+       const fields = this.paymentDataFields();
+       fields.forEach(field => {
+            this.entity[field] = $MAPAS.config.registrationPaymentForm.paymentData[field] || null
+       });
+    },
+
     setup() {
         const text = Utils.getTexts('registration-payment-tab')
         return { text }
@@ -45,6 +52,19 @@ app.component('registration-payment-form', {
             }
             
             return show;
+        },
+        paymentDataFields() {
+            return [
+                'payment_social_type',
+                'payment_proponent_name',
+                'payment_proponent_document',
+                'payment_account_type',
+                'payment_bank',
+                'payment_branch',
+                'payment_branch_dv',
+                'payment_account',
+                'payment_account_dv',
+            ]
         }
     }
 });

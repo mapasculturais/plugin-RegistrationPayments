@@ -499,13 +499,6 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
-        // Insere botão para preencher formulario na timeline
-        $app->hook("component(opportunity-phases-timeline).item:end", function() {
-            $entity = $this->controller->requestedEntity;
-            if($entity instanceof \MapasCulturais\Entities\Registration) {
-                $this->part("registration/registration-payment-timeline");
-            }
-        });
 
         // Faz o desparo de email quando selecionado na ultima fase
         $app->hook("entity(Registration).status(approved)", function(){

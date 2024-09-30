@@ -1,0 +1,48 @@
+.payment-form {
+    padding: 15px;
+    border-radius: 5px;
+
+    h3 {
+        margin-bottom: 15px;
+    }
+
+    &.evaluation-empty {
+        background-color: #E8E8E8;
+    }
+
+    &.field-shadow {
+        border: solid 1px #000;
+    }
+
+    &.evaluation-valid {
+        background-color: #E3FFE2;
+    }
+
+    &.evaluation-invalid {
+        background-color: #FFE3E3;
+    }
+
+    &__view {
+        .field {
+            label {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 700;
+                font-size: 14px;
+                line-height: 19px;
+
+                &.is-required::before { 
+                    content: "*";
+                }
+            }
+
+            span {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 700;
+                font-size: 18px;
+                line-height: 25px;
+            }
+        }
+    }
+}

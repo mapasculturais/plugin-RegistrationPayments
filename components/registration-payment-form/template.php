@@ -12,83 +12,93 @@ $this->import('
     mc-card
 ');
 ?>
+<div ref="paymentForm" :class="'payment-form evaluation-'+evaluationClass">
+    <h3><?= i::__('Informações bancárias') ?></h3>
 
-<div class="registration__content">
-    <mc-card>
-        <h3><?= i::__('Informações bancárias') ?></h3>
-
-        <div class="grid-12">
-            <div v-if="isEditable()" class="col-12">
-                <entity-field :entity="entity" prop="payment_proponent_name"></entity-field>
-            </div>
-            <div v-else class="col-12 field">
-                <label class="field__title" for="payment_proponent_name"><?= i::__('Nome do proponente') ?></label>
-                <input id="payment_proponent_name" :value="entity.payment_proponent_name" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_social_type"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_social_type"><?= i::__('Tipo social') ?></label>
-                <input id="payment_social_type" :value="entity.payment_social_type" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_proponent_document" mask="['###.###.###-##', '##.###.###/####-##']"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_proponent_document"><?= i::__('Documento do proponente') ?></label>
-                <input id="payment_proponent_document" :value="entity.payment_proponent_document" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-12">
-                <entity-field :entity="entity" prop="payment_account_type"></entity-field>
-            </div>
-            <div v-else class="col-12 field">
-                <label class="field__title" for="payment_account_type"><?= i::__('Tipo de conta') ?></label>
-                <input id="payment_account_type" :value="entity.payment_account_type" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-12">
-                <entity-field :entity="entity" prop="payment_bank"></entity-field>
-            </div>
-            <div v-else class="col-12 field">
-                <label class="field__title" for="payment_bank"><?= i::__('Banco') ?></label>
-                <input id="payment_bank" :value="entity.payment_bank" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_branch"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_branch"><?= i::__('Agência sem o dígito') ?></label>
-                <input id="payment_branch" :value="entity.payment_branch" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_branch_dv" mask="**"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_branch_dv"><?= i::__('Dígito verificador da agência') ?></label>
-                <input id="payment_branch_dv" :value="entity.payment_branch_dv" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_account"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_account"><?= i::__('Conta sem o dígito') ?></label>
-                <input id="payment_account" :value="entity.payment_account" type="text" autocomplete="off" disabled>
-            </div>
-
-            <div v-if="isEditable()" class="col-6">
-                <entity-field :entity="entity" prop="payment_account_dv"></entity-field>
-            </div>
-            <div v-else class="col-6 field">
-                <label class="field__title" for="payment_account_dv"><?= i::__('Dígito verificador da conta') ?></label>
-                <input id="payment_account_dv" :value="entity.payment_account_dv" type="text" autocomplete="off" disabled>
-            </div>
+    <div v-if="isEditable()" class="grid-12 payment-form__edit">
+        <div class="col-12">
+            <entity-field :entity="entity" prop="payment_proponent_name"></entity-field>
         </div>
-    </mc-card>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_social_type"></entity-field>
+        </div>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_proponent_document" mask="['###.###.###-##', '##.###.###/####-##']"></entity-field>
+        </div>
+
+        <div class="col-12">
+            <entity-field :entity="entity" prop="payment_account_type"></entity-field>
+        </div>
+
+        <div class="col-12">
+            <entity-field :entity="entity" prop="payment_bank"></entity-field>
+        </div>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_branch"></entity-field>
+        </div>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_branch_dv" mask="**"></entity-field>
+        </div>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_account"></entity-field>
+        </div>
+
+        <div class="col-6">
+            <entity-field :entity="entity" prop="payment_account_dv"></entity-field>
+        </div>
+    </div>
+    
+    <div v-else @click="toggleEvaluationForm()" class="grid-12 payment-form__view">
+        <div class="col-6 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_proponent_name')}" for="payment_proponent_name"><?= i::__('Nome do proponente') ?>:</label>
+            <span>{{entity.payment_proponent_name}}</span>
+        </div>
+
+        <div class="col-6 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_proponent_document')}" for="payment_proponent_document"><?= i::__('Documento do proponente') ?>:</label>
+            <span>{{entity.payment_proponent_document}}</span>
+        </div>
+
+
+        <div class="col-4 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_social_type')}" for="payment_social_type"><?= i::__('Tipo social') ?>:</label>
+            <span>{{entity.payment_social_type}}</span>
+        </div>
+
+
+        <div class="col-4 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_account_type')}" for="payment_account_type"><?= i::__('Tipo de conta') ?>:</label>
+            <span>{{entity.payment_account_type}}</span>
+        </div>
+
+        <div class="col-4 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_bank')}" for="payment_bank"><?= i::__('Banco') ?>:</label>
+            <span>{{entity.payment_bank}}</span>
+        </div>
+
+        <div class="col-6 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_branch')}" for="payment_branch"><?= i::__('Agência sem o dígito') ?>:</label>
+            <span>{{entity.payment_branch}}</span>
+        </div>
+
+        <div class="col-6 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_branch_dv')}" for="payment_branch_dv"><?= i::__('Dígito verificador da agência') ?>:</label>
+            <span>{{entity.payment_branch_dv}}</span>
+        </div>
+
+        <div class="col-6 field">
+            <label class="field__title" :class="{'is-required': isRequired('payment_account')}" for="payment_account"><?= i::__('Conta sem o dígito') ?>:</label>
+            <span>{{entity.payment_account}}</span>
+        </div>
+
+        <div class="col-6 field">
+            <strong class="field__title" :class="{'is-required': isRequired('payment_account_dv')}" for="payment_account_dv"><?= i::__('Dígito verificador da conta') ?>:</strong>
+            <span>{{entity.payment_account_dv}}</span>
+        </div>
+    </div>
 </div>

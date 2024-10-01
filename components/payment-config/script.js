@@ -7,7 +7,6 @@ app.component('payment-config', {
             required: true,
         },
         toggleConfigPayment: {
-            type: Object,
             required: true,
         }
     },

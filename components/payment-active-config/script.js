@@ -23,6 +23,7 @@ app.component('payment-active-config', {
             let toggle = !this.entity.active_payment_phase
             this.entity.active_payment_phase = toggle;
             this.entity.save();
+            window.dispatchEvent(new CustomEvent('activePaymentPhase', {detail:{toggle:toggle}}));
         },
     },
 });

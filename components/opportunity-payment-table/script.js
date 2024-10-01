@@ -6,8 +6,14 @@ app.component('opportunity-payment-table', {
             type: Entity,
             required: true,
         },
+        usePayment: {
+            required: true
+        }
     },
     
+     mounted() {
+        window.addEventListener('activePaymentPhase', this.activePaymentPhase);
+    },
     computed: {
         lastPhase() {
             let phase = null;
@@ -114,6 +120,7 @@ app.component('opportunity-payment-table', {
         const phasesId = $MAPAS.config.opportunityPaymentTable.phasesIds;
         const api = new API();
         return {
+            usePaymentPhase: this.usePayment || false,
             processFileLoading: false,
             query: {
                 opportunity: `IN(${phasesId})`,
@@ -133,6 +140,9 @@ app.component('opportunity-payment-table', {
     },
 
     methods: {
+        activePaymentPhase(data) {
+            this.usePaymentPhase = data.detail.toggle;
+        },
         formatDateInput(date) {
             return new Date(date);
         },

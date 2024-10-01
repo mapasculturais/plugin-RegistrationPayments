@@ -112,34 +112,37 @@ app.component('registration-payment-form', {
             ]
         },
         toggleEvaluationForm() {
-            window.postMessage({
-                type: 'evaluationRegistration.clearStyles',
-            });
-
-            if (this.isEvaluationFormOpen && this.paymentFieldOpen) {
-                this.$refs.paymentForm.classList.remove('field-shadow');
-
+            if (this.evaluationType === "documentary") {
                 window.postMessage({
-                    type: 'evaluationForm.closeForm',
-                    element: '',
-                    fieldName: 'field_payment',
-                    fieldId: 'payment',
-                    fieldType: 'field'
-                })
-            } else {
-                this.paymentFieldOpen = true;
-                this.$refs.paymentForm.classList.add('field-shadow');
-
-                window.postMessage({
-                    type: 'evaluationForm.openForm',
-                    element: '',
-                    fieldName: 'field_payment',
-                    fieldId: 'payment',
-                    fieldType: 'field'
+                    type: 'evaluationRegistration.clearStyles',
                 });
+
+                if (this.isEvaluationFormOpen && this.paymentFieldOpen) {
+                    this.$refs.paymentForm.classList.remove('field-shadow');
+
+                    window.postMessage({
+                        type: 'evaluationForm.closeForm',
+                        element: '',
+                        fieldName: 'field_payment',
+                        fieldId: 'payment',
+                        fieldType: 'field'
+                    })
+                } else {
+                    this.paymentFieldOpen = true;
+                    this.$refs.paymentForm.classList.add('field-shadow');
+
+                    window.postMessage({
+                        type: 'evaluationForm.openForm',
+                        element: '',
+                        fieldName: 'field_payment',
+                        fieldId: 'payment',
+                        fieldType: 'field'
+                    });
+                }
+
+                this.isEvaluationFormOpen = !this.isEvaluationFormOpen;
             }
 
-            this.isEvaluationFormOpen = !this.isEvaluationFormOpen;
         }
     }
 });

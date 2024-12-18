@@ -18,9 +18,9 @@ use MapasCulturais\i;
         <div class="item__content--description">
             <h5 class="semibold"> 
                 <?= i::__('de') ?> 
-                <span>{{opportunity.payment_registration_from.date('numeric year')}} {{opportunity.payment_registration_from.time('numeric')}}</span>  
+                <span>{{opportunity?.payment_registration_from?.date('numeric year')}} {{opportunity?.payment_registration_from?.time('numeric')}}</span>  
                 <?= i::__('a') ?>
-                <span>{{opportunity.payment_registration_to.date('numeric year')}} {{opportunity.payment_registration_to.time('numeric')}}</span>  
+                <span>{{opportunity?.payment_registration_to?.date('numeric year')}} {{opportunity?.payment_registration_to?.time('numeric')}}</span>  
             </h5>
         </div>
 

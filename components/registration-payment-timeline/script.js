@@ -42,7 +42,7 @@ app.component('registration-payment-timeline', {
 
     methods: {
         isPaymentDataOpen() {
-            if((this.opportunity.payment_registration_from.isPast() || this.opportunity.payment_registration_from.isToday()) && this.opportunity.payment_registration_to.isFuture()) {
+            if((this.opportunity?.payment_registration_from?.isPast() || this.opportunity?.payment_registration_from?.isToday()) && this.opportunity?.payment_registration_to?.isFuture()) {
                 return true;
             }
 

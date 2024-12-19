@@ -73,7 +73,7 @@ return [
                         $value = $value === "Conta corrente" ? 1 : 2;
                     }
     
-                    if(!$reg_first_phase->$field && $value) {
+                    if(!$reg_first_phase->$field && $value || $reg_first_phase->$field != $value) {
                         echo "$field ---------> $value\n";
                         $modified = true;
                         $reg_first_phase->$field = $value;

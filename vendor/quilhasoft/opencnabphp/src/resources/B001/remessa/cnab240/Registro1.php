@@ -119,7 +119,7 @@ class Registro1 extends Generico1 {
             'tamanho' => 1,
             'default' => '',
             'tipo' => 'alfa',
-            'required' => true),
+            'required' => false),
         'conta' => array(//14.1
             'tamanho' => 12,
             'default' => '',

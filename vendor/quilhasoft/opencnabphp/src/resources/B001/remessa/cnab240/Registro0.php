@@ -102,7 +102,7 @@ class Registro0 extends Generico0
 			'tamanho' => 1,
 			'default' => '',
 			'tipo' => 'alfa',
-			'required' => true
+			'required' => false
 		),
 		'conta' => array( // 10.0
 			'tamanho' => 12,

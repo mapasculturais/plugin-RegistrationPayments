@@ -447,6 +447,11 @@ class Plugin extends \MapasCulturais\Plugin{
                 return $value == 1 ? true : false;
             }
         ]);
+
+        $this->registerOpportunityMetadata('payment_step_form', [
+            'label' => 'Etapa que o formulário será exibida',
+            'type' => 'int',
+        ]);
         
         $this->registerRegistrationMetadata('financial_validator_filename', [
             'label' => 'Nome do arquivo de criação de pagamentos',

@@ -7,8 +7,8 @@ $payment_bank_data = [
         'label' => 'Tipo social',
         'type' => 'select',
         'options' => [
-            1 => i::__('Pessoa física'),
-            2 => i::__('Pessoa jurídica'),
+            '1' => i::__('Pessoa física'),
+            '2' => i::__('Pessoa jurídica'),
         ],
         'validations' => [
             'required' => i::__("O Tipo social é obrigatório")

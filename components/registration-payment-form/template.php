@@ -12,7 +12,7 @@ $this->import('
     mc-card
 ');
 ?>
-<div ref="paymentForm" :class="'payment-form evaluation-'+evaluationClass">
+<div v-if="showForm()" ref="paymentForm" :class="'payment-form evaluation-'+evaluationClass">
     <h3><?= i::__('Informações bancárias') ?></h3>
 
     <div v-if="isEditable()" class="grid-12 payment-form__edit">

@@ -5,19 +5,15 @@ app.component('registration-payment-form', {
         entity: {
             type: Entity,
             required: true
-        }
+        },
+         step: {
+            type: Entity
+        },
     },
 
     setup() {
         const text = Utils.getTexts('registration-payment-tab')
         return { text }
-    },
-
-    created() {
-        const fields = this.paymentDataFields();
-        fields.forEach(field => {
-            this.entity[field] = $MAPAS.config.registrationPaymentForm.paymentData[field] || null
-        });
     },
 
     mounted() {
@@ -58,6 +54,26 @@ app.component('registration-payment-form', {
     },
 
     methods: {
+        showForm() {
+            if($MAPAS.route.action === "evaluation") {
+                return true;
+            }
+
+            if(this.entity.opportunity.registrationSteps.length <= 1) {
+                return true;
+            }
+
+            if((this.entity.opportunity.payment_step_form == 0 || !this.entity.opportunity.payment_step_form) && this.step.id == this.entity.opportunity.registrationSteps[0].id) {
+                return true;
+            }
+
+            if(this.step?.id == this.entity.opportunity?.payment_step_form) {
+                return true;
+            }
+
+            return false;
+        },
+
         setClass(className) {
             const $field = this.$refs.paymentForm;
 

@@ -147,4 +147,18 @@ return [
         }
         $app->enableAccessControl();
     },
+    'Habilita aba de pagamento para as fases de oportunidades legadas' => function() use ($app, $em, $conn) {
+        $app->log->debug('Teste Db-Update');
+
+        if($registration_ids = $conn->fetchAll("SELECT object_id FROM  opportunity_meta WHERE key = 'has_payment_phase' AND value = '1'")) {
+            foreach($registration_ids as $value) {
+                $opportunity = $app->repo("Opportunity")->find($value['object_id']);
+                $opportunity->active_payment_phase = 1;
+                $opportunity->save(true);
+                $app->em->clear();
+            }
+        }
+
+        return false;
+    }
 ];

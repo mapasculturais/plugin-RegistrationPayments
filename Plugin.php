@@ -369,6 +369,32 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Adiciona campos na exibição de erros do formulario de inscrição
+        $app->hook('component(registration-actions).additionalValidateFields', function (&$additionalValidateFields, &$additionalValidateFieldsSteps) {
+            $entity = $this->controller->requestedEntity;
+            $step_id = $entity->opportunity->payment_step_form;
+
+            include __DIR__ . "/registereds/payment_bank_data.php";
+            $fields_meta = array_keys($payment_bank_data);
+            foreach ($fields_meta as $value) {
+                $additionalValidateFieldsSteps[$value] = $step_id;
+                array_push($additionalValidateFields, $value);
+            }
+        });
+
+        // Sincroniza os dados de pagamento entre as inscrições das fases
+        $app->hook('entity(Registration).insert:after', function () use ($plugin) {
+            /** @var Opportunity $this */
+            if ($this->firstPhase) {
+                $plugin->registeredPaymentMetadata(); 
+                include __DIR__ . "/registereds/payment_bank_data.php";
+                $fields_meta = array_keys($payment_bank_data);
+                foreach ($fields_meta as $value) {
+                    $this->$value =  $this->firstPhase->$value;
+                }
+                $this->save(true);
+            }
+        });
 
         // Faz o desparo de email quando selecionado na ultima fase
         $app->hook("entity(Registration).status(approved)", function() use ($plugin) {

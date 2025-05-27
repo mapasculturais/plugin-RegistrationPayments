@@ -1,4 +1,4 @@
-.payment-config{
+.payment-config {
     border-radius: var(--mc-border-radius-xs);
     border: 0.0625rem solid var(--mc-gray-300);
     display: flex;
@@ -7,10 +7,37 @@
 
 }
 
-.payment-config-title{
+.payment-config-title {
     width: 10rem;
     height: 2rem;
     line-height: 2rem;
     padding-right: 0.5rem;
     padding-top: 1.5rem;
+}
+
+.paymet-form-step {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    gap: 10px;
+    border: solid 1px #00000036;
+    padding: 7px;
+    border-radius: 5px;
+
+    .title {
+        font-weight: bold;
+    }
+
+    .steps {
+        display: grid;
+        gap: 10px;
+        overflow: hidden;
+        grid-template-columns: repeat(3, 1fr);
+
+        label {
+            display: flex;
+            gap: 5px;
+        }
+    }
 }

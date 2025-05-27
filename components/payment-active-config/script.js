@@ -15,6 +15,9 @@ app.component('payment-active-config', {
     computed: {
         firstPhase(){
             return this.phases[0];
+        },
+        opportunityPhase() {
+            return this.entity;
         }
     },
 

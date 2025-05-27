@@ -12,5 +12,5 @@ $this->import('
 ');
 ?>
 
-<payment-config v-if="entity.active_payment_phase" :toggleConfigPayment="toggleConfigPayment" :entity="firstPhase"></payment-config>
+<payment-config v-if="entity.active_payment_phase" :toggleConfigPayment="toggleConfigPayment" :entity="firstPhase" :phase="opportunityPhase"></payment-config>
 <button v-if="!entity.active_payment_phase" class="button button--primary w-100" @click="toggleConfigPayment()"><?= i::__('Configurar pagamentos')?></button>

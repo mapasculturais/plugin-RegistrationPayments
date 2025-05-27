@@ -25,6 +25,22 @@ $this->import('
             </button>
         </div>
     </div>
+    <div v-if="phase.registrationSteps.length > 1" class="paymet-form-step">
+        <div class="title">
+            <h5 class="title"><?= i::__('Selecione abaixo em qual etapa do formulário os dados bancários deverão ser solicitados') ?></h5>
+        </div>
+        <div class="steps">
+            <label v-for="step in phase.registrationSteps" :key="step.id">
+                <input
+                    @click="entity.save()"
+                    type="radio"
+                    name="payment_step"
+                    v-model="entity.payment_step_form"
+                    :value="step.id">
+                    <span class="name">{{ stepNameResolve(step) }}</span>
+            </label>
+        </div>
+    </div>
 
     <article class="">
         <h4 class="bold"><?= i::__('Dados da fonte pagadora') ?></h4><br>

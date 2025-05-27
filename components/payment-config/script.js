@@ -1,6 +1,11 @@
 app.component('payment-config', {
     template: $TEMPLATES['payment-config'],
 
+    setup() {
+        const text = Utils.getTexts('payment-config')
+        return { text }
+    },
+
     props: {
         entity: {
             type: Entity,
@@ -8,6 +13,10 @@ app.component('payment-config', {
         },
         toggleConfigPayment: {
             required: true,
+        },
+        phase: {
+            type: Entity,
+            required: true
         }
     },
 
@@ -18,7 +27,7 @@ app.component('payment-config', {
                 return {
                     item,
                     index,
-                    number: index+1,
+                    number: index + 1,
                     open: () => this.open(index),
                     close: () => this.close(index),
                     toggle: () => this.toggle(index),
@@ -29,6 +38,9 @@ app.component('payment-config', {
     },
 
     data() {
+
+        this.entity.payment_step_form = this.entity.payment_step_form || this.phase.registrationSteps[0].id;
+
         const activeItems = {};
         if (this.opened !== undefined) {
             activeItems[this.opened] = true;
@@ -40,6 +52,14 @@ app.component('payment-config', {
     },
 
     methods: {
+        stepNameResolve(step) {
+            for (const [index, item] of this.phase.registrationSteps.entries()) {
+                if(step.id === item.id) {
+                    return step.name || `${index+1}. ${this.text('etapa')}`
+                }
+            }
+        },
+
         documentMask() {
             let social_type = this.entity.payment_company_data_registration_type;
             return !social_type || social_type == 1 ? "###.###.###-##" : "##.###.###/####-##"
@@ -64,7 +84,7 @@ app.component('payment-config', {
             }
         },
 
-        deletePaymentPhase () {
+        deletePaymentPhase() {
             this.entity.has_payment_phase = !this.entity.has_payment_phase;
             this.entity.save();
             this.unregisterProperties();

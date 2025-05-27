@@ -3,6 +3,11 @@
 use MapasCulturais\i;
 
 $payment_company_data = [
+    'payment_step_form' => [
+        'label' => 'Etapa que o formulário será exibida',
+        'type' => 'int',
+        'default' => 0,
+    ],
     'payment_company_data_name' => [
         'label' => i::__('Nome ou Razão Social'),
         'type' => 'string',

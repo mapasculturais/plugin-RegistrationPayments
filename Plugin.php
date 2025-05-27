@@ -265,7 +265,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
         // Insere os metados payment_processed_files e active_payment_phase no retorno da API 
         $app->hook("module(OpportunityPhases).dataCollectionPhaseData", function(&$mout_simplify) {
-            $mout_simplify.=",payment_processed_files,active_payment_phase";
+            $mout_simplify.=",payment_processed_files,active_payment_phase,payment_step_form";
         });
 
         // Registra os metadados de pagamento da oportunidade e inscrições em todas as requisições

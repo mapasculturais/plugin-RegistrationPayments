@@ -368,7 +368,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'opportunity',
             new Definitions\FileGroup(
                 'export-cnab-files',
-                ['text/plain'],
+                ['^(text/plain|text/csv|application/csv|application/vnd.ms-excel)$'],
                 'O arquivo não e valido',
                 private:true
             )
@@ -378,7 +378,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'opportunity',
             new Definitions\FileGroup(
                 'export-payments-filters-files',
-                ['^text/csv$'],
+                ['^(text/plain|text/csv|application/csv|application/vnd.ms-excel)$'],
                 'O arquivo não e valido',
                 unique:true,
             )
@@ -388,7 +388,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'opportunity',
             new Definitions\FileGroup(
                 'export-financial-validator-files',
-                ['^text/csv$'],
+                ['^(text/plain|text/csv|application/csv|application/vnd.ms-excel)$'],
                 'O arquivo não e valido',
                 unique:true,
             )
@@ -398,7 +398,7 @@ class Plugin extends \MapasCulturais\Plugin{
             'opportunity',
             new Definitions\FileGroup(
                 'import-financial-validator-files',
-                ['^text/csv$'],
+                ['^(text/plain|text/csv|application/csv|application/vnd.ms-excel)$'],
                 'O arquivo não e valido',
             )
         );

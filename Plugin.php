@@ -15,7 +15,7 @@ use RegistrationPayments\JobTypes\GenerateCnab;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
 use DateTime;
 
-require_once 'vendor/autoload.php';
+require_once 'vendor/quilhasoft/opencnabphp/autoloader.php';
 class Plugin extends \MapasCulturais\Plugin{
 
     protected static $instance = null;

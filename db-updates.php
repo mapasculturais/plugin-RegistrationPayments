@@ -122,6 +122,10 @@ return [
         
         $app->disableAccessControl();
         foreach($opportunitysCnab as $opp_id => $settings) {
+            if (!is_numeric($opp_id)) {
+                continue;
+            }
+            
             if($opportunity = $app->repo('Opportunity')->find($opp_id)) {
                 
                 $firstPhase = $opportunity->firstPhase;

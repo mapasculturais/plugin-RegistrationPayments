@@ -1,7 +1,6 @@
 <?php
-if(!$this instanceof \MapasCulturais\Theme) {
-    return;
-}
+
+$this->import('registration-payment-form');
 ?>
 
 <registration-payment-form :step="step" :entity="registration"></registration-payment-form>

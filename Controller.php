@@ -549,7 +549,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
         $company_data = $plugin->config['cnab240_company_data'];
 
-        $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][ $request['lotType']];
+        if(isset($plugin->config['opportunitysCnab'][$opportunity->id])) {
+            $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$request['lotType']];
+        }else {
+            $lot = $plugin->config['opportunitysCnab']['release_type'][$request['lotType']];
+        }
+        
 
         $paymentDate =  $request['paymentDate'] ?? null;
      

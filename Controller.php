@@ -791,9 +791,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
 
         $plugin = Plugin::getInstance();
 
-        $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'];
+        $settings = $plugin->config['opportunitysCnab'][$registration->opportunity->id]['settings'] ?? [];
 
-        $social_type = $plugin->config['opportunitysCnab']['social_type'];
+        $social_type = $settings['social_type'] ?? $plugin->config['opportunitysCnab']['social_type'] ?? [];
 
         $field_id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$value] ?? null;
        
@@ -805,17 +805,38 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         if(is_array($field_id) && isset($field_id['dependence'])){
             if($field_id['dependence'] == "category"){
                 $field_id = $field_id['dependence']; 
-            }else{
-                $field_name = 'field_'.$plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']];
-                $dependence = $social_type[$field_id['dependence']][$registration->$field_name]; 
-                $field_id = $field_id[$dependence];  
+            } else {
+                $dependence_field_id = $plugin->config['opportunitysCnab'][$registration->opportunity->id][$field_id['dependence']] ?? null;
+                
+                if ($dependence_field_id) {
+                    $field_name = 'field_'.$dependence_field_id;
+                    
+                    if (isset($registration->$field_name) && $registration->$field_name) {
+                        $field_value = $registration->$field_name;
+                        
+                        if (isset($social_type[$field_value])) {
+                            $dependence = $social_type[$field_value];
+                            
+                            if (isset($field_id[$dependence])) {
+                                $field_id = $field_id[$dependence];
+                            }
+                        }
+                    }
+                }
             }
                       
         }
 
         $plugin->registeredPaymentMetadata();
         
-        return $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : $value;
+        $result = $tratament ? $tratament($registration, $field_id, $settings, $metadata, $dependence) : '';
+        
+        // Se não conseguiu processar e o valor original é uma chave, retornar vazio ao invés da chave
+        if ($result === $value && in_array($value, ['bank', 'account', 'branch', 'proponent_name', 'proponent_document', 'social_type'])) {
+            return '';
+        }
+        
+        return $result;
     }
 
     public function getImportValidateErros($file) {

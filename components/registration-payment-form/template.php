@@ -67,18 +67,18 @@ $this->import('
 
         <div class="col-4 field">
             <label class="field__title" :class="{'is-required': isRequired('payment_social_type')}" for="payment_social_type"><?= i::__('Tipo social') ?>:</label>
-            <span>{{entity.getHumanReadable('payment_social_type')}}</span>
+            <span>{{entity.payment_social_type}}</span>
         </div>
 
 
         <div class="col-4 field">
             <label class="field__title" :class="{'is-required': isRequired('payment_account_type')}" for="payment_account_type"><?= i::__('Tipo de conta') ?>:</label>
-            <span>{{entity.getHumanReadable('payment_account_type')}}</span>
+            <span>{{entity.payment_account_type}}</span>
         </div>
 
         <div class="col-4 field">
             <label class="field__title" :class="{'is-required': isRequired('payment_bank')}" for="payment_bank"><?= i::__('Banco') ?>:</label>
-            <span>{{entity.getHumanReadable('payment_bank')}}</span>
+            <span>{{entity.payment_bank}}</span>
         </div>
 
         <div class="col-6 field">

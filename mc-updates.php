@@ -38,42 +38,55 @@ return [
         DB_UPDATE::enqueue('Registration', "status = 10 AND opportunity_id in ({$opp_ids})", function (Registration $registration) use ($opportunitysCnab, $app, $banc_data_fields) {
             
             $processValue = function($registration) use ($opportunitysCnab, $app, $banc_data_fields) {
-                $opportunity = $registration->opportunity->firstPhase;
-                $opportunity->lastPhase->registerRegistrationMetadata(true);
+                $current_opportunity = $registration->opportunity;
+                
+                $opportunity_last_phase = $current_opportunity->lastPhase ?? $current_opportunity;
+                $opportunity_last_phase->registerRegistrationMetadata(true);
+                
                 $reg_first_phase = $registration->firstPhase;
+                
+                if (!$reg_first_phase) {
+                    echo "ERRO: Registration {$registration->id} sem firstPhase\n";
+                    return;
+                }
     
-                $config = $opportunitysCnab[$opportunity->lastPhase->id];
+                $config = $opportunitysCnab[$opportunity_last_phase->id] ?? null;
+                
+                if (!$config) {
+                    echo "ERRO: Sem configuração para opportunity {$opportunity_last_phase->id}\n";
+                    return;
+                }
     
                 if($config['social_type'] == "category") {
                     $category = $registration->category;
                     $social_type = $config['settings']['social_type'][ $category];
                 }else {
                     $_field = 'field_'.$config['social_type'];
-                    if(!($registration->$_field)) {
+                    if(!($reg_first_phase->$_field)) {
                         echo "VAZIO =========================\n======================== \n\n(status: {$registration->status}) {$registration->number} {$registration->id} === $_field\n\n ==========\n";
                     }
-                    $social_type = $config['settings']['social_type'][$registration->$_field];
+                    $social_type = $config['settings']['social_type'][$reg_first_phase->$_field];
                   
                 }
     
                 $reg_first_phase->payment_social_type = $social_type;
                 $modified = false;
                 foreach($banc_data_fields as $ref => $field) {
-                    $field = $banc_data_fields[$ref];
-    
                     if(is_array($config[$ref])) {
                         $_field = 'field_'.$config[$ref][$social_type];
-                        $value = $registration->$_field;
-                    }else {
+                    } else {
                         $_field = 'field_'.$config[$ref];
-                        $value = $registration->$_field;
                     }
+                    
+                    $value = $reg_first_phase->$_field;
     
                     if($field == 'payment_account_type') {
                         $value = $value === "Conta corrente" ? 1 : 2;
                     }
     
-                    if(!$reg_first_phase->$field && $value || $reg_first_phase->$field != $value) {
+                    $value = $value ?? '';
+                    
+                    if((!$reg_first_phase->$field && $value) || ($reg_first_phase->$field != $value)) {
                         echo "$field ---------> $value\n";
                         $modified = true;
                         $reg_first_phase->$field = $value;

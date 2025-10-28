@@ -775,6 +775,7 @@ class Plugin extends \MapasCulturais\Plugin{
 
         if($request['lotType'] && !$request['ts_lot']) {
             $lot_type = $this->config['file_type'][$request['lotType']];
+            $identifier = 'lote-' . str_pad($request['identifier'], 4, '0', STR_PAD_LEFT);
             if(in_array($request['lotType'], $payment_lot_export[$identifier] ?? [])){
                 $errors[] = i::__("{$identifier} para o arquivo {$lot_type} Já usado anteriormente.");
             }

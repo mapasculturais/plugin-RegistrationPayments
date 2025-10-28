@@ -30,7 +30,10 @@ app.component('registration-payment-form', {
             }
         });
 
-        if (this.evaluationType === "documentary") {
+        if (this.evaluationType === "documentary" && $MAPAS.config.documentaryEvaluationForm) {
+            if (!$MAPAS.config.documentaryEvaluationForm.fieldsInfo) {
+                $MAPAS.config.documentaryEvaluationForm.fieldsInfo = {};
+            }
             $MAPAS.config.documentaryEvaluationForm.fieldsInfo['field_payment'] = { label: this.text('informacoes bancarias'), fieldId: "payment" }
         }
     },
@@ -50,7 +53,7 @@ app.component('registration-payment-form', {
         },
         evaluationType() {
             return $MAPAS.config.registrationPaymentForm.evaluationType;
-        }
+        },
     },
 
     methods: {

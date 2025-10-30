@@ -2,6 +2,7 @@
 
 namespace RegistrationPayments;
 
+use DateTime;
 use Normalizer;
 use CnabPHP\Remessa;
 use MapasCulturais\i;
@@ -12,8 +13,8 @@ use MapasCulturais\Entities\Registration;
 use BankValidator\classes\BankCodeMapping;
 use BankValidator\Validator as BankValidator;
 use RegistrationPayments\JobTypes\GenerateCnab;
+use RegistrationPayments\JobTypes\CnabDataClone;
 use BankValidator\classes\exceptions\NotRegistredBankCode;
-use DateTime;
 
 require_once 'vendor/quilhasoft/opencnabphp/autoloader.php';
 class Plugin extends \MapasCulturais\Plugin{
@@ -170,6 +171,7 @@ class Plugin extends \MapasCulturais\Plugin{
         $app = App::i();
         $app->view->enqueueStyle('app-v2', 'registrationpayments-v2', 'css/plugin-RegistrationPayments.css');
         
+        $app->registerJobType(new CnabDataClone(CnabDataClone::SLUG));
 
         $plugin = $this;
         

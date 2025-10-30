@@ -14,6 +14,7 @@ use RegistrationPayments\Plugin;
 use RegistrationPayments\Payment;
 use MapasCulturais\Entities\Opportunity;
 use MapasCulturais\Entities\Registration;
+use RegistrationPayments\JobTypes\CnabDataClone;
 use MapasCulturais\Entities\RegistrationFieldConfiguration ;
 
 /**
@@ -86,6 +87,17 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }
 
         return $errors;
+    }
+
+    public function GET_cnabDataClone() {
+        $this->requireAuthentication();
+
+        if(!$app->user->is('admin')) {
+            $app->pass();
+        }
+        
+        $app = App::i();
+        $app->enqueueOrReplaceJob(CnabDataClone::SLUG, ['opportunityId' => $this->data['id']]);
     }
 
     public function POST_export() {

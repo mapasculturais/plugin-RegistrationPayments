@@ -152,6 +152,8 @@ return [
         $app->enableAccessControl();
     },
     'Habilita aba de pagamento para as fases de oportunidades legadas' => function() use ($app, $em, $conn) {
+        return false;
+
         $app->log->debug('Teste Db-Update');
 
         if($registration_ids = $conn->fetchAll("SELECT object_id FROM  opportunity_meta WHERE key = 'has_payment_phase' AND value = '1'")) {
@@ -163,6 +165,5 @@ return [
             }
         }
 
-        return false;
     }
 ];

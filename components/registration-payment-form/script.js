@@ -103,6 +103,15 @@ app.component('registration-payment-form', {
                 return true;
             }
 
+            // Verifica se o usuário de suporte tem permissão para editar campos de pagamento
+            const editableFields = this.entity.editableFields || [];
+            const paymentFields = this.paymentDataFields();
+            const hasEditablePaymentField = paymentFields.some(field => editableFields.includes(field));
+            
+            if (hasEditablePaymentField) {
+                return true;
+            }
+
             return false;
         },
 

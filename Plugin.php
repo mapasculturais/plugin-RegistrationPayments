@@ -383,6 +383,38 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Inclui os campos de dados bancários na configuração de suporte
+        $app->hook('component(opportunity-support-config).fields', function (&$result, $entity) use($plugin) {
+            $plugin->registeredPaymentMetadata();
+
+            if (!$entity->active_payment_phase) {
+                return;
+            }
+
+            include __DIR__ . "/registereds/payment_bank_data.php";
+            $displayOrder = 9990;
+            
+            foreach ($payment_bank_data as $ref => $config) {
+                $result[] = [
+                    'id' => $ref,
+                    'title' => $config['label'] ?? $ref,
+                    'ref' => $ref,
+                    'type' => $config['type'] ?? 'string',
+                    'categories' => [],
+                    'proponentTypes' => [],
+                    'registrationRanges' => [],
+                    'config' => $config['config'] ?? [],
+                    'order' => $displayOrder,
+                    'conditional' => false,
+                    'conditionalField' => null,
+                    'required' => !empty($config['validations']['required']),
+                    'displayOrder' => $displayOrder,
+                    'step' => null,
+                ];
+                $displayOrder++;
+            }
+        });
+
         // Sincroniza os dados de pagamento entre as inscrições das fases
         $app->hook('entity(Registration).insert:after', function () use ($plugin) {
             /** @var Opportunity $this */

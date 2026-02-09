@@ -415,6 +415,29 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Inclui os campos de dados bancários na lista de campos editáveis
+        $app->hook('component(registration-editable-fields).fields', function (&$result, $entity) use($plugin) {
+            $plugin->registeredPaymentMetadata();
+
+            if (!$entity->active_payment_phase) {
+                return;
+            }
+
+            include __DIR__ . "/registereds/payment_bank_data.php";
+            $displayOrder = 9990;
+            foreach ($payment_bank_data as $ref => $config) {
+                $result[] = [
+                    'id' => $ref,
+                    'title' => $config['label'] ?? $ref,
+                    'ref' => $ref,
+                    'displayOrder' => $displayOrder,
+                ];
+                $displayOrder++;
+            }
+            
+            usort($result, fn($field1, $field2) => $field1['displayOrder'] <=> $field2['displayOrder']);
+        });
+
         // Sincroniza os dados de pagamento entre as inscrições das fases
         $app->hook('entity(Registration).insert:after', function () use ($plugin) {
             /** @var Opportunity $this */

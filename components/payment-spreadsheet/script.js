@@ -61,7 +61,8 @@ app.component('payment-spreadsheet', {
                     this.response = data
                 } else {
                     messages.success(this.text('exportSuccess'));
-                    window.open(data.url, '_blank');
+                    const downloadUrl = Utils.createUrl('payment', 'downloadFile', { file_id: data.id });
+                    window.open(downloadUrl, '_blank');
                 }
             });
         },
@@ -94,9 +95,17 @@ app.component('payment-spreadsheet', {
             this.processFileLoading = true; 
             api.POST(url).then(res => res.json()).then(data => {
                 this.processFileLoading = false;
-                if (data?.error) {
-                    messages.error(this.text('importError'));
-                    this.response = data
+                const hasError = data?.error === true || Array.isArray(data?.error);
+                const errorPayload = hasError && (Array.isArray(data) || (data && '0' in data))
+                    ? (data[0] ?? data['0'])
+                    : data;
+                if (hasError) {
+                    const notFound = errorPayload?.registration_not_found;
+                    if (Array.isArray(notFound) && notFound.length > 0) {
+                        const list = notFound.join('<br>');
+                        messages.warning(this.text('registrationNotFound') + ' <br>' + list);
+                    }
+                    this.response = errorPayload;
                 } else {
                     modal.close();
                     this.entities.refresh();

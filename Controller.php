@@ -74,10 +74,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $from = isset($request['from']) ? DateTime::createFromFormat('Y-m-d', $request['from']) : null;
         $to = isset($request['to']) ? DateTime::createFromFormat('Y-m-d', $request['to']) : null;
         
-        if (!$registrations) {
-            $errors[] = i::__("Não foram encontrados registros.");   
-        }
-
+        // Não tratar ausência de inscrições como erro: permite baixar CSV modelo (só header)
         if (!$opportunity->canUser('@control')) {
             $errors[] = i::__("Não autorizado");   
         }
@@ -98,6 +95,58 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         $app = App::i();
         $app->enqueueOrReplaceJob(CnabDataClone::SLUG, ['opportunityId' => $this->data['id']]);
+    }
+
+    /**
+     * Força o download do arquivo (Content-Disposition: attachment) em vez de exibir na tela.
+     * Aceita apenas arquivos dos grupos export-financial-validator-files e export-cnab-files.
+     */
+    public function GET_downloadFile()
+    {
+        $this->requireAuthentication();
+
+        $app = App::i();
+        $file_id = (int) ($this->data['file_id'] ?? 0);
+        if (!$file_id) {
+            $this->errorJson(i::__('Arquivo não informado.'), 400);
+        }
+
+        $file = $app->repo('File')->find($file_id);
+        if (!$file) {
+            $this->errorJson(i::__('Arquivo não encontrado.'), 404);
+        }
+
+        $owner = $file->owner;
+        if (!$owner instanceof Opportunity) {
+            $app->pass();
+        }
+        $owner->checkPermission('@control');
+
+        $allowed_groups = ['export-financial-validator-files', 'export-cnab-files'];
+        if (!in_array($file->group, $allowed_groups, true)) {
+            $this->errorJson(i::__('Tipo de arquivo não permitido para download.'), 403);
+        }
+
+        $path = $file->getPath();
+        if (!is_file($path)) {
+            $this->errorJson(i::__('Arquivo não encontrado no servidor.'), 404);
+        }
+
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: ' . (mime_content_type($path) ?: 'application/octet-stream'));
+        header('Content-Disposition: attachment; filename="' . addslashes($file->name) . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($path));
+
+        readfile($path);
+        exit;
     }
 
     public function POST_export() {
@@ -219,11 +268,14 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         }        
         
         //$validador = $this->plugin->getSlug();
-        $hash = md5(json_encode($csv_data));
-
         $dir = PRIVATE_FILES_PATH . "financeiro/";
 
-        $file_name = "validador-financeiro-{$hash}.csv";
+        if (empty($csv_data)) {
+            $file_name = "validador-financeiro-modelo-" . (new DateTime())->format('dmY-His') . ".csv";
+        } else {
+            $hash = md5(json_encode($csv_data));
+            $file_name = "validador-financeiro-{$hash}.csv";
+        }
         $path =  $dir . $file_name;
 
         if (!is_dir($dir)) {
@@ -935,6 +987,7 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         
         $app->disableAccessControl();
         $count = 0;
+        $errors = [];
         foreach ($results as $i => $line) {
             $num = $line['NUMERO'];
             $obs = $line['OBSERVACOES'];
@@ -995,7 +1048,8 @@ class Controller extends \MapasCulturais\Controllers\EntityController
             $registration = $app->repo('Registration')->findOneBy(['number' => $num, 'opportunity' => $opportunity]);
 
             if(!$registration){
-                $app->log->debug($num. " Não encontrada");
+                $errors['registration_not_found'][] = $num;
+                $app->log->debug($num. " Não encontrada na ultima fase ou status diferente de aprovado");
                 continue;
             }
 
@@ -1050,7 +1104,12 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $files->{basename($filename)} = date('d/m/Y \à\s H:i');
         $opportunity->payment_processed_files = $files;
         $opportunity->save(true);
-        $this->finish('ok');
+
+        if($errors){
+            $this->json(['error' => true, $errors]);
+        } else {
+            $this->finish('ok');
+        }
     }
 
     public function getStatus($value) {

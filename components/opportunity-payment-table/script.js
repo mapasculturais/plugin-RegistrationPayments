@@ -276,7 +276,8 @@ app.component('opportunity-payment-table', {
             entities.refresh();
         },
 
-        downloadFile(url) {
+        downloadFile(file) {
+            const url = Utils.createUrl('payment', 'downloadFile', { file_id: file.id });
             window.open(url, '_blank');
         },
         processFile(file) {
@@ -290,9 +291,14 @@ app.component('opportunity-payment-table', {
             
             this.processFileLoading = true;
             api.POST(url).then(res => res.json()).then(data => {
-                if (data?.error) {
+                console.log(data);
+                const hasError = data?.error === true || Array.isArray(data?.error);
+                const errorPayload = hasError && (Array.isArray(data) || (data && '0' in data))
+                    ? (data[0] ?? data['0'])
+                    : data;
+                if (hasError) {
                     messages.error(this.text('processError'));
-                    this.response = data
+                    this.response = errorPayload;
                 } else {
                     let date = new McDate(new Date());
                     this.importedFiles[file.name].processed = true;

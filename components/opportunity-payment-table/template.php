@@ -62,7 +62,7 @@ $url = $app->createUrl('payment', 'export');
 
                             <mc-loading :condition="processFileLoading"><?= i::__('Processando arquivo...') ?></mc-loading>
                             <div v-for="file in paymentProcessed">
-                                <div @click="downloadFile(file.url)" :title="file.name">
+                                <div @click="downloadFile(file)" :title="file.name">
                                     <mc-icon name="download"></mc-icon>
                                     {{file.name.slice(0, 25)}}...
                                 </div>
@@ -88,7 +88,7 @@ $url = $app->createUrl('payment', 'export');
                         <div v-if="cnabProcessed" class="col-6">
                             <h4 class="bold"><?= i::__('Arquivos CNAB240') ?></h4>
                             <div v-for="file in cnabProcessed">
-                                <div @click="downloadFile(file.url)" :title="file.name">
+                                <div @click="downloadFile(file)" :title="file.name">
                                     <mc-icon name="download"></mc-icon>
                                     {{file.name.slice(0, 44)}}...
                                 </div>

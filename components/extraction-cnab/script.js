@@ -48,7 +48,8 @@ app.component('extraction-cnab', {
                     this.response = data
                 } else {
                     messages.success(this.text('generateCnabSuccess'));
-                    window.open(data.url, '_blank');
+                    const downloadUrl = Utils.createUrl('payment', 'downloadFile', { file_id: data.id });
+                    window.open(downloadUrl, '_blank');
                     this.response = {}
                 }
                 this.exportCnabLoading = false;

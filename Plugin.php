@@ -841,6 +841,18 @@ class Plugin extends \MapasCulturais\Plugin{
             $errors[] = i::__("A entidade pagadora nao foi configurada");
         }
 
+        $release_type = null;
+        if ($request['lotType'] !== null && $request['lotType'] !== '') {
+            if (isset($this->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$request['lotType']])) {
+                $release_type = $this->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$request['lotType']];
+            } elseif (isset($this->config['opportunitysCnab']['release_type'][$request['lotType']])) {
+                $release_type = $this->config['opportunitysCnab']['release_type'][$request['lotType']];
+            }
+            if ($release_type === null) {
+                $errors['lotType'] = i::__("Tipo de lote não configurado para esta oportunidade. Verifique a configuração do plugin (opportunitysCnab) na config do mapa.");
+            }
+        }
+
         return $errors;
     }
 

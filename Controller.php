@@ -613,12 +613,17 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $payment_lot_export = json_decode($opportunity->payment_lot_export ?: '[]', true);
         $company_data = $plugin->config['cnab240_company_data'];
 
-        if(isset($plugin->config['opportunitysCnab'][$opportunity->id])) {
+        $lot = null;
+        if (isset($plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$request['lotType']])) {
             $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$request['lotType']];
-        }else {
+        } elseif (isset($plugin->config['opportunitysCnab']['release_type'][$request['lotType']])) {
             $lot = $plugin->config['opportunitysCnab']['release_type'][$request['lotType']];
         }
-        
+        if ($lot === null) {
+            $this->errorJson([
+                'lotType' => i::__('Tipo de lote não configurado para esta oportunidade. Verifique a configuração do plugin (opportunitysCnab) na config do mapa.')
+            ]);
+        }
 
         $paymentDate =  $request['paymentDate'] ?? null;
      
@@ -691,9 +696,9 @@ class Controller extends \MapasCulturais\Controllers\EntityController
                 'data_emissao' => (new DateTime('now'))->format("Y-m-d"), 
 
 
-                //Dados para pagamento
+                //Dados para pagamento (agência só dígitos: a lib CNAB usa number_format e quebra com "3442-5")
                 'codigo_banco_favorecido' => substr(preg_replace('/[^0-9]/', '', $this->processValues('bank', $registration)), 0, 3),
-                'agencia_favorecido' => $this->processValues('branch', $registration),
+                'agencia_favorecido' => $this->normalizeAgencyForCnab($this->processValues('branch', $registration)),
                 'agencia_favorecido_dv' => $this->processValues('branch_dv', $registration),
                 'conta_favorecido' => preg_replace('/[^0-9]/', '', $this->processValues('account', $registration)),
                 'conta_favorecido_dv' => $this->processValues('account_dv', $registration),
@@ -780,7 +785,15 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         $sub_query = "SELECT number FROM registration r";
         $complement_where = "";
         $conn = $app->em->getConnection();
-        $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
+        $lot = null;
+        if (isset($plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']])) {
+            $lot = $plugin->config['opportunitysCnab'][$opportunity->id]['settings']['release_type'][$this->data['lotType']];
+        } elseif (isset($plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']])) {
+            $lot = $plugin->config['opportunitysCnab']['release_type'][$this->data['lotType']];
+        }
+        if ($lot === null) {
+            return [];
+        }
         if($this->data['registrationFilter']){
 
             $registration_numbers = preg_split ('/[,|;|\n|\r ]+/', $this->data['registrationFilter']);
@@ -840,6 +853,21 @@ class Controller extends \MapasCulturais\Controllers\EntityController
         return $ids;
     }
     
+    /**
+     * Normaliza o valor de agência para o CNAB: apenas dígitos (a lib usa number_format e quebra com "3442-5").
+     * Ex.: "3442-5" -> "3442", "3442" -> "3442"
+     *
+     * @param mixed $branch
+     * @return string
+     */
+    protected function normalizeAgencyForCnab($branch)
+    {
+        $s = (string) ($branch ?? '');
+        $parts = preg_split('/[\s\-]+/', $s, 2);
+        $agencyOnly = preg_replace('/[^0-9]/', '', $parts[0] ?? '');
+        return $agencyOnly !== '' ? $agencyOnly : preg_replace('/[^0-9]/', '', $s);
+    }
+
     /**
      * Processa os valores devolvendo os dados que devem ser exibidos
      *

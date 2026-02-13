@@ -32,26 +32,39 @@ app.component('extraction-cnab', {
             }
         },
         hasErrors() {
-            return this.response?.error ? true : false;
+            return this.response?.error === true;
         },
         fieldError(prop) {
-            return this.response?.error && this.response?.data[prop] ? true : false
+            const data = this.response?.data;
+            return this.response?.error === true && data != null && typeof data === 'object' && data[prop];
+        },
+        errorMessages() {
+            const data = this.response?.data;
+            if (!this.response?.error || data == null) return [];
+            if (Array.isArray(data)) return data.filter(Boolean);
+            return Object.values(data).filter(Boolean);
         },
         async exportCnab() {
             const api = new API();
             const messages = useMessages();
             let url = Utils.createUrl('payment', 'generateCnab', { opportunity_id: this.entity.id });
             this.exportCnabLoading = true;
-            api.POST(url, this.cnabData).then(res => res.json()).then(data => {
-                if (data?.error) {
-                    messages.error(this.text('generateCnabError'));
-                    this.response = data
-                } else {
-                    messages.success(this.text('generateCnabSuccess'));
-                    const downloadUrl = Utils.createUrl('payment', 'downloadFile', { file_id: data.id });
-                    window.open(downloadUrl, '_blank');
-                    this.response = {}
-                }
+            api.POST(url, this.cnabData).then(res => {
+                return res.json().then(data => {
+                    if (!res.ok || data?.error) {
+                        messages.error(this.text('generateCnabError'));
+                        this.response = (data && typeof data === 'object') ? data : { error: true, data: [] };
+                    } else {
+                        messages.success(this.text('generateCnabSuccess'));
+                        const downloadUrl = Utils.createUrl('payment', 'downloadFile', { file_id: data.id });
+                        window.open(downloadUrl, '_blank');
+                        this.response = {};
+                    }
+                    this.exportCnabLoading = false;
+                });
+            }).catch(() => {
+                messages.error(this.text('generateCnabError'));
+                this.response = { error: true, data: [] };
                 this.exportCnabLoading = false;
             });
         },

@@ -17,7 +17,7 @@ $this->import('
     <mc-modal title="<?= i::__('Exportar TXT CNAB') ?>">
         <div class="grid-12 extraction-cnab__content">
             <span v-if="hasErrors" class="col-12">
-                <p v-for="item in response?.data" class="field__error">* {{item}}</p>
+                <p v-for="item in errorMessages()" :key="item" class="field__error">* {{ item }}</p>
             </span>
 
             <div class="field col-12" :class="{'error': fieldError('identifier')}">

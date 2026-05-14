@@ -210,7 +210,7 @@ class Plugin extends \MapasCulturais\Plugin{
             $conn->commit();
         }
 
-        $app->hook('mapas.printJsObject:before', function () {            
+        $app->hook('mapas.printJsObject:before', function () use ($app, $plugin) {            
             $statusDic = [
                 ['value' => Payment::STATUS_PENDING, 'label' => i::__("Pendente")],
                 ['value' => Payment::STATUS_PROCESSING, 'label' => i::__("Em processo")],
@@ -231,6 +231,9 @@ class Plugin extends \MapasCulturais\Plugin{
             $this->jsObject['config']['payment']['registrationStatus'] = $registrationStatus;
             $this->jsObject['config']['payment']['statusDic'] = $statusDic;
             $this->jsObject['EntitiesDescription']['payment'] = Payment::getPropertiesMetadata();
+
+            // Adiciona opção única "Dados bancários" à lista de campos visíveis para avaliadores
+            $plugin->addPaymentFieldsToVisibleEvaluators($this);
         });
 
         $app->hook('doctrine.emum(object_type).values', function(&$values) {
@@ -325,12 +328,12 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
-         // Faz o formulário ser exibido na tela de avaliação para o avaliador
-         $app->hook("template(registration.evaluation.registration-evaluation-view):after", function($registration) use ($plugin) {
-             /** @var Theme $this */
-            $plugin->registeredPaymentMetadata();  
+        // Faz o formulário ser exibido na tela de avaliação para o avaliador
+        $app->hook("template(registration.evaluation.registration-evaluation-view):after", function($registration) use ($plugin) {
+            /** @var Theme $this */
+            $plugin->registeredPaymentMetadata();
 
-            if($registration->opportunity->active_payment_phase) {
+            if ($registration->opportunity->active_payment_phase && $plugin->isPaymentFieldsVisibleForEvaluators($registration->opportunity)) {
                 $this->part("registration/registration-payment-form-view", ['entity' => $registration]);
             }
         });
@@ -871,6 +874,72 @@ class Plugin extends \MapasCulturais\Plugin{
     {
         $fields_id = $this->config['fields'];
         return $fields_id[$value] ? "field_".$fields_id[$value] : null;
+    }
+
+    /**
+     * Adiciona os campos de pagamento à lista de campos visíveis para avaliadores
+     * 
+     * @param Theme $view
+     */
+    function addPaymentFieldsToVisibleEvaluators($view)
+    {
+        $app = App::i();
+        $entity = $view->controller->requestedEntity ?? null;
+        
+        // Obtém a oportunidade dependendo do contexto
+        $opportunity = null;
+        if ($entity instanceof \MapasCulturais\Entities\Opportunity) {
+            $opportunity = $entity;
+        } elseif ($entity instanceof \MapasCulturais\Entities\Registration) {
+            $opportunity = $entity->opportunity;
+        }
+
+        if (!$opportunity || !$opportunity->active_payment_phase) {
+            return;
+        }
+
+        $phases_fields = $view->jsObject['config']['fieldsVisibleEvaluators'] ?? [];
+        
+        // Adiciona apenas uma opção única "Dados bancários" para controlar todo o bloco
+        $payment_fields = [
+            [
+                'fieldName' => 'paymentData',
+                'title' => i::__('Dados bancários'),
+            ]
+        ];
+
+        // Adiciona os campos de pagamento em todas as fases da oportunidade
+        if (isset($phases_fields[$opportunity->id])) {
+            $phases_fields[$opportunity->id] = array_merge($phases_fields[$opportunity->id], $payment_fields);
+        }
+
+        // Também adiciona nas fases anteriores
+        $phase = $opportunity;
+        while ($phase = $phase->previousPhase) {
+            if (isset($phases_fields[$phase->id])) {
+                $phases_fields[$phase->id] = array_merge($phases_fields[$phase->id], $payment_fields);
+            }
+        }
+
+        $view->jsObject['config']['fieldsVisibleEvaluators'] = $phases_fields;
+    }
+
+    /**
+     * Verifica se algum campo de pagamento está habilitado para os avaliadores
+     * 
+     * @param Opportunity $opportunity
+     * @return bool
+     */
+    function isPaymentFieldsVisibleForEvaluators($opportunity)
+    {
+        $avaliableEvaluationFields = $opportunity->avaliableEvaluationFields ?? [];
+        
+        if (empty($avaliableEvaluationFields)) {
+            return true; // Se não há configuração, mostra por padrão
+        }
+
+        // Verifica se a opção única "Dados bancários" está habilitada
+        return isset($avaliableEvaluationFields['paymentData']) && $avaliableEvaluationFields['paymentData'] === "true";
     }
 
     function registeredPaymentMetadata()

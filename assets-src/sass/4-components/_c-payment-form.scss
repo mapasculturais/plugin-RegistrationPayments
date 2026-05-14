@@ -21,28 +21,4 @@
     &.evaluation-invalid {
         background-color: #FFE3E3;
     }
-
-    &__view {
-        .field {
-            label {
-                font-family: 'Open Sans';
-                font-style: normal;
-                font-weight: 700;
-                font-size: 14px;
-                line-height: 19px;
-
-                &.is-required::before { 
-                    content: "*";
-                }
-            }
-
-            span {
-                font-family: 'Open Sans';
-                font-style: normal;
-                font-weight: 700;
-                font-size: 18px;
-                line-height: 25px;
-            }
-        }
-    }
 }

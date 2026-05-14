@@ -59,6 +59,7 @@ $payment_bank_data = [
             '341' => i::__("Itaú Unibanco S.A - 341"),
             '104' => i::__("Caixa Econômica Federal (CEF) - 104"),
             '403' => i::__("Cora Sociedade De Crédito Direto S.A. - 403"),
+            '380' => i::__("PicPay - 380"),
             '33'  => i::__("Banco Santander Brasil S.A - 33"),
             '212' => i::__("Banco Original S.A - 212"),
             '422' => i::__("Banco Safra S.A - 422"),

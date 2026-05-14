@@ -98,13 +98,21 @@ app.component('registration-payment-form', {
             }
         },
 
+        getFieldLabel(field, value) {
+            const options = $DESCRIPTIONS.registration[field]?.options;
+            if (options && value !== undefined && value !== null) {
+                return options[value] ?? value;
+            }
+            return value;
+        },
+
         isEditable() {
             if (this.entity.status == 0 || this.entity.active_payment_phase) {
                 return true;
             }
 
             // Verifica se o usuário de suporte tem permissão para editar campos de pagamento
-            const editableFields = this.entity.editableFields || [];
+            const editableFields = Array.isArray(this.entity.editableFields) ? this.entity.editableFields : [];
             const paymentFields = this.paymentDataFields();
             const hasEditablePaymentField = paymentFields.some(field => editableFields.includes(field));
             

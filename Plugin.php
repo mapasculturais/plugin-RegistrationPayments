@@ -284,15 +284,71 @@ class Plugin extends \MapasCulturais\Plugin{
                 $this->save_first_phase = true;
                 self::$save_first_phase =  true;
                 $first_phase = $this->firstPhase;
-                $first_phase->$property_name = $value;
+                if ($first_phase) {
+                    $first_phase->$property_name = $value;
+                }
             }
         });
         
         // salva o dados de pagamentos na primeira fase
-        $app->hook('entity(registration).save:finish', function() use($app){
+        $app->hook('entity(registration).save:finish', function() use($app, $plugin){
             if($this->save_first_phase && !isset(self::$saved_ids[$this->id])) {
                 self::$saved_ids[$this->id] = true; 
-                $this->firstPhase->save(true);
+                $first_phase = $this->firstPhase;
+                if ($first_phase && $plugin->hasPaymentDataToSync($this, $first_phase)) {
+                    $plugin->syncPaymentDataToFirstPhase($this, $first_phase);
+                    $first_phase->save(true);
+                }
+            }
+        });
+
+        // Sincroniza dados bancários ao visualizar inscrição
+        $app->hook("template(registration.view.registration-form-view):before", function($registration) use ($plugin) {
+            if (!$registration->opportunity || $registration->opportunity->isFirstPhase) {
+                return;
+            }
+            
+            $first_phase = $registration->firstPhase;
+            if (!$first_phase) {
+                return;
+            }
+            
+            // Só sincroniza se a oportunidade tem fase de pagamento ativa
+            if (!$registration->opportunity->active_payment_phase && !$first_phase->opportunity->active_payment_phase) {
+                return;
+            }
+            
+            $plugin->registeredPaymentMetadata();
+            
+            if ($plugin->hasPaymentDataToSync($registration, $first_phase)) {
+                $plugin->syncPaymentDataToFirstPhase($registration, $first_phase);
+                $first_phase->save(true);
+            }
+        });
+
+        // Sincroniza dados bancários ao editar inscrição
+        $app->hook("component(registration-form):before", function() use ($app, $plugin) {
+            $registration = $this->controller->requestedEntity;
+            
+            if (!$registration || !$registration->opportunity || $registration->opportunity->isFirstPhase) {
+                return;
+            }
+            
+            $first_phase = $registration->firstPhase;
+            if (!$first_phase) {
+                return;
+            }
+            
+            // Só sincroniza se a oportunidade tem fase de pagamento ativa
+            if (!$registration->opportunity->active_payment_phase && !$first_phase->opportunity->active_payment_phase) {
+                return;
+            }
+            
+            $plugin->registeredPaymentMetadata();
+            
+            if ($plugin->hasPaymentDataToSync($registration, $first_phase)) {
+                $plugin->syncPaymentDataToFirstPhase($registration, $first_phase);
+                $first_phase->save(true);
             }
         });
 
@@ -940,6 +996,72 @@ class Plugin extends \MapasCulturais\Plugin{
 
         // Verifica se a opção única "Dados bancários" está habilitada
         return isset($avaliableEvaluationFields['paymentData']) && $avaliableEvaluationFields['paymentData'] === "true";
+    }
+
+    /**
+     * Retorna a lista de campos de dados bancários
+     * 
+     * @return array
+     */
+    function getPaymentDataFields()
+    {
+        return [
+            'payment_social_type',
+            'payment_proponent_name',
+            'payment_proponent_document',
+            'payment_account_type',
+            'payment_bank',
+            'payment_branch',
+            'payment_branch_dv',
+            'payment_account',
+            'payment_account_dv',
+        ];
+    }
+
+    /**
+     * Verifica se há dados de pagamento para sincronizar da fase atual para a primeira fase
+     * 
+     * @param Registration $registration
+     * @param Registration $first_phase
+     * @return bool
+     */
+    function hasPaymentDataToSync($registration, $first_phase)
+    {
+        $fields = $this->getPaymentDataFields();
+        
+        foreach ($fields as $field) {
+            $current_value = $registration->$field ?? '';
+            $first_phase_value = $first_phase->$field ?? '';
+            
+            // Se o campo atual tem valor e é diferente do valor na primeira fase
+            if ($current_value !== '' && $current_value != $first_phase_value) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Sincroniza os dados de pagamento da fase atual para a primeira fase
+     * 
+     * @param Registration $registration
+     * @param Registration $first_phase
+     * @return void
+     */
+    function syncPaymentDataToFirstPhase($registration, $first_phase)
+    {
+        $fields = $this->getPaymentDataFields();
+        
+        foreach ($fields as $field) {
+            $current_value = $registration->$field ?? '';
+            $first_phase_value = $first_phase->$field ?? '';
+            
+            // Só sincroniza se o valor atual é diferente e não está vazio
+            if ($current_value !== '' && $current_value != $first_phase_value) {
+                $first_phase->$field = $current_value;
+            }
+        }
     }
 
     function registeredPaymentMetadata()

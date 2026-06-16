@@ -297,13 +297,13 @@ class Plugin extends \MapasCulturais\Plugin{
                 $first_phase = $this->firstPhase;
                 if ($first_phase && $plugin->hasPaymentDataToSync($this, $first_phase)) {
                     $plugin->syncPaymentDataToFirstPhase($this, $first_phase);
-                    $first_phase->save(true);
+                    $plugin->saveFirstPhase($first_phase);
                 }
             }
         });
 
         // Sincroniza dados bancários ao visualizar inscrição
-        $app->hook("template(registration.view.registration-form-view):before", function($registration) use ($plugin) {
+        $app->hook("template(registration.view.registration-form-view):before", function($registration) use ($plugin, $app) {
             if (!$registration->opportunity || $registration->opportunity->isFirstPhase) {
                 return;
             }
@@ -319,10 +319,10 @@ class Plugin extends \MapasCulturais\Plugin{
             }
             
             $plugin->registeredPaymentMetadata();
-            
+
             if ($plugin->hasPaymentDataToSync($registration, $first_phase)) {
                 $plugin->syncPaymentDataToFirstPhase($registration, $first_phase);
-                $first_phase->save(true);
+                $plugin->saveFirstPhase($first_phase);
             }
         });
 
@@ -348,7 +348,7 @@ class Plugin extends \MapasCulturais\Plugin{
             
             if ($plugin->hasPaymentDataToSync($registration, $first_phase)) {
                 $plugin->syncPaymentDataToFirstPhase($registration, $first_phase);
-                $first_phase->save(true);
+                $plugin->saveFirstPhase($first_phase);
             }
         });
 
@@ -1040,6 +1040,19 @@ class Plugin extends \MapasCulturais\Plugin{
         }
         
         return false;
+    }
+
+    /**
+     * Salva a inscrição da primeira fase durante sincronização de dados bancários
+     * 
+     * @param Registration $first_phase
+     * @return void
+     */
+    function saveFirstPhase($first_phase)
+    {
+        self::$save_first_phase = true;
+        $first_phase->save(true);
+        self::$save_first_phase = false;
     }
 
     /**

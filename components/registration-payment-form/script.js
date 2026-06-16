@@ -17,6 +17,16 @@ app.component('registration-payment-form', {
     },
 
     mounted() {
+        const paymentData = $MAPAS.config.registrationPaymentForm?.paymentData;
+        if (paymentData) {
+            this.paymentDataFields().forEach(field => {
+                const value = paymentData[field];
+                if (value !== undefined && value !== null && value !== '') {
+                    this.entity[field] = value;
+                }
+            });
+        }
+
         const self = this;
         window.addEventListener('message', (event) => {
             if (event.data?.type == 'evaluationForm.openForm' && event.data.fieldName != 'field_payment') {
@@ -62,11 +72,22 @@ app.component('registration-payment-form', {
                 return true;
             }
 
+            if (['view', 'single'].includes($MAPAS.route.action)) {
+                const paymentStepForm = this.entity.opportunity?.payment_step_form
+                    || $MAPAS.config.registrationPaymentForm?.opportunity?.payment_step_form;
+                if (paymentStepForm) {
+                    return true;
+                }
+                if (this.paymentDataFields().some(field => this.entity[field])) {
+                    return true;
+                }
+            }
+
             if(this.entity.opportunity.registrationSteps.length <= 1) {
                 return true;
             }
 
-            if((this.entity.opportunity.payment_step_form == 0 || !this.entity.opportunity.payment_step_form) && this.step.id == this.entity.opportunity.registrationSteps[0].id) {
+            if(this.step && (this.entity.opportunity.payment_step_form == 0 || !this.entity.opportunity.payment_step_form) && this.step.id == this.entity.opportunity.registrationSteps[0].id) {
                 return true;
             }
 

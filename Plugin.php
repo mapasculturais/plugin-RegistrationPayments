@@ -1156,9 +1156,17 @@ class Plugin extends \MapasCulturais\Plugin{
      */
     function saveFirstPhase($first_phase)
     {
+        $app = App::i();
+
         self::$save_first_phase = true;
-        $first_phase->save(true);
-        self::$save_first_phase = false;
+        $app->disableAccessControl();
+
+        try {
+            $first_phase->save(true);
+        } finally {
+            $app->enableAccessControl();
+            self::$save_first_phase = false;
+        }
     }
 
     /**

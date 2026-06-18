@@ -363,17 +363,14 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
-        // Insere o dados de pagamentos da primeira fase no jsonSerialize da inscrição
-        $app->hook('entity(registration).jsonSerialize', function(&$result) use($app){
-            $result['payment_social_type'] = $this->isFirstPhase ? $this->payment_social_type : $this->firstPhase->payment_social_type;
-            $result['payment_proponent_name'] = $this->isFirstPhase ? $this->payment_proponent_name : $this->firstPhase->payment_proponent_name;
-            $result['payment_proponent_document'] = $this->isFirstPhase ? $this->payment_proponent_document :$this->firstPhase->payment_proponent_document;
-            $result['payment_account_type'] = $this->isFirstPhase ? $this->payment_account_type : $this->firstPhase->payment_account_type;
-            $result['payment_bank'] = $this->isFirstPhase ? $this->payment_bank :$this->firstPhase->payment_bank;
-            $result['payment_branch'] = $this->isFirstPhase ? $this->payment_branch : $this->firstPhase->payment_branch;
-            $result['payment_branch_dv'] = $this->isFirstPhase ? $this->payment_branch_dv : $this->firstPhase->payment_branch_dv;
-            $result['payment_account'] = $this->isFirstPhase ? $this->payment_account : $this->firstPhase->payment_account;
-            $result['payment_account_dv'] = $this->isFirstPhase ? $this->payment_account_dv : $this->firstPhase->payment_account_dv;
+        // Insere os dados de pagamento na serialização sem sobrescrever a fase atual com nulos da primeira fase
+        $app->hook('entity(registration).jsonSerialize', function(&$result) use($plugin){
+            /** @var Registration $registration */
+            $registration = $this;
+
+            foreach($plugin->getPaymentDataFields() as $field) {
+                $result[$field] = $plugin->getPaymentDataValueForSerialization($registration, $field);
+            }
         });
 
         // Faz o formulário ser exibido no modo de visualização da inscrição
@@ -406,6 +403,12 @@ class Plugin extends \MapasCulturais\Plugin{
             }
         });
 
+        // Evita que autosaves com valores vazios apaguem dados bancários já preenchidos
+        $app->hook("entity(Registration).save:before", function() use($plugin) {
+            /** @var Registration $this */
+            $plugin->preservePaymentDataFromBlankAutosave($this);
+        });
+
          // Remove os erros de validação dos campos de pagamento para inscrições nao selecionadas na fase final
          $app->hook('entity(Registration).validationErrors', function(&$errors) {
             /** @var Registration $this */
@@ -414,6 +417,31 @@ class Plugin extends \MapasCulturais\Plugin{
                 $fields_meta = array_keys($payment_bank_data);
                 foreach($fields_meta as $value) {
                     unset($errors[$value]);
+                }
+            }
+        });
+
+        // Valida os campos obrigatórios de pagamento também no envio da inscrição
+        $app->hook('entity(Registration).sendValidationErrors', function(&$errors) {
+            /** @var Registration $this */
+            if(!$this->opportunity->active_payment_phase) {
+                return;
+            }
+
+            include __DIR__."/registereds/payment_bank_data.php";
+
+            foreach($payment_bank_data as $field => $definition) {
+                $validations = $definition['validations'] ?? [];
+
+                if(!isset($validations['required'])) {
+                    continue;
+                }
+
+                $value = $this->$field ?? null;
+                $is_empty = is_array($value) ? count($value) === 0 : trim((string) $value) === '';
+
+                if($is_empty) {
+                    $errors[$field] = [$validations['required']];
                 }
             }
         });
@@ -1016,6 +1044,84 @@ class Plugin extends \MapasCulturais\Plugin{
             'payment_account',
             'payment_account_dv',
         ];
+    }
+
+    function isPaymentDataValueEmpty($value)
+    {
+        if(is_array($value)) {
+            return count($value) === 0;
+        }
+
+        return trim((string) $value) === '';
+    }
+
+    /**
+     * Retorna o valor de pagamento usando a fase atual como fonte principal e a primeira fase como fallback.
+     */
+    function getPaymentDataValueForSerialization(Registration $registration, string $field)
+    {
+        $current_value = $registration->$field ?? null;
+
+        if($registration->isFirstPhase || !$this->isPaymentDataValueEmpty($current_value)) {
+            return $current_value;
+        }
+
+        $first_phase = $registration->firstPhase;
+        if($first_phase) {
+            $first_phase_value = $first_phase->$field ?? null;
+
+            if(!$this->isPaymentDataValueEmpty($first_phase_value)) {
+                return $first_phase_value;
+            }
+        }
+
+        return $current_value;
+    }
+
+    /**
+     * Protege dados bancários já salvos contra autosaves que enviam valores vazios após a tela receber nulos.
+     */
+    function preservePaymentDataFromBlankAutosave(Registration $registration)
+    {
+        if($registration->isNew() || $registration->isFirstPhase || !$registration->opportunity->active_payment_phase) {
+            return;
+        }
+
+        $first_phase = $registration->firstPhase;
+
+        foreach($this->getPaymentDataFields() as $field) {
+            $current_value = $registration->$field ?? null;
+
+            if(!$this->isPaymentDataValueEmpty($current_value)) {
+                continue;
+            }
+
+            $stored_value = $this->getStoredRegistrationPaymentValue($registration, $field);
+            if(!$this->isPaymentDataValueEmpty($stored_value)) {
+                $registration->$field = $stored_value;
+                continue;
+            }
+
+            $first_phase_value = $first_phase ? ($first_phase->$field ?? null) : null;
+            if(!$this->isPaymentDataValueEmpty($first_phase_value)) {
+                $registration->$field = $first_phase_value;
+            }
+        }
+    }
+
+    function getStoredRegistrationPaymentValue(Registration $registration, string $field)
+    {
+        $app = App::i();
+        $conn = $app->em->getConnection();
+        $stmt = $conn->executeQuery(
+            'SELECT value FROM registration_meta WHERE object_id = :object_id AND key = :field LIMIT 1',
+            [
+                'object_id' => $registration->id,
+                'field' => $field,
+            ]
+        );
+
+        return $stmt->fetchOne();
     }
 
     /**

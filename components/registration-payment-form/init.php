@@ -21,8 +21,10 @@ if ($em = $entity->getEvaluationMethod()) {
   $evaluation_type = $em->slug;
 }
 
-$paymentData = $entity->firstPhase->simplify("id,payment_social_type,payment_proponent_name,payment_proponent_document,payment_account_type,payment_bank,payment_branch,payment_branch_dv,payment_account,payment_account_dv,payment_sent_timestamp");
-$opportunity = $entity->firstPhase->opportunity->simplify('id,active_payment_phase,payment_step_form,has_payment_phase');
+$paymentDataSource = $entity->firstPhase ?: $entity;
+
+$paymentData = $paymentDataSource->simplify("id,payment_social_type,payment_proponent_name,payment_proponent_document,payment_account_type,payment_bank,payment_branch,payment_branch_dv,payment_account,payment_account_dv,payment_sent_timestamp");
+$opportunity = $paymentDataSource->opportunity->simplify('id,active_payment_phase,payment_step_form,has_payment_phase');
 
 $this->jsObject['config']['registrationPaymentForm'] = [
   'paymentData' => $paymentData,
